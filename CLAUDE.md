@@ -164,6 +164,7 @@ npm run lh
 
 1. **このプロジェクトの完全仕様** → `reference/rishiri_3d_site_procedure_ai_optimized.html`
 2. **要件定義** → `docs/01-requirements.md`
-3. **参考サイト** → https://haru-ni.net
-4. **R3F公式** → https://r3f.docs.pmnd.rs/
-5. **WPGraphQL** → https://www.wpgraphql.com/
+3. **コンテンツスキーマ** → `docs/03-content-schema.md`
+4. **参考サイト** → https://haru-ni.net
+5. **R3F公式** → https://r3f.docs.pmnd.rs/
+6. **WPGraphQL** → https://www.wpgraphql.com/
