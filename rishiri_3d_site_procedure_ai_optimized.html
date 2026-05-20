@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>利尻島 3Dサイト構築 手順書（AI最適化版）</title>
+
+<!-- ====== AI-readable meta ====== -->
+<meta name="description" content="ヘッドレスWordPress + Next.js + React Three Fiberで利尻島の3Dポップなインタラクティブサイトを構築する完全手順書。スクロール連動回転（範囲制限）、ローポリGLB、ピン経由で求人/イベント/観光地/コラムを表示。">
+<meta name="ai-document-type" content="project-specification-and-procedure">
+<meta name="ai-intended-use" content="Share with AI assistants as full project context to receive specific, actionable help on any phase or technical issue.">
+<meta name="project-stack" content="Next.js 14 App Router, React Three Fiber, drei, Lenis, Zustand, TanStack Query, WordPress (headless), WPGraphQL, ACF Pro, Blender, GLB+Draco">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+Antique:wght@400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,800;1,9..144,500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<!-- ====== Machine-readable project spec for AI ====== -->
+<script type="application/json" id="ai-project-context">
+{
+  "documentType": "project-specification-and-procedure",
+  "documentPurpose": "When the human shares this document with an AI assistant, the AI should read this JSON first to fully understand the project context, then answer the human's question with this context in mind. Be specific and actionable; reference the relevant Phase number when applicable.",
+  "project": {
+    "name": "利尻島3Dポップサイト",
+    "shortDescription": "利尻島を忠実にローポリ&ポップに3D化し、ピンを経由して求人・イベント・観光地・コラム記事を発見できるインタラクティブサイト",
+    "referenceSite": "https://haru-ni.net",
+    "referenceSiteNotes": "鹿児島の街を3Dポップに表現している。利尻島版を作るが、街ではなく島全体が舞台。",
+    "primaryGoal": "利尻島の魅力を3D体験として伝え、求人応募・イベント参加・観光客誘致・コラム閲覧へつなげる",
+    "targetAudience": ["利尻島への移住検討者", "観光客", "求職者", "島に興味がある一般読者"]
+  },
+  "confirmedDecisions": {
+    "architecture": {
+      "value": "B. Headless WordPress + Next.js frontend",
+      "rationale": "3Dとインタラクションが体験の中核なので、表現力とパフォーマンスを優先。WPはCMSとしてのみ使用。"
+    },
+    "cameraInteraction": {
+      "value": "Scroll-linked rotation with limited range",
+      "rationale": "スクロールで島がぐるりと回る体験。ただし回転範囲を制限することで(1)操作迷子を防ぎ、(2)島の裏側のモデリングを省略できる(工数削減)。",
+      "implementation": "Lenis(smooth scroll) + drei useScroll → island.rotation.y にマッピング → THREE.MathUtils.clamp で例えば -π/4 〜 +π/4 に制限"
+    },
+    "mobileStrategy": {
+      "value": "Lightweight 3D (not 2D fallback)",
+      "rationale": "ブランド体験を保つためモバイルでも3Dを維持。ただしLOD切替・dpr制限・影オフでパフォーマンスを確保。"
+    },
+    "wpTheme": {
+      "value": "Build from scratch (no parent theme)",
+      "rationale": "ヘッドレス運用なのでフロント表示用のテーマ機能は不要。管理機能とAPIに専念したミニマルなテーマを自作。"
+    },
+    "contentTypes": ["求人(recruit)", "イベント(event)", "観光地(spot)", "コラム(column)"]
+  },
+  "techStack": {
+    "frontend": {
+      "framework": "Next.js 14 (App Router)",
+      "language": "TypeScript",
+      "3d": ["@react-three/fiber", "@react-three/drei", "@react-three/postprocessing", "three"],
+      "scroll": "Lenis",
+      "state": "Zustand",
+      "data": "TanStack Query (or SWR)",
+      "graphql": "graphql-request + GraphQL Codegen",
+      "styling": "Tailwind CSS or CSS Modules",
+      "animation": "Framer Motion (for UI)",
+      "deploy": "Vercel"
+    },
+    "backend": {
+      "cms": "WordPress (headless mode)",
+      "plugins": ["WPGraphQL", "ACF Pro", "ACF for WPGraphQL", "CPT UI"],
+      "auth": "Application Passwords or JWT",
+      "hosting": ["Kinsta", "WP Engine", "Cloudways"]
+    },
+    "3dAssets": {
+      "modeler": "Blender",
+      "format": "glTF/GLB",
+      "compression": ["Draco", "Meshopt"],
+      "elevationData": "国土地理院 DEM",
+      "targetPolyCount": "50000-100000",
+      "targetFileSize": "2-5 MB"
+    }
+  },
+  "phases": [
+    {"id": 1, "name": "要件定義・設計", "durationDays": [3,5], "produces": ["ワイヤーフレーム", "ピン配置マップ(2D)", "コンテンツスキーマ", "カラーパレット"]},
+    {"id": 2, "name": "3Dアセット制作", "durationDays": [7,14], "produces": ["island.glb (高品質版)", "island-mobile.glb (LOD版)"], "requires": ["Phase 1 のピン配置マップ"]},
+    {"id": 3, "name": "WordPress構築", "durationDays": [3,5], "produces": ["WP環境", "4つのCPT", "ACFフィールド", "WPGraphQLエンドポイント"], "requires": ["Phase 1 のコンテンツスキーマ"]},
+    {"id": 4, "name": "フロントエンド基盤", "durationDays": [3,5], "produces": ["Next.jsプロジェクト", "ディレクトリ構造", "APIクライアント"]},
+    {"id": 5, "name": "3Dシーン実装", "durationDays": [7,14], "produces": ["3Dシーンコンポーネント", "スクロール連動回転"], "requires": ["Phase 2のGLB", "Phase 4の基盤"]},
+    {"id": 6, "name": "ピン・コンテンツ実装", "durationDays": [5,7], "produces": ["ピン表示", "モーダル", "カテゴリフィルタ"], "requires": ["Phase 3のAPI", "Phase 5の3Dシーン"]},
+    {"id": 7, "name": "モバイル最適化", "durationDays": [3,5], "produces": ["LOD自動切替", "タッチ操作", "Lighthouseスコア改善"]},
+    {"id": 8, "name": "テスト・デプロイ", "durationDays": [3,5], "produces": ["本番環境", "監視設定", "運用ドキュメント"]}
+  ],
+  "commonPitfalls": [
+    {"area": "WordPress", "issue": "CORS設定漏れでフロントからAPI叩けない", "solution": "functions.phpか専用プラグインで Access-Control-Allow-Origin ヘッダを適切に設定"},
+    {"area": "WordPress", "issue": "ヘッドレス時にWP標準のプレビュー機能が動かない", "solution": "Next.jsのDraft Mode + WP側のプレビュー用エンドポイントを実装"},
+    {"area": "3D", "issue": "GLBファイルのMIMEタイプが application/octet-stream になりキャッシュ効率が悪い", "solution": "ホスティング側で model/gltf-binary を設定"},
+    {"area": "3D", "issue": "iOS Safari で 3D がカクつく/落ちる", "solution": "dpr 上限を下げる、影をオフ、ポストエフェクト削減、LODモデル使用"},
+    {"area": "Scroll", "issue": "Lenis と native scroll の干渉でスクロール量がズレる", "solution": "Lenis を一元化し、ScrollTrigger等を使う場合は同期させる"},
+    {"area": "3D", "issue": "回転制限のロジックがイージングと噛み合わずカクつく", "solution": "clamp で角度を制限したあと、damp で慣性をつける順序にする"},
+    {"area": "Operation", "issue": "ピン座標(X/Y/Z)を編集者が手で入力するのが現実的でない", "solution": "管理画面に専用マップピッカーUIを実装するか、別のJSONファイルで管理"},
+    {"area": "Performance", "issue": "ピンが多いとHTMLオーバーレイで重くなる", "solution": "Spriteベースに切替 or 視錐台外のピンを非表示化"}
+  ],
+  "fileStructureSuggestion": {
+    "frontend": {
+      "/app": "App Router pages",
+      "/components/scene": "Canvas, Island, Pins, Lighting",
+      "/components/ui": "Modal, Filter, Nav",
+      "/lib/wp": "GraphQL client and queries",
+      "/lib/three": "Helpers (clamp rotation, billboard)",
+      "/public/models": "island.glb, island-mobile.glb",
+      "/store": "Zustand stores"
+    }
+  },
+  "howToAskAi": {
+    "template": "私はこのドキュメントに記載のプロジェクトを構築しています。今 Phase [N] の作業中で、[具体的な状況] に直面しています。コードは [貼り付け] です。このプロジェクトの方針(特に [関連する決定事項]) を踏まえて、解決策を提案してください。",
+    "examples": [
+      "Phase 5 で Lenis を入れたらスクロールがカクつくようになりました。原因と修正方法を教えてください。",
+      "Phase 3 のACFで座標フィールドを作りたいのですが、3D空間の座標を編集者が直感的に入れられるUIにしたいです。実装方針を3案出してください。",
+      "Phase 2 のBlenderで利尻富士のローポリ化をしています。シルエットを保ちながらポリゴンを5000以下にする手順を教えてください。"
+    ]
+  }
+}
+</script>
+
+<style>
+  :root{
+    --bg:#FAF6EE;
+    --bg-2:#F2EBDD;
+    --ink:#1F1B16;
+    --ink-soft:#5C544A;
+    --line:#E2D7C2;
+    --ocean:#0E5E7A;
+    --ocean-deep:#0A4258;
+    --sky:#7EC8DF;
+    --coral:#F26A5A;
+    --sun:#F5C642;
+    --moss:#5C8F6E;
+    --lavender:#9B7BB8;
+    --paper:#FFFDF7;
+    --shadow: 0 1px 0 rgba(31,27,22,0.06), 0 12px 28px -16px rgba(14,94,122,0.18);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Zen Kaku Gothic Antique","Helvetica Neue",sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(126,200,223,0.18), transparent 38%),
+      radial-gradient(circle at 92% 22%, rgba(245,198,66,0.14), transparent 42%),
+      radial-gradient(circle at 50% 110%, rgba(242,106,90,0.10), transparent 55%);
+    line-height:1.75;
+    letter-spacing:0.02em;
+    font-feature-settings:"palt";
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:64px 28px 96px}
+
+  /* ===== AI Badge ===== */
+  .ai-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 12px;border-radius:999px;
+    background:var(--ocean);color:#fff;
+    font-family:"JetBrains Mono",monospace;font-weight:500;font-size:11.5px;
+    letter-spacing:0.06em;text-transform:uppercase;
+    margin-bottom:18px;
+  }
+  .ai-badge::before{
+    content:"";width:8px;height:8px;border-radius:50%;
+    background:var(--sun);
+    box-shadow:0 0 0 3px rgba(245,198,66,0.35);
+  }
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    padding:48px 0 24px;
+    border-bottom:1px dashed var(--line);
+    margin-bottom:48px;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:"Fraunces",serif;font-style:italic;font-weight:500;
+    font-size:14px;color:var(--ocean);
+    letter-spacing:0.08em;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{content:"";width:32px;height:1px;background:var(--ocean)}
+  h1{
+    font-family:"Zen Maru Gothic",sans-serif;
+    font-weight:900;
+    font-size:clamp(34px,5.4vw,54px);
+    line-height:1.2;
+    margin:0 0 18px;
+    letter-spacing:0.01em;
+  }
+  h1 .pop{
+    display:inline-block;
+    background:linear-gradient(180deg, transparent 60%, var(--sun) 60%, var(--sun) 92%, transparent 92%);
+    padding:0 4px;
+  }
+  h1 .accent{color:var(--coral)}
+  .lead{
+    max-width:720px;
+    font-size:16.5px;color:var(--ink-soft);
+    margin:0 0 32px;
+  }
+  .island-ornament{
+    position:absolute;right:-12px;top:24px;
+    width:180px;height:140px;opacity:0.85;
+    pointer-events:none;
+  }
+  @media (max-width:720px){.island-ornament{display:none}}
+
+  /* ===== AI How-To Box ===== */
+  .ai-howto{
+    margin:0 0 48px;
+    padding:28px 30px;
+    background:linear-gradient(180deg, #0A4258 0%, #0E5E7A 100%);
+    color:#F4F8FA;
+    border-radius:20px;
+    position:relative;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .ai-howto::before{
+    content:"AI ASSIST";
+    position:absolute;top:18px;right:24px;
+    font-family:"JetBrains Mono",monospace;font-weight:700;font-size:11px;
+    letter-spacing:0.18em;color:var(--sun);opacity:0.9;
+  }
+  .ai-howto h2{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;
+    font-size:22px;margin:0 0 8px;color:#fff;
+  }
+  .ai-howto p{color:#CFE0E6;margin:0 0 16px;font-size:14.5px}
+  .ai-howto .copy-block{
+    background:rgba(0,0,0,0.25);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:10px;
+    padding:14px 16px;
+    font-family:"JetBrains Mono",monospace;font-size:12.5px;
+    color:#E8F3F7;line-height:1.7;
+    white-space:pre-wrap;
+  }
+  .ai-howto .examples{margin-top:14px;padding-left:18px;color:#CFE0E6;font-size:13.5px}
+  .ai-howto .examples li{margin:4px 0}
+
+  /* ===== Summary card ===== */
+  .summary{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .summary .cell{padding:22px 22px;border-right:1px solid var(--line)}
+  .summary .cell:last-child{border-right:none}
+  .summary .label{
+    font-family:"Fraunces",serif;font-style:italic;
+    font-size:12px;color:var(--ocean);
+    letter-spacing:0.1em;text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .summary .val{
+    font-family:"Zen Maru Gothic",sans-serif;
+    font-weight:700;font-size:22px;color:var(--ink);
+  }
+  .summary .val small{
+    font-size:12.5px;font-weight:500;color:var(--ink-soft);margin-left:4px;
+  }
+  @media (max-width:720px){
+    .summary{grid-template-columns:repeat(2,1fr)}
+    .summary .cell{border-right:none;border-bottom:1px solid var(--line)}
+    .summary .cell:nth-child(odd){border-right:1px solid var(--line)}
+    .summary .cell:nth-last-child(-n+2){border-bottom:none}
+  }
+
+  /* ===== Project Context block ===== */
+  .ctx{
+    margin:48px 0 16px;
+    padding:28px 30px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+  }
+  .ctx h2{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;
+    font-size:20px;margin:0 0 16px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .ctx h2::before{
+    content:"";width:10px;height:10px;background:var(--coral);transform:rotate(45deg);
+  }
+  .ctx-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media (max-width:720px){.ctx-grid{grid-template-columns:1fr}}
+  .ctx-item .k{
+    font-family:"Fraunces",serif;font-style:italic;font-size:12px;
+    color:var(--ocean);letter-spacing:0.08em;text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .ctx-item .v{font-size:14.5px;color:var(--ink)}
+  .ctx-item .v code{
+    background:var(--bg-2);padding:2px 6px;border-radius:4px;
+    font-family:"JetBrains Mono",monospace;font-size:12.5px;
+  }
+
+  /* ===== Section heading ===== */
+  .section-title{
+    display:flex;align-items:baseline;gap:14px;
+    margin:64px 0 28px;
+    font-family:"Zen Maru Gothic",sans-serif;
+    font-weight:700;font-size:22px;
+  }
+  .section-title::before{
+    content:"";flex-shrink:0;
+    display:inline-block;width:10px;height:10px;
+    background:var(--coral);transform:rotate(45deg);
+  }
+  .section-title .meta{
+    font-family:"Fraunces",serif;font-style:italic;
+    font-size:13px;color:var(--ocean);font-weight:500;letter-spacing:0.06em;
+  }
+
+  /* ===== Timeline ===== */
+  .timeline{position:relative;padding-left:0}
+  .timeline::before{
+    content:"";position:absolute;left:32px;top:8px;bottom:8px;width:2px;
+    background:repeating-linear-gradient(180deg, var(--line) 0 6px, transparent 6px 12px);
+  }
+  @media (max-width:720px){.timeline::before{left:22px}}
+  .phase{position:relative;padding-left:84px;margin-bottom:36px}
+  @media (max-width:720px){.phase{padding-left:60px}}
+  .phase-num{
+    position:absolute;left:0;top:0;
+    width:64px;height:64px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;background:var(--paper);
+    border:2px solid var(--ocean);
+    box-shadow:0 6px 0 -2px var(--ocean);
+    font-family:"Fraunces",serif;
+    font-weight:800;font-size:24px;color:var(--ocean);z-index:1;
+  }
+  @media (max-width:720px){.phase-num{width:44px;height:44px;font-size:18px}}
+  .phase:nth-child(2) .phase-num{border-color:var(--coral);color:var(--coral);box-shadow:0 6px 0 -2px var(--coral)}
+  .phase:nth-child(3) .phase-num{border-color:var(--moss);color:var(--moss);box-shadow:0 6px 0 -2px var(--moss)}
+  .phase:nth-child(4) .phase-num{border-color:var(--sun);color:#A07700;box-shadow:0 6px 0 -2px var(--sun)}
+  .phase:nth-child(5) .phase-num{border-color:var(--lavender);color:var(--lavender);box-shadow:0 6px 0 -2px var(--lavender)}
+  .phase:nth-child(6) .phase-num{border-color:var(--coral);color:var(--coral);box-shadow:0 6px 0 -2px var(--coral)}
+  .phase:nth-child(7) .phase-num{border-color:var(--moss);color:var(--moss);box-shadow:0 6px 0 -2px var(--moss)}
+  .phase:nth-child(8) .phase-num{border-color:var(--ocean-deep);color:var(--ocean-deep);box-shadow:0 6px 0 -2px var(--ocean-deep)}
+
+  .phase-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:26px 30px 24px;
+    box-shadow:var(--shadow);
+  }
+  @media (max-width:720px){.phase-card{padding:22px 20px}}
+  .phase-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;margin-bottom:8px}
+  .phase-name{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:20px;
+    margin:0;letter-spacing:0.01em;
+  }
+  .phase-en{font-family:"Fraunces",serif;font-style:italic;font-size:13px;color:var(--ocean);letter-spacing:0.06em}
+  .phase-time{
+    margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+    padding:6px 12px;border-radius:999px;background:var(--sun);color:#3A2A00;
+    font-family:"JetBrains Mono",monospace;font-weight:500;font-size:12.5px;white-space:nowrap;
+  }
+  .phase-time::before{content:"";width:6px;height:6px;border-radius:50%;background:#3A2A00}
+  .phase-desc{margin:6px 0 18px;color:var(--ink-soft);font-size:14.5px}
+
+  .tasks{list-style:none;padding:0;margin:0 0 18px}
+  .tasks li{
+    position:relative;padding:6px 0 6px 28px;font-size:15px;
+    border-bottom:1px dashed var(--line);
+  }
+  .tasks li:last-child{border-bottom:none}
+  .tasks li::before{
+    content:"";position:absolute;left:0;top:14px;
+    width:14px;height:14px;border-radius:4px;
+    border:1.5px solid var(--ocean);background:var(--paper);
+  }
+
+  .meta-row{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+    margin:4px 0 14px;
+  }
+  @media (max-width:720px){.meta-row{grid-template-columns:1fr}}
+  .meta-box{
+    padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+    background:var(--bg-2);font-size:13.5px;
+  }
+  .meta-box .k{
+    font-family:"Fraunces",serif;font-style:italic;
+    font-size:11.5px;letter-spacing:0.08em;color:var(--ocean);
+    text-transform:uppercase;margin-bottom:4px;display:block;
+  }
+  .meta-box.deliv{background:#E6F0EA;border-color:#CBE0D3}
+  .meta-box.deliv .k{color:#2F5C42}
+  .meta-box.pre{background:#FFF1E6;border-color:#F5D9BD}
+  .meta-box.pre .k{color:#7A4A0E}
+
+  .pitfalls{
+    margin:6px 0 14px;padding:14px 16px;
+    background:#FCE7E3;border-left:3px solid var(--coral);border-radius:6px;font-size:13.5px;
+  }
+  .pitfalls .k{
+    font-family:"Fraunces",serif;font-style:italic;font-size:11.5px;
+    letter-spacing:0.08em;color:#A53322;text-transform:uppercase;margin-bottom:6px;display:block;
+  }
+  .pitfalls ul{margin:0;padding-left:18px;color:#6A2C20}
+  .pitfalls li{margin:3px 0}
+
+  .ai-ask{
+    margin:6px 0 14px;padding:14px 16px;
+    background:#EEF2FB;border-left:3px solid var(--lavender);border-radius:6px;font-size:13.5px;
+  }
+  .ai-ask .k{
+    font-family:"Fraunces",serif;font-style:italic;font-size:11.5px;
+    letter-spacing:0.08em;color:#5A4280;text-transform:uppercase;margin-bottom:6px;display:block;
+  }
+  .ai-ask ul{margin:0;padding-left:18px;color:#3F2F60}
+  .ai-ask li{margin:3px 0}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding-top:14px;border-top:1px solid var(--line)}
+  .chip{
+    display:inline-block;font-family:"JetBrains Mono",monospace;font-size:11.5px;
+    padding:4px 10px;border-radius:6px;background:var(--bg-2);
+    color:var(--ocean-deep);border:1px solid var(--line);
+  }
+  .chip.warn{background:#FCE7E3;color:#A53322;border-color:#F6CBC4}
+  .chip.ok{background:#E6F0EA;color:#2F5C42;border-color:#CBE0D3}
+
+  /* ===== Code block ===== */
+  .code-block{
+    margin:18px 0;border-radius:12px;overflow:hidden;
+    border:1px solid var(--line);background:#0F1B22;
+  }
+  .code-block .head{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px;background:#0A141A;color:#A0CBD9;
+    font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:0.04em;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .code-block .head::before{
+    content:"";width:10px;height:10px;border-radius:50%;background:var(--coral);
+    box-shadow:16px 0 var(--sun),32px 0 var(--moss);
+  }
+  .code-block .head span{margin-left:48px;color:#E8F3F7}
+  .code-block pre{
+    margin:0;padding:18px 18px;color:#E8F3F7;
+    font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.7;
+    overflow-x:auto;
+  }
+  .code-block pre .c{color:#7AA0AD}
+  .code-block pre .k{color:#F5C642}
+  .code-block pre .s{color:#9BD8AE}
+  .code-block pre .n{color:#F26A5A}
+
+  /* ===== Decisions log ===== */
+  .decisions{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px;
+  }
+  @media (max-width:720px){.decisions{grid-template-columns:1fr}}
+  .decision{
+    padding:18px 20px;background:var(--paper);
+    border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);
+  }
+  .decision .label{
+    font-family:"Fraunces",serif;font-style:italic;font-size:12px;
+    color:var(--ocean);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;
+  }
+  .decision .name{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:16px;margin-bottom:6px;
+  }
+  .decision .why{font-size:13.5px;color:var(--ink-soft)}
+  .decision .why strong{color:var(--ink)}
+
+  /* ===== Pitfalls grid ===== */
+  .pf-list{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+  @media (max-width:720px){.pf-list{grid-template-columns:1fr}}
+  .pf-card{
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);
+    border-left:4px solid var(--coral);
+  }
+  .pf-card .tag{
+    display:inline-block;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+    padding:2px 8px;border-radius:4px;background:var(--bg-2);color:var(--ocean-deep);
+    margin-bottom:6px;letter-spacing:0.06em;
+  }
+  .pf-card .issue{font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:14.5px;margin-bottom:4px}
+  .pf-card .fix{font-size:13px;color:var(--ink-soft)}
+  .pf-card .fix::before{content:"→ ";color:var(--coral);font-weight:700}
+
+  /* ===== Glossary ===== */
+  .glossary{
+    margin-top:8px;background:var(--paper);
+    border:1px solid var(--line);border-radius:18px;
+    overflow:hidden;box-shadow:var(--shadow);
+  }
+  .glossary dl{margin:0}
+  .glossary div{
+    display:grid;grid-template-columns:200px 1fr;gap:24px;
+    padding:14px 24px;border-top:1px solid var(--line);
+  }
+  .glossary div:first-child{border-top:none}
+  @media (max-width:720px){
+    .glossary div{grid-template-columns:1fr;gap:4px;padding:14px 20px}
+  }
+  .glossary dt{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:14.5px;
+    color:var(--ocean-deep);
+  }
+  .glossary dt small{
+    display:block;font-family:"JetBrains Mono",monospace;font-weight:500;
+    font-size:11px;color:var(--ink-soft);margin-top:2px;letter-spacing:0.04em;
+  }
+  .glossary dd{margin:0;font-size:13.5px;color:var(--ink-soft)}
+
+  /* ===== Final summary ===== */
+  .final{
+    margin-top:72px;padding:36px 32px;border-radius:22px;
+    background:linear-gradient(135deg, var(--ocean) 0%, var(--ocean-deep) 100%);
+    color:#F4F8FA;position:relative;overflow:hidden;
+  }
+  .final::after{
+    content:"";position:absolute;right:-40px;bottom:-60px;
+    width:240px;height:240px;border-radius:50%;
+    background:radial-gradient(circle, rgba(245,198,66,0.35), transparent 70%);
+  }
+  .final h2{font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:24px;margin:0 0 8px}
+  .final p{margin:0 0 18px;color:#CFE0E6;font-size:14.5px}
+  .final-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px;position:relative;z-index:1}
+  @media (max-width:720px){.final-grid{grid-template-columns:1fr}}
+  .final-grid .stat{
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);
+    border-radius:12px;padding:16px 18px;
+  }
+  .stat .k{
+    font-family:"Fraunces",serif;font-style:italic;font-size:12px;
+    letter-spacing:0.08em;color:var(--sun);text-transform:uppercase;margin-bottom:4px;
+  }
+  .stat .v{font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:20px}
+
+  footer{
+    margin-top:48px;text-align:center;
+    font-family:"Fraunces",serif;font-style:italic;
+    color:var(--ink-soft);font-size:13px;
+  }
+  footer .wave{display:inline-block;margin:0 8px;color:var(--coral)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <svg class="island-ornament" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="155" cy="38" r="18" fill="#F5C642"/>
+      <path d="M0 130 Q20 122 40 130 T80 130 T120 130 T160 130 T200 130 V160 H0 Z" fill="#7EC8DF" opacity="0.55"/>
+      <path d="M0 142 Q20 134 40 142 T80 142 T120 142 T160 142 T200 142 V160 H0 Z" fill="#0E5E7A" opacity="0.5"/>
+      <polygon points="40,128 100,40 160,128" fill="#5C8F6E"/>
+      <polygon points="80,76 100,40 120,76 100,90" fill="#FAF6EE" opacity="0.85"/>
+      <g>
+        <path d="M70 105 Q70 92 80 92 Q90 92 90 105 Q90 115 80 124 Q70 115 70 105 Z" fill="#F26A5A"/>
+        <circle cx="80" cy="104" r="3.5" fill="#FAF6EE"/>
+      </g>
+    </svg>
+
+    <span class="ai-badge">AI Optimized · v2</span>
+    <div class="eyebrow">Project Procedure / 制作手順書</div>
+    <h1>
+      <span class="pop">利尻島</span> を <span class="accent">3Dポップ</span><br>
+      で立ち上げる 制作手順
+    </h1>
+    <p class="lead">
+      ヘッドレスWordPress + Next.js (React Three Fiber) で構築する、ローポリ＆軽量な3Dインタラクティブサイトの全工程ガイド。
+      <strong>このドキュメントはAIアシスタントに渡して使うことを想定して最適化されています。</strong>
+      JSON仕様・判断の根拠・つまずきポイント・コード例を埋め込んであるので、貼り付けるだけでAIが文脈を理解してくれます。
+    </p>
+
+    <div class="summary">
+      <div class="cell"><div class="label">Total</div><div class="val">7〜10<small>週間</small></div></div>
+      <div class="cell"><div class="label">Phases</div><div class="val">8<small>工程</small></div></div>
+      <div class="cell"><div class="label">Stack</div><div class="val">Next.js × WP</div></div>
+      <div class="cell"><div class="label">3D</div><div class="val">R3F + GLB</div></div>
+    </div>
+  </header>
+
+  <!-- ===== AI How-To ===== -->
+  <section class="ai-howto">
+    <h2>このドキュメントをAIと一緒に使う</h2>
+    <p>困ったときは、このHTMLファイルを丸ごとAIに渡すか、関連セクションをコピーして以下のテンプレートと一緒に貼り付けてください。AIは文中のJSON仕様と判断ログを参照して、プロジェクトの方針に沿った具体的な回答を返します。</p>
+    <div class="copy-block">【AIへの質問テンプレート】
+
+このドキュメントは私が構築中のプロジェクトの完全仕様書です。
+私は今 Phase [番号]：[フェーズ名] の作業中で、
+[具体的な状況・困りごと] に直面しています。
+
+参考コード/エラー：
+[ここに貼り付け]
+
+このプロジェクトの方針（特に [関連する確定事項]）を踏まえて、
+具体的で実行可能な解決策を提案してください。
+不明な点があれば聞き返してください。</div>
+    <ul class="examples">
+      <li>例1: 「Phase 5でLenisを入れたらスクロールがカクつく。原因と修正方法は？」</li>
+      <li>例2: 「Phase 3のACFで3D座標フィールドを編集者が直感的に入れられるUIを3案出して」</li>
+      <li>例3: 「Phase 2で利尻富士のシルエットを保ちつつポリゴンを5000以下にしたい」</li>
+    </ul>
+  </section>
+
+  <!-- ===== Project Context ===== -->
+  <section class="ctx" aria-labelledby="ctx-title">
+    <h2 id="ctx-title">プロジェクト・コンテキスト</h2>
+    <div class="ctx-grid">
+      <div class="ctx-item">
+        <div class="k">目的 / Goal</div>
+        <div class="v">利尻島の魅力を3D体験として伝え、<strong>求人応募・イベント参加・観光誘致・コラム閲覧</strong>へつなげる。</div>
+      </div>
+      <div class="ctx-item">
+        <div class="k">ターゲット / Audience</div>
+        <div class="v">移住検討者 / 観光客 / 求職者 / 島に関心のある一般読者。</div>
+      </div>
+      <div class="ctx-item">
+        <div class="k">参考サイト / Reference</div>
+        <div class="v"><code>haru-ni.net</code>（3Dポップな街の表現）。当プロジェクトは「街」ではなく「島全体」を舞台にする。</div>
+      </div>
+      <div class="ctx-item">
+        <div class="k">体験の核 / Core UX</div>
+        <div class="v">スクロールで島が左右に回転（範囲制限あり）。ピンをクリックすると詳細モーダル。</div>
+      </div>
+      <div class="ctx-item">
+        <div class="k">コンテンツ4種 / Content Types</div>
+        <div class="v"><code>recruit</code>(求人) / <code>event</code>(イベント) / <code>spot</code>(観光地) / <code>column</code>(コラム)</div>
+      </div>
+      <div class="ctx-item">
+        <div class="k">体験品質の目標 / Quality Bar</div>
+        <div class="v">PCもSPも3D維持・LCP &lt; 2.5s・GLB ≤ 5MB・ポリゴン ≤ 10万。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Decisions Log ===== -->
+  <h2 class="section-title">確定した判断と根拠 <span class="meta">— Decisions Log</span></h2>
+  <div class="decisions">
+    <div class="decision">
+      <div class="label">Architecture</div>
+      <div class="name">B案: Headless WP + Next.js</div>
+      <div class="why"><strong>なぜ:</strong> 3Dとインタラクションが体験の中核。表現力とパフォーマンスを優先するためフロントを分離。WPはCMSとしてのみ使う。</div>
+    </div>
+    <div class="decision">
+      <div class="label">Camera</div>
+      <div class="name">スクロール連動回転（範囲制限）</div>
+      <div class="why"><strong>なぜ:</strong> 操作迷子を防ぎ、島の裏側のモデリングを省略して工数を削減できる。回転範囲は左右45°程度を想定。</div>
+    </div>
+    <div class="decision">
+      <div class="label">Mobile</div>
+      <div class="name">3Dを軽量化して維持</div>
+      <div class="why"><strong>なぜ:</strong> ブランド体験の一貫性。2Dフォールバックではなく、LOD切替・dpr制限・影オフでパフォーマンスを担保。</div>
+    </div>
+    <div class="decision">
+      <div class="label">WP Theme</div>
+      <div class="name">ゼロから自作</div>
+      <div class="why"><strong>なぜ:</strong> ヘッドレス運用で表示用テンプレが不要。管理画面とAPIに専念した最小構成のテーマを作る。</div>
+    </div>
+  </div>
+
+  <!-- ===== Timeline ===== -->
+  <h2 class="section-title">構築フェーズ <span class="meta">— 8 Phases</span></h2>
+  <div class="timeline">
+
+    <!-- ===== Phase 1 ===== -->
+    <section class="phase" data-phase="1">
+      <div class="phase-num">01</div>
+      <div class="phase-card">
+        <div class="phase-head">
+          <h3 class="phase-name">要件定義・設計</h3>
+          <span class="phase-en">Discovery &amp; Design</span>
+          <span class="phase-time">3〜5日</span>
+        </div>
+        <p class="phase-desc">島のどこに何のピンを立て、どんなUIで見せるかをここで固める。後工程の出戻りを最小にする最重要フェーズ。</p>
+        <ul class="tasks">
+          <li>利尻島の地形・主要ランドマーク調査（利尻富士／沓形岬／オタトマリ沼 等）</li>
+          <li>4種コンテンツの整理：<strong>求人 / イベント / 観光地 / コラム</strong>の項目定義</li>
+          <li>ピン配置マップを2Dで先に作成（座標 → 3D化のメモを残す）</li>
+          <li>カラーパレット・トンマナ決定（ローポリ × ポップの方向性）</li>
+          <li>ワイヤーフレーム作成（PC / SP両方）</li>
+        </ul>
+        <div class="meta-row">
+          <div class="meta-box deliv"><span class="k">成果物</span>ワイヤーフレーム / ピン配置マップ(2D) / コンテンツスキーマ / カラーパレット</div>
+          <div class="meta-box pre"><span class="k">前提条件</span>なし（着手フェーズ）</div>
+        </div>
+        <div class="pitfalls">
+          <span class="k">つまずきやすい点</span>
+          <ul>
+            <li>ピン配置を3Dで考え始めると延々と迷う → まず2Dマップで決め切る</li>
+            <li>コンテンツ項目を後から増やすとACFもAPIも全部直す羽目になる</li>
+          </ul>
+        </div>
+        <div class="ai-ask">
+          <span class="k">AIに相談できること</span>
+          <ul>
+            <li>利尻島のランドマーク優先順位の整理</li>
+            <li>4種コンテンツに必要なフィールド洗い出し</li>
+            <li>カラーパレット案の生成（ポップ × 北方の島）</li>
+          </ul>
+        </div>
+        <div class="chips">
+          <span class="chip">Figma</span><span class="chip">FigJam</span>
+          <span class="chip">Notion</span><span class="chip">国土地理院マップ</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Phase 2 ===== -->
+    <section class="phase" data-phase="2">
+      <div class="phase-num">02</div>
+      <div class="phase-card">
+        <div class="phase-head">
+          <h3 class="phase-name">3Dアセット制作</h3>
+          <span class="phase-en">3D Asset Production</span>
+          <span class="phase-time">1〜2週間</span>
+        </div>
+        <p class="phase-desc">忠実だがローポリで軽量、かつポップな利尻島モデルを作る。完成度がサイトの体験品質を直接決める。</p>
+        <ul class="tasks">
+          <li>国土地理院DEM（標高データ）取得 → Blenderにインポートして地形ベース作成</li>
+          <li>利尻富士のシルエットを保ちつつローポリ化（総ポリ目安 5〜10万）</li>
+          <li>主要ランドマーク（漁港・灯台・神社・観光地）を象徴的に配置</li>
+          <li>フラットシェーディング + 単色マテリアルでポップさを表現</li>
+          <li>ライティングのベイク（ランタイム計算を削減）</li>
+          <li>glTF/GLB書き出し → <strong>Draco / Meshopt圧縮</strong>で2〜5MBに収める</li>
+          <li>モバイル向けLOD（軽量版）を別ファイルで書き出し</li>
+        </ul>
+        <div class="meta-row">
+          <div class="meta-box deliv"><span class="k">成果物</span><code>island.glb</code>（フル版）+ <code>island-mobile.glb</code>（LOD版）</div>
+          <div class="meta-box pre"><span class="k">前提条件</span>Phase 1のピン配置マップ（どこにランドマークを置くかが決まっている）</div>
+        </div>
+        <div class="pitfalls">
+          <span class="k">つまずきやすい点</span>
+          <ul>
+            <li>テクスチャに頼るとファイルが膨らむ → 単色＋バーテックスカラー基本</li>
+            <li>左右回転制限を活かさず360°作り込んでしまい工数2倍になる</li>
+            <li>書き出し時にDracoかけ忘れて20MB超え</li>
+          </ul>
+        </div>
+        <div class="ai-ask">
+          <span class="k">AIに相談できること</span>
+          <ul>
+            <li>Blenderでのローポリ化手順（リトポロジー、Decimate設定）</li>
+            <li>glTF-Transformコマンドで最適化する具体的なコマンド</li>
+            <li>ポップに見える配色レシピ</li>
+          </ul>
+        </div>
+        <div class="chips">
+          <span class="chip">Blender</span><span class="chip">glTF-Transform</span>
+          <span class="chip">Draco</span><span class="chip">Meshopt</span>
+          <span class="chip ok">≤ 5MB目標</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Phase 3 ===== -->
+    <section class="phase" data-phase="3">
+      <div class="phase-num">03</div>
+      <div class="phase-card">
+        <div class="phase-head">
+          <h3 class="phase-name">WordPress（ヘッドレスCMS）構築</h3>
+          <span class="phase-en">Headless WordPress</span>
+          <span class="phase-time">3〜5日</span>
+        </div>
+        <p class="phase-desc">WPはAPI提供に専念。管理画面の使いやすさが後の運用コストを左右する。</p>
+        <ul class="tasks">
+          <li>ローカル環境構築（Local by Flywheel 等）</li>
+          <li>本番ホスティング選定（Kinsta / WP Engine / Cloudways など）</li>
+          <li>カスタム投稿タイプ作成: <code>recruit</code> / <code>event</code> / <code>spot</code> / <code>column</code></li>
+          <li>ACF設定: 3D座標(X/Y/Z) または 緯度経度、画像、概要、CTAリンク</li>
+          <li>WPGraphQL + ACF for WPGraphQL 導入（型安全に取得）</li>
+          <li>CORS設定 / API認証（Application Passwords or JWT）</li>
+          <li>管理画面UIの調整（編集者がピン位置を入れやすいよう工夫）</li>
+        </ul>
+        <div class="meta-row">
+          <div class="meta-box deliv"><span class="k">成果物</span>WP環境 / 4CPT / ACFフィールド / WPGraphQLエンドポイント</div>
+          <div class="meta-box pre"><span class="k">前提条件</span>Phase 1のコンテンツスキーマ</div>
+        </div>
+        <div class="pitfalls">
+          <span class="k">つまずきやすい点</span>
+          <ul>
+            <li>CORS設定漏れでフロントからAPI叩けない</li>
+            <li>ピン座標(X/Y/Z)を編集者が手で入力するのは現実的でない</li>
+            <li>ヘッドレスでWP標準プレビューが動かない</li>
+          </ul>
+        </div>
+        <div class="ai-ask">
+          <span class="k">AIに相談できること</span>
+          <ul>
+            <li>functions.phpでCPT/ACF/CORS設定する具体コード</li>
+            <li>WPGraphQLのクエリ作成・トラブルシュート</li>
+            <li>ピン座標入力UIの実装案（マップピッカー等）</li>
+          </ul>
+        </div>
+        <div class="chips">
+          <span class="chip">WordPress</span><span class="chip">WPGraphQL</span>
+          <span class="chip">ACF Pro</span><span class="chip">CPT UI</span>
+          <span class="chip warn">CORS注意</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Phase 4 ===== -->
+    <section class="phase" data-phase="4">
+      <div class="phase-num">04</div>
+      <div class="phase-card">
+        <div class="phase-head">
+          <h3 class="phase-name">フロントエンド基盤構築</h3>
+          <span class="phase-en">Frontend Foundation</span>
+          <span class="phase-time">3〜5日</span>
+        </div>
+        <p class="phase-desc">Next.js + R3Fのプロジェクト土台を作る。ここで設計を雑にやると後で必ず詰む。</p>
+        <ul class="tasks">
+          <li>Next.js 14 (App Router) + TypeScript プロジェクト作成</li>
+          <li>R3F関連導入: <code>@react-three/fiber</code> / <code>@react-three/drei</code> / <code>@react-three/postprocessing</code></li>
+          <li>状態管理: Zustand 導入（3Dシーンとモーダルの状態を分離）</li>
+          <li>データ取得層: TanStack Query または SWR でWPGraphQLとつなぐ</li>
+          <li>スタイル: Tailwind CSS or CSS Modules（チーム慣習に合わせる）</li>
+          <li>ESLint / Prettier / Husky 設定</li>
+          <li>ディレクトリ設計（<code>/components/scene</code>, <code>/components/ui</code>, <code>/lib/wp</code> など）</li>
+        </ul>
+        <div class="meta-row">
+          <div class="meta-box deliv"><span class="k">成果物</span>Next.jsプロジェクト / ディレクトリ構造 / APIクライアント</div>
+          <div class="meta-box pre"><span class="k">前提条件</span>Phase 3のAPIエンドポイント（接続テスト用）</div>
+        </div>
+        <div class="pitfalls">
+          <span class="k">つまずきやすい点</span>
+          <ul>
+            <li>R3Fは Server Component に置けない → <code>"use client"</code> を忘れない</li>
+            <li>Three.js のバージョンと R3F の対応バージョンを合わせる</li>
+          </ul>
+        </div>
+        <div class="ai-ask">
+          <span class="k">AIに相談できること</span>
+          <ul>
+            <li>App RouterでR3Fを使うときの構成ベストプラクティス</li>
+            <li>GraphQL Codegen設定</li>
+            <li>Zustandストア設計（3D / UI / データの責務分離）</li>
+          </ul>
+        </div>
+        <div class="chips">
+          <span class="chip">Next.js 14</span><span class="chip">TypeScript</span>
+          <span class="chip">React Three Fiber</span><span class="chip">drei</span>
+          <span class="chip">Zustand</span><span class="chip">TanStack Query</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Phase 5 ===== -->
+    <section class="phase" data-phase="5">
+      <div class="phase-num">05</div>
+      <div class="phase-card">
+        <div class="phase-head">
+          <h3 class="phase-name">3Dシーン実装（スクロール連動）</h3>
+          <span class="phase-en">3D Scene &amp; Scroll Interaction</span>
+          <span class="phase-time">1〜2週間</span>
+        </div>
+        <p class="phase-desc">島の登場・回転・ライティングを作り込む。「スクロールで回るが回転範囲は制限」がこの工程のキモ。</p>
+        <ul class="tasks">
+          <li>Canvas / Scene セットアップ（適切なカメラFOV・遠近）</li>
+          <li>ライティング設計（HemisphereLight + DirectionalLight + 影の最適化）</li>
+          <li><code>useGLTF</code> でモデル読み込み + Suspense でローディングUI</li>
+          <li>スムーススクロール: <strong>Lenis</strong> 導入</li>
+          <li>スクロール連動回転: <code>useScroll</code>(drei) で進捗取得 → <code>island.rotation.y</code> にマッピング</li>
+          <li>回転範囲を制限: <code>THREE.MathUtils.clamp</code> で例えば <code>-π/4 〜 +π/4</code></li>
+          <li>イージング: <code>damp</code> でカクつかせず慣性をつける</li>
+          <li>空・霧・微細な雲などで奥行きを演出</li>
+        </ul>
+        <div class="meta-row">
+          <div class="meta-box deliv"><span class="k">成果物</span>3Dシーンコンポーネント / スクロール連動回転</div>
+          <div class="meta-box pre"><span class="k">前提条件</span>Phase 2のGLB / Phase 4の基盤</div>
+        </div>
+        <div class="pitfalls">
+          <span class="k">つまずきやすい点</span>
+          <ul>
+            <li>Lenis と native scroll の干渉でスクロール量がズレる</li>
+            <li>clampとdampの順序を間違えるとカクつく → clamp後にdampが正解</li>
+            <li>useFrameの中で重い処理を書いてフレーム落ち</li>
+          </ul>
+        </div>
+        <div class="ai-ask">
+          <span class="k">AIに相談できること</span>
+          <ul>
+            <li>スクロール進捗と回転角度のマッピングロジック</li>
+            <li>パフォーマンスチューニング（影、ポストエフェクト、frustum culling）</li>
+            <li>ローディング演出の実装案</li>
+          </ul>
+        </div>
+        <div class="chips">
+          <span class="chip">three.js</span><span class="chip">Lenis</span>
+          <span class="chip">drei/useScroll</span><span class="chip">r3f-perf</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Phase 6 ===== -->
+    <section class="phase" data-phase="6">
+      <div class="phase-num">06</div>
+      <div class="phase-card">
+        <div class="phase-head">
+          <h3 class="phase-name">ピン・コンテンツ表示実装</h3>
+          <span class="phase-en">Pins &amp; Content</span>
+          <span class="phase-time">1週間</span>
+        </div>
+        <p class="phase-desc">WPから取得したコンテンツを3D空間と接続する。サイトの核となる体験部分。</p>
+        <ul class="tasks">
+          <li>WPGraphQLから4種ピンデータ取得 + 型生成（GraphQL Codegen 推奨）</li>
+          <li>3D空間にピン配置: <code>&lt;Html&gt;</code>(drei) または Sprite で実装</li>
+          <li>カテゴリ別アイコン・色を統一</li>
+          <li>カメラ追従でピンの向きとサイズを調整（Billboard化）</li>
+          <li>ピンクリック → サイドパネル/モーダルで詳細表示</li>
+          <li>カテゴリ別フィルタ機能（特定カテゴリのピンだけ表示）</li>
+          <li>SEO対策: コラム記事は個別ページも持たせる（Next.js動的ルート）</li>
+        </ul>
+        <div class="meta-row">
+          <div class="meta-box deliv"><span class="k">成果物</span>ピン表示 / モーダル / カテゴリフィルタ / 動的ルート</div>
+          <div class="meta-box pre"><span class="k">前提条件</span>Phase 3のAPI / Phase 5の3Dシーン</div>
+        </div>
+        <div class="pitfalls">
+          <span class="k">つまずきやすい点</span>
+          <ul>
+            <li>HTMLオーバーレイ式ピンを大量に置くと重い → Sprite化検討</li>
+            <li>ピンが島の裏に隠れたときのクリック判定</li>
+            <li>SEOのため動的ルートにメタデータを生成し忘れる</li>
+          </ul>
+        </div>
+        <div class="ai-ask">
+          <span class="k">AIに相談できること</span>
+          <ul>
+            <li>大量ピンのパフォーマンス最適化</li>
+            <li>モーダルのアニメーション（Framer Motion）</li>
+            <li>カテゴリ別フィルタ状態管理</li>
+          </ul>
+        </div>
+        <div class="chips">
+          <span class="chip">GraphQL Codegen</span>
+          <span class="chip">drei/Html</span>
+          <span class="chip">Framer Motion</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Phase 7 ===== -->
+    <section class="phase" data-phase="7">
+      <div class="phase-num">07</div>
+      <div class="phase-card">
+        <div class="phase-head">
+          <h3 class="phase-name">モバイル最適化（軽量3D維持）</h3>
+          <span class="phase-en">Mobile Optimization</span>
+          <span class="phase-time">3〜5日</span>
+        </div>
+        <p class="phase-desc">SPでも3Dを諦めない。Phase 2で作ったLODモデルと、SP専用のチューニングを使ってヌルヌル動かす。</p>
+        <ul class="tasks">
+          <li>ブレイクポイント設計（PC / Tablet / SP）</li>
+          <li>デバイス判定で<strong>軽量GLB</strong>に自動切替</li>
+          <li>SP時は <code>dpr</code> 上限を下げる（例: <code>[1, 1.5]</code>）</li>
+          <li>影を無効化 or 簡易化、ポストエフェクト削減</li>
+          <li>タッチ操作対応（ピンチズーム抑制、ピンタップ判定の調整）</li>
+          <li>レスポンシブUI: モーダルはフルスクリーン or ボトムシート</li>
+          <li>Lighthouse mobile測定 → LCP / CLS / INP 改善</li>
+        </ul>
+        <div class="meta-row">
+          <div class="meta-box deliv"><span class="k">成果物</span>LOD自動切替 / タッチ操作 / 改善されたCWV</div>
+          <div class="meta-box pre"><span class="k">前提条件</span>Phase 2のLOD版GLB / Phase 5・6完了</div>
+        </div>
+        <div class="pitfalls">
+          <span class="k">つまずきやすい点</span>
+          <ul>
+            <li>iOS Safariで3Dが落ちる/カクつく</li>
+            <li>横スクロール防止のCSSが3D操作と干渉する</li>
+            <li>タップ vs スクロール の判定が曖昧でピンが押せない</li>
+          </ul>
+        </div>
+        <div class="ai-ask">
+          <span class="k">AIに相談できること</span>
+          <ul>
+            <li>iOS Safari固有の3Dパフォーマンス問題</li>
+            <li>タッチイベントとスクロールの両立</li>
+            <li>Lighthouseスコアごとの改善優先順位</li>
+          </ul>
+        </div>
+        <div class="chips">
+          <span class="chip">Lighthouse</span>
+          <span class="chip">Web Vitals</span>
+          <span class="chip ok">LCP &lt; 2.5s</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Phase 8 ===== -->
+    <section class="phase" data-phase="8">
+      <div class="phase-num">08</div>
+      <div class="phase-card">
+        <div class="phase-head">
+          <h3 class="phase-name">テスト・本番デプロイ</h3>
+          <span class="phase-en">Test &amp; Launch</span>
+          <span class="phase-time">3〜5日</span>
+        </div>
+        <p class="phase-desc">本番公開と監視。WPとフロントの2系統を扱うので、デプロイ手順は文書化して引き継ぎを楽に。</p>
+        <ul class="tasks">
+          <li>全ブラウザテスト（Chrome / Safari / Firefox / Edge）</li>
+          <li>iOS Safari / Android Chrome 実機テスト</li>
+          <li>Core Web Vitals 計測 → 必要なら3Dの再チューニング</li>
+          <li>フロントデプロイ: <strong>Vercel</strong></li>
+          <li>WPデプロイ: ホスティングへ。管理画面は<strong>IP制限 or BASIC認証</strong>必須</li>
+          <li>独自ドメイン設定 / SSL証明書 / CDN設定</li>
+          <li>解析: GA4 / Vercel Analytics</li>
+          <li>運用ドキュメント作成（編集者向けマニュアル）</li>
+        </ul>
+        <div class="meta-row">
+          <div class="meta-box deliv"><span class="k">成果物</span>本番環境 / 監視 / 運用マニュアル</div>
+          <div class="meta-box pre"><span class="k">前提条件</span>全Phase完了</div>
+        </div>
+        <div class="pitfalls">
+          <span class="k">つまずきやすい点</span>
+          <ul>
+            <li>WP側のCORSが本番ドメインで効いていない</li>
+            <li>GLBがCDNでgzip二重圧縮されて壊れる</li>
+            <li>ヘッドレス構成ではWP標準プレビューが動かない</li>
+          </ul>
+        </div>
+        <div class="ai-ask">
+          <span class="k">AIに相談できること</span>
+          <ul>
+            <li>Vercel + WPホスティングの構成例</li>
+            <li>ヘッドレスWPでのプレビュー実装（Draft Mode）</li>
+            <li>本番反映前のチェックリスト作成</li>
+          </ul>
+        </div>
+        <div class="chips">
+          <span class="chip">Vercel</span><span class="chip">Kinsta / WP Engine</span>
+          <span class="chip">Cloudflare</span><span class="chip">GA4</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ===== Sample Code ===== -->
+  <h2 class="section-title">参考コードパターン <span class="meta">— Code Patterns</span></h2>
+  <p style="margin:-12px 0 14px;color:var(--ink-soft);font-size:14.5px">
+    主要な処理の雛形。AIに質問するときに「これをベースに〜」と一緒に貼ると、回答の精度がぐっと上がります。
+  </p>
+
+  <div class="code-block">
+    <div class="head"><span>scene.tsx — Scroll-controlled rotation with clamp + damp</span></div>
+    <pre><span class="c">// Phase 5: スクロール進捗 → 島の回転（範囲制限あり）</span>
+<span class="k">import</span> { useRef } <span class="k">from</span> <span class="s">"react"</span>;
+<span class="k">import</span> { useFrame } <span class="k">from</span> <span class="s">"@react-three/fiber"</span>;
+<span class="k">import</span> { useScroll } <span class="k">from</span> <span class="s">"@react-three/drei"</span>;
+<span class="k">import</span> * <span class="k">as</span> THREE <span class="k">from</span> <span class="s">"three"</span>;
+
+<span class="k">export function</span> <span class="n">Island</span>({ gltf }) {
+  <span class="k">const</span> ref = useRef&lt;THREE.Group&gt;(null);
+  <span class="k">const</span> scroll = useScroll();
+  <span class="k">const</span> MAX = Math.PI / <span class="n">4</span>; <span class="c">// 左右45°</span>
+
+  useFrame((_, dt) =&gt; {
+    <span class="k">if</span> (!ref.current) <span class="k">return</span>;
+    <span class="k">const</span> p = scroll.offset; <span class="c">// 0..1</span>
+    <span class="k">const</span> target = THREE.MathUtils.clamp(
+      (p - <span class="n">0.5</span>) * <span class="n">2</span> * MAX, <span class="c">// -MAX..+MAX</span>
+      -MAX, MAX
+    );
+    ref.current.rotation.y = THREE.MathUtils.damp(
+      ref.current.rotation.y, target, <span class="n">4</span>, dt
+    );
+  });
+
+  <span class="k">return</span> &lt;primitive ref={ref} object={gltf.scene} /&gt;;
+}</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="head"><span>functions.php — Custom Post Type + ACF coordinate field</span></div>
+    <pre><span class="c">// Phase 3: 観光地CPT登録（他3種も同様）</span>
+add_action(<span class="s">'init'</span>, <span class="k">function</span>() {
+  register_post_type(<span class="s">'spot'</span>, [
+    <span class="s">'label'</span>          =&gt; <span class="s">'観光地'</span>,
+    <span class="s">'public'</span>         =&gt; <span class="k">true</span>,
+    <span class="s">'show_in_rest'</span>   =&gt; <span class="k">true</span>,
+    <span class="s">'show_in_graphql'</span>=&gt; <span class="k">true</span>,
+    <span class="s">'graphql_single_name'</span>=&gt; <span class="s">'spot'</span>,
+    <span class="s">'graphql_plural_name'</span>=&gt; <span class="s">'spots'</span>,
+    <span class="s">'supports'</span>       =&gt; [<span class="s">'title'</span>,<span class="s">'editor'</span>,<span class="s">'thumbnail'</span>],
+  ]);
+});
+
+<span class="c">// ACFで X / Y / Z 数値フィールドを定義（pos_x, pos_y, pos_z）</span>
+<span class="c">// ACF for WPGraphQL 経由で GraphQL に露出</span>
+
+<span class="c">// CORS（本番ドメインのみ許可）</span>
+add_action(<span class="s">'init'</span>, <span class="k">function</span>() {
+  header(<span class="s">"Access-Control-Allow-Origin: https://your-frontend.vercel.app"</span>);
+});</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="head"><span>queries/pins.graphql — Fetch all pins</span></div>
+    <pre><span class="k">query</span> AllPins {
+  spots(first: <span class="n">100</span>) {
+    nodes { id title acf { pos_x pos_y pos_z summary } }
+  }
+  events(first: <span class="n">100</span>) {
+    nodes { id title acf { pos_x pos_y pos_z startAt } }
+  }
+  recruits(first: <span class="n">100</span>) {
+    nodes { id title acf { pos_x pos_y pos_z employment } }
+  }
+  columns(first: <span class="n">100</span>) {
+    nodes { id title acf { pos_x pos_y pos_z excerpt } }
+  }
+}</pre>
+  </div>
+
+  <!-- ===== Pitfalls Grid ===== -->
+  <h2 class="section-title">プロジェクト全体の落とし穴 <span class="meta">— Common Pitfalls</span></h2>
+  <div class="pf-list">
+    <div class="pf-card"><span class="tag">WP / CORS</span><div class="issue">CORS設定漏れでAPI叩けない</div><div class="fix">functions.phpで本番ドメインに対する Allow-Origin ヘッダを設定</div></div>
+    <div class="pf-card"><span class="tag">WP / Preview</span><div class="issue">ヘッドレスでプレビューが動かない</div><div class="fix">Next.js Draft Mode + WP側プレビュー用エンドポイントを実装</div></div>
+    <div class="pf-card"><span class="tag">3D / MIME</span><div class="issue">GLBのMIMEがoctet-streamでキャッシュ非効率</div><div class="fix">ホスティング側で model/gltf-binary を設定</div></div>
+    <div class="pf-card"><span class="tag">3D / iOS</span><div class="issue">iOS Safariで3Dがカクつく/落ちる</div><div class="fix">dpr下げ、影オフ、ポストエフェクト削減、LODモデル使用</div></div>
+    <div class="pf-card"><span class="tag">Scroll</span><div class="issue">Lenisとnative scrollが干渉</div><div class="fix">Lenisに一元化、ScrollTrigger等は同期させる</div></div>
+    <div class="pf-card"><span class="tag">3D / Easing</span><div class="issue">回転制限とイージングが噛み合わずカクつく</div><div class="fix">clamp で角度制限後に damp で慣性をつける順序</div></div>
+    <div class="pf-card"><span class="tag">Operation</span><div class="issue">ピン座標を編集者が手入力できない</div><div class="fix">専用マップピッカーUIか別JSONで管理</div></div>
+    <div class="pf-card"><span class="tag">Performance</span><div class="issue">ピンが多いとHTMLオーバーレイで重い</div><div class="fix">Spriteベースに切替、視錐台外を非表示</div></div>
+  </div>
+
+  <!-- ===== Glossary ===== -->
+  <h2 class="section-title">用語集 <span class="meta">— Glossary</span></h2>
+  <div class="glossary">
+    <dl>
+      <div><dt>ヘッドレスCMS<small>headless CMS</small></dt><dd>表示テンプレを持たず、コンテンツをAPIで提供するCMSの使い方。WPはAPI、フロントは別フレームワーク。</dd></div>
+      <div><dt>React Three Fiber<small>R3F</small></dt><dd>three.jsをReactコンポーネント感覚で書けるライブラリ。シーン構築が宣言的になる。</dd></div>
+      <div><dt>drei<small>@react-three/drei</small></dt><dd>R3Fのユーティリティ集。useGLTF、Html、useScroll など本プロジェクトでも多用。</dd></div>
+      <div><dt>glTF / GLB<small>3D file format</small></dt><dd>Webの標準的な3Dフォーマット。GLBはバイナリ版で1ファイルにまとめられる。</dd></div>
+      <div><dt>LOD<small>Level of Detail</small></dt><dd>距離・端末に応じてモデルの精度を切り替える手法。本プロジェクトはモバイル軽量版で使う。</dd></div>
+      <div><dt>Draco / Meshopt<small>compression</small></dt><dd>glTFのジオメトリ圧縮方式。ファイルサイズを大幅に削減できる。</dd></div>
+      <div><dt>Lenis<small>smooth scroll</small></dt><dd>滑らかなスクロールを実現するライブラリ。3D連動と相性が良い。</dd></div>
+      <div><dt>WPGraphQL<small>WP plugin</small></dt><dd>WPコンテンツをGraphQLで取得できるようにするプラグイン。REST APIより型安全。</dd></div>
+      <div><dt>ACF<small>Advanced Custom Fields</small></dt><dd>WPに任意フィールドを追加するプラグイン。ピン座標などのカスタム情報を保持。</dd></div>
+      <div><dt>Billboard<small>3D技法</small></dt><dd>カメラに常に正面を向ける表示手法。ピンや看板に使う。</dd></div>
+      <div><dt>Core Web Vitals<small>CWV</small></dt><dd>GoogleのWebパフォーマンス指標（LCP / CLS / INP）。SEOにも影響。</dd></div>
+      <div><dt>Draft Mode<small>Next.js</small></dt><dd>Next.jsの下書きプレビュー機能。ヘッドレスWPと組み合わせて使う。</dd></div>
+    </dl>
+  </div>
+
+  <!-- ===== Final summary ===== -->
+  <section class="final">
+    <h2>合計スケジュール目安</h2>
+    <p>1人〜少人数チームでの想定。並行できる工程（Phase 2の3DモデリングとPhase 3〜4のWP/フロント基盤）を重ねれば短縮可能。</p>
+    <div class="final-grid">
+      <div class="stat"><div class="k">最短</div><div class="v">約 7週間</div></div>
+      <div class="stat"><div class="k">標準</div><div class="v">約 8〜10週間</div></div>
+      <div class="stat"><div class="k">バッファ込み</div><div class="v">約 3ヶ月</div></div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="wave">⌇</span> Rishiri 3D Site — Build Procedure (AI Optimized) <span class="wave">⌇</span>
+  </footer>
+
+</div>
+</body>
+</html>
