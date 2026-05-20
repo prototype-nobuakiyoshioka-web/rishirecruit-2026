@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 このファイルは Claude Code がこのリポジトリで作業するときに自動で読み込まれます。
-**完全仕様は `rishiri_3d_site_procedure_ai_optimized.html` を参照してください。**
+**完全仕様は `reference/rishiri_3d_site_procedure_ai_optimized.html` を参照してください。**
 （特に `<script id="ai-project-context">` のJSONブロックにプロジェクト全体の構造化データがあります）
 
 ---
@@ -162,7 +162,8 @@ npm run lh
 
 ## 困ったときの参照先
 
-1. **このプロジェクトの完全仕様** → `rishiri_3d_site_procedure_ai_optimized.html`
-2. **参考サイト** → https://haru-ni.net
-3. **R3F公式** → https://r3f.docs.pmnd.rs/
-4. **WPGraphQL** → https://www.wpgraphql.com/
+1. **このプロジェクトの完全仕様** → `reference/rishiri_3d_site_procedure_ai_optimized.html`
+2. **要件定義** → `docs/01-requirements.md`
+3. **参考サイト** → https://haru-ni.net
+4. **R3F公式** → https://r3f.docs.pmnd.rs/
+5. **WPGraphQL** → https://www.wpgraphql.com/
