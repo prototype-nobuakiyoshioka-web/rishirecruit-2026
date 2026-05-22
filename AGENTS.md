@@ -6,6 +6,28 @@
 
 ---
 
+## Andrej Karpathy のコーディング原則
+
+**Behavioral guidelines to reduce common LLM coding mistakes.**
+
+### 1. Think Before Coding
+- 実装前に考える。仮定を明示、不明点は質問、トレードオフを提示。
+- 不確かな点は必ず確認する。
+
+### 2. Simplicity First
+- 最小限のコードで解決。余計な機能・抽象化は絶対に追加しない。
+- 要求されていないものは作らない。
+
+### 3. Surgical Changes
+- 必要な部分だけ外科的に変更。他のコードは触らない。
+- 関係ないリファクタリングは禁止。
+
+### 4. Goal-Driven Execution
+- 成功条件を明確に定義し、検証しながら進める。
+- 各ステップで確認しながら進捗する。
+
+---
+
 ## プロジェクト概要
 
 利尻島を3Dローポリ&ポップに表現したインタラクティブサイト。スクロールで島が左右に回転（範囲制限あり）し、ピンをクリックすると **求人 / イベント / 観光地 / コラム** の詳細が表示される。参考: `haru-ni.net`。
@@ -163,8 +185,9 @@ npm run lh
 ## 困ったときの参照先
 
 1. **このプロジェクトの完全仕様** → `reference/rishiri_3d_site_procedure_ai_optimized.html`
-2. **要件定義** → `docs/01-requirements.md`
-3. **コンテンツスキーマ** → `docs/03-content-schema.md`
-4. **参考サイト** → https://haru-ni.net
-5. **R3F公式** → https://r3f.docs.pmnd.rs/
-6. **WPGraphQL** → https://www.wpgraphql.com/
+2. **Blender作業** → `reference/blender-roadmap.html`
+3. **要件定義** → `docs/01-requirements.md`
+4. **コンテンツスキーマ** → `docs/03-content-schema.md`
+5. **デザイントークン** → `docs/04-design-tokens.md`
+6. **サイトマップ・情報設計** → `docs/05-sitemap.md`
+7. **参考サイト** → https://haru-ni.net
