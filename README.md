@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rishiri Recruit 2026
 
-## Getting Started
+利尻島を3Dローポリ&ポップに表現したインタラクティブサイトのリポジトリ。
+スクロールで島が回転し、ピン（求人 / イベント / 観光地 / コラム）から詳細を引き出す体験を目指します。
 
-First, run the development server:
+参考: <https://haru-ni.net>
+
+## 構成
+
+| レイヤー | 技術 | 役割 |
+| --- | --- | --- |
+| フロント | Next.js 16 (App Router) + React 19 + Tailwind v4 | 3Dシーン・UI |
+| 3D | React Three Fiber / drei / postprocessing | 島・ピン描画 |
+| データ | WordPress (Headless) + WPGraphQL + ACF Pro | コンテンツ管理 |
+| WPテーマ | `style.css` / `index.php` / `front-page.php` / `functions.php` | 最小ヘッドレス構成 |
+
+> このディレクトリはWordPressテーマ本体でもあり、Next.jsアプリケーションのルートでもあります。
+> WordPress側は管理機能とAPIのみを担当し、表示はNext.jsに集約します。
+
+## セットアップ
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ディレクトリ
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+/app                 Next.js App Router
+/components
+  /scene             3D（Canvas / Island / Pins / Lighting）
+  /ui                DOM側UI（Modal / Filter / Nav）
+/lib
+  /wp                GraphQLクライアントとクエリ
+  /three             clamp回転・Billboard等のヘルパ
+/public/models       island.glb / island-mobile.glb
+/store               Zustand（scene / ui / data）
+/docs                要件・スキーマ
+/reference           完全仕様HTML
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 参考
 
-## Learn More
+- 完全仕様: `reference/rishiri_3d_site_procedure_ai_optimized.html`
+- 要件定義: `docs/01-requirements.md`
+- コンテンツスキーマ: `docs/03-content-schema.md`
+- Claude 用ガイド: `CLAUDE.md`（`AGENTS.md` は同内容のsymlink）
 
-To learn more about Next.js, take a look at the following resources:
+## スクリプト
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| コマンド | 内容 |
+| --- | --- |
+| `npm run dev` | Next.js 開発サーバ |
+| `npm run build` | 本番ビルド |
+| `npm run start` | 本番起動 |
+| `npm run lint` | ESLint |
