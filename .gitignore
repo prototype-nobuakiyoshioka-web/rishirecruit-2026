@@ -92,5 +92,11 @@ next-env.d.ts
 .node_repl_history
 .lock-wscript
 
+# Merge / editor backups (e.g. AGENTS.md~origin_main, foo.orig)
+*~origin_*
+*~origin/*
+*~HEAD
+*.orig
+
 # Vercel
 .vercel
