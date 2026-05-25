@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blender制作 ロードマップ — リシリクルート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+Antique:wght@400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,800;1,9..144,500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EE;
+    --snow:#FFFFFF;
+    --ink:#1F1B16;
+    --ink-soft:#5C544A;
+    --ink-faint:#A39A8C;
+    --line:#E2D7C2;
+    --line-soft:#F0EBE0;
+    --ocean:#0A2E4E;
+    --ocean-mid:#1B5F8C;
+    --sky:#5BB4E0;
+    --ice:#C9E2F0;
+    --coral:#FF7B5B;
+    --coral-dark:#D14E2B;
+    --gold:#F4B942;
+    --moss:#5FA88B;
+    --moss-dark:#3D7A60;
+    --pink:#FF8FB1;
+    --shadow: 0 1px 0 rgba(31,27,22,0.04), 0 12px 28px -16px rgba(10,46,78,0.18);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Zen Kaku Gothic Antique","Helvetica Neue",sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 8% 6%, rgba(91,180,224,0.14), transparent 38%),
+      radial-gradient(circle at 95% 14%, rgba(244,185,66,0.10), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(255,123,91,0.08), transparent 50%);
+    line-height:1.78;
+    letter-spacing:0.02em;
+    font-feature-settings:"palt";
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:56px 28px 96px}
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    padding:32px 0 36px;
+    border-bottom:1px dashed var(--line);
+    margin-bottom:56px;
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 12px;border-radius:999px;
+    background:var(--ocean);color:#fff;
+    font-family:"JetBrains Mono",monospace;font-weight:500;font-size:11.5px;
+    letter-spacing:0.08em;text-transform:uppercase;
+    margin-bottom:18px;
+  }
+  .badge::before{
+    content:"";width:8px;height:8px;border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 0 3px rgba(244,185,66,0.35);
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:"Fraunces",serif;font-style:italic;font-weight:500;
+    font-size:14px;color:var(--ocean-mid);
+    letter-spacing:0.08em;
+    margin-bottom:16px;
+  }
+  .eyebrow::before{content:"";width:32px;height:1px;background:var(--ocean-mid)}
+  h1{
+    font-family:"Zen Maru Gothic",sans-serif;
+    font-weight:900;
+    font-size:clamp(32px,5.2vw,52px);
+    line-height:1.2;
+    margin:0 0 18px;
+    letter-spacing:0.01em;
+    color:var(--ocean);
+  }
+  h1 .accent{color:var(--coral)}
+  h1 .underline{
+    display:inline-block;
+    background:linear-gradient(180deg, transparent 60%, var(--gold) 60%, var(--gold) 92%, transparent 92%);
+    padding:0 4px;
+  }
+  .lead{
+    max-width:680px;
+    font-size:16px;color:var(--ink-soft);
+    margin:0 0 24px;
+  }
+
+  /* hero mountain ornament */
+  .mt-row{
+    display:flex;gap:14px;flex-wrap:wrap;align-items:end;
+    margin-top:8px;
+  }
+  .mt-row .item{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+  }
+  .mt-row .item svg{display:block}
+  .mt-row .label{
+    font-family:"Fraunces",serif;font-style:italic;font-size:11px;
+    color:var(--ink-faint);letter-spacing:0.06em;
+  }
+
+  /* ===== Goal section ===== */
+  .goal-section{
+    margin:0 0 64px;
+    padding:32px 32px;
+    background:var(--snow);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  .goal-section::before{
+    content:"GOAL";
+    position:absolute;top:18px;right:24px;
+    font-family:"JetBrains Mono",monospace;font-weight:700;font-size:11px;
+    letter-spacing:0.2em;color:var(--coral);
+  }
+  .goal-section h2{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:24px;
+    margin:0 0 14px;color:var(--ocean);
+  }
+  .goal-desc{
+    font-size:15.5px;color:var(--ink);margin:0 0 24px;
+  }
+  .deliv-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
+    margin-bottom:24px;
+  }
+  @media (max-width:720px){.deliv-grid{grid-template-columns:1fr}}
+  .deliv{
+    padding:18px 20px;border-radius:12px;
+    background:var(--paper);border:1px solid var(--line);
+  }
+  .deliv .file{
+    font-family:"JetBrains Mono",monospace;font-weight:500;font-size:13px;
+    color:var(--ocean);display:flex;align-items:center;gap:8px;margin-bottom:6px;
+  }
+  .deliv .file::before{
+    content:"";width:8px;height:8px;background:var(--moss);border-radius:2px;
+  }
+  .deliv .desc{font-size:13.5px;color:var(--ink-soft);margin:0 0 8px}
+  .deliv .meta{
+    display:flex;gap:12px;flex-wrap:wrap;
+    font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ocean-mid);
+  }
+  .deliv .meta span{
+    background:var(--ice);padding:2px 8px;border-radius:4px;
+  }
+
+  .criteria{
+    padding:18px 20px;background:var(--ice);border-radius:12px;
+    font-size:13.5px;
+  }
+  .criteria .ck{
+    font-family:"Fraunces",serif;font-style:italic;font-size:11.5px;
+    color:var(--ocean);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;
+  }
+  .criteria ul{margin:0;padding-left:18px;color:var(--ocean)}
+  .criteria li{margin:3px 0}
+  .criteria code{
+    background:rgba(255,255,255,0.6);padding:1px 6px;border-radius:4px;
+    font-family:"JetBrains Mono",monospace;font-size:12px;
+  }
+
+  /* ===== Section heading ===== */
+  .section-title{
+    display:flex;align-items:baseline;gap:14px;
+    margin:64px 0 28px;
+    font-family:"Zen Maru Gothic",sans-serif;
+    font-weight:700;font-size:22px;color:var(--ocean);
+  }
+  .section-title::before{
+    content:"";flex-shrink:0;
+    display:inline-block;width:10px;height:10px;
+    background:var(--coral);transform:rotate(45deg);
+  }
+  .section-title .meta{
+    font-family:"Fraunces",serif;font-style:italic;
+    font-size:13px;color:var(--ocean-mid);font-weight:500;letter-spacing:0.06em;
+  }
+
+  /* ===== Timeline (roadmap) ===== */
+  .timeline{position:relative;padding-left:0}
+  .timeline::before{
+    content:"";position:absolute;left:32px;top:8px;bottom:8px;width:2px;
+    background:repeating-linear-gradient(180deg, var(--line) 0 6px, transparent 6px 12px);
+  }
+  @media (max-width:720px){.timeline::before{left:22px}}
+  .step{position:relative;padding-left:84px;margin-bottom:32px}
+  @media (max-width:720px){.step{padding-left:60px}}
+
+  .step-num{
+    position:absolute;left:0;top:0;
+    width:64px;height:64px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;background:var(--snow);
+    border:2px solid var(--ocean);
+    box-shadow:0 6px 0 -2px var(--ocean);
+    font-family:"Fraunces",serif;
+    font-weight:800;font-size:24px;color:var(--ocean);z-index:1;
+  }
+  @media (max-width:720px){.step-num{width:44px;height:44px;font-size:18px}}
+  .step:nth-child(2) .step-num{border-color:var(--coral);color:var(--coral);box-shadow:0 6px 0 -2px var(--coral)}
+  .step:nth-child(3) .step-num{border-color:var(--gold);color:#A07700;box-shadow:0 6px 0 -2px var(--gold)}
+  .step:nth-child(4) .step-num{border-color:var(--moss);color:var(--moss-dark);box-shadow:0 6px 0 -2px var(--moss)}
+  .step:nth-child(5) .step-num{border-color:var(--sky);color:var(--ocean-mid);box-shadow:0 6px 0 -2px var(--sky)}
+  .step:nth-child(6) .step-num{border-color:var(--coral);color:var(--coral);box-shadow:0 6px 0 -2px var(--coral)}
+
+  .step-card{
+    background:var(--snow);border:1px solid var(--line);
+    border-radius:18px;padding:24px 28px 22px;
+    box-shadow:var(--shadow);
+  }
+  @media (max-width:720px){.step-card{padding:20px 18px}}
+  .step-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;margin-bottom:8px}
+  .step-name{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:19px;
+    margin:0;color:var(--ocean);
+  }
+  .step-en{
+    font-family:"Fraunces",serif;font-style:italic;font-size:13px;
+    color:var(--ocean-mid);letter-spacing:0.06em;
+  }
+  .step-time{
+    margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+    padding:6px 12px;border-radius:999px;background:var(--gold);color:#3A2A00;
+    font-family:"JetBrains Mono",monospace;font-weight:500;font-size:12.5px;white-space:nowrap;
+  }
+  .step-time::before{content:"";width:6px;height:6px;border-radius:50%;background:#3A2A00}
+  .step-goal{
+    margin:6px 0 16px;padding:12px 14px;
+    background:var(--ice);border-radius:8px;font-size:13.5px;color:var(--ocean);
+  }
+  .step-goal::before{content:"🎯 ";opacity:0.8}
+
+  .tasks{list-style:none;padding:0;margin:0 0 14px}
+  .tasks li{
+    position:relative;padding:7px 0 7px 28px;font-size:14.5px;
+    border-bottom:1px dashed var(--line);
+  }
+  .tasks li:last-child{border-bottom:none}
+  .tasks li::before{
+    content:"";position:absolute;left:0;top:14px;
+    width:14px;height:14px;border-radius:4px;
+    border:1.5px solid var(--ocean);background:var(--snow);
+  }
+  .tasks code{
+    background:var(--paper);padding:1px 6px;border-radius:4px;
+    font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--ocean-mid);
+  }
+
+  .step-row{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;
+  }
+  @media (max-width:720px){.step-row{grid-template-columns:1fr}}
+  .info-box{
+    padding:12px 14px;border-radius:10px;font-size:13px;
+  }
+  .info-box .k{
+    font-family:"Fraunces",serif;font-style:italic;font-size:11px;
+    letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;display:block;
+  }
+  .info-box.skills{background:var(--ice);}
+  .info-box.skills .k{color:var(--ocean-mid)}
+  .info-box.output{background:#E6F0EA;border:1px solid #CBE0D3}
+  .info-box.output .k{color:var(--moss-dark)}
+
+  .pitfall{
+    margin:8px 0 0;padding:12px 14px;
+    background:#FCE7E3;border-left:3px solid var(--coral);border-radius:6px;font-size:13px;
+  }
+  .pitfall .k{
+    font-family:"Fraunces",serif;font-style:italic;font-size:11px;
+    color:var(--coral-dark);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;display:block;
+  }
+  .pitfall p{margin:0;color:#6A2C20}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .chip{
+    display:inline-block;font-family:"JetBrains Mono",monospace;font-size:11px;
+    padding:3px 9px;border-radius:6px;background:var(--paper);
+    color:var(--ocean);border:1px solid var(--line);
+  }
+
+  /* ===== Mindset section ===== */
+  .mindset{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:12px;
+    margin-top:8px;
+  }
+  @media (max-width:900px){.mindset{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.mindset{grid-template-columns:1fr}}
+  .principle{
+    padding:20px 18px;border-radius:14px;
+    background:var(--snow);border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  .principle::before{
+    content:attr(data-num);
+    position:absolute;top:-10px;left:14px;
+    font-family:"Fraunces",serif;font-style:italic;font-weight:800;font-size:36px;
+    color:var(--coral);
+    line-height:1;
+  }
+  .principle .title{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:14.5px;
+    color:var(--ocean);margin:24px 0 8px;line-height:1.4;
+  }
+  .principle .desc{font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin:0}
+
+  /* ===== Checkpoints ===== */
+  .ck-list{display:flex;flex-direction:column;gap:14px}
+  .ck-item{
+    display:grid;grid-template-columns:120px 1fr;gap:20px;
+    padding:20px 24px;background:var(--snow);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow);
+    border-left:4px solid var(--gold);
+  }
+  @media (max-width:720px){
+    .ck-item{grid-template-columns:1fr;gap:8px}
+  }
+  .ck-when{
+    font-family:"Fraunces",serif;font-style:italic;font-weight:800;font-size:24px;
+    color:var(--ocean);line-height:1.2;
+  }
+  .ck-when small{
+    display:block;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+    color:var(--ink-faint);font-weight:500;font-style:normal;
+    letter-spacing:0.1em;margin-top:2px;
+  }
+  .ck-criteria{font-size:14px}
+  .ck-criteria .pass{
+    display:flex;align-items:center;gap:8px;color:var(--moss-dark);
+    font-weight:500;margin-bottom:6px;
+  }
+  .ck-criteria .pass::before{
+    content:"✓";font-weight:700;
+  }
+  .ck-criteria .fallback{
+    display:flex;align-items:flex-start;gap:8px;color:var(--coral-dark);
+    font-size:13px;margin-top:4px;
+  }
+  .ck-criteria .fallback::before{
+    content:"→";font-weight:700;flex-shrink:0;
+  }
+
+  /* ===== Resources ===== */
+  .res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:720px){.res-grid{grid-template-columns:1fr}}
+  .res-cat{
+    padding:20px 22px;background:var(--snow);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow);
+  }
+  .res-cat h3{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:15px;
+    margin:0 0 12px;color:var(--ocean);
+    display:flex;align-items:center;gap:8px;
+  }
+  .res-cat h3 .emoji{font-size:18px}
+  .res-cat ul{margin:0;padding-left:0;list-style:none}
+  .res-cat li{
+    padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;
+  }
+  .res-cat li:last-child{border-bottom:none}
+  .res-cat li .title{color:var(--ocean);font-weight:500;display:block;margin-bottom:2px}
+  .res-cat li .url{
+    font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ocean-mid);
+    word-break:break-all;
+  }
+  .res-cat li .note{color:var(--ink-soft);font-size:12px;display:block;margin-top:2px}
+
+  /* ===== Skills inventory ===== */
+  .skills-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media (max-width:720px){.skills-grid{grid-template-columns:1fr}}
+  .skill-phase{
+    padding:18px 20px;background:var(--snow);
+    border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);
+  }
+  .skill-phase h3{
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:14.5px;
+    margin:0 0 10px;color:var(--ocean);
+    padding-bottom:8px;border-bottom:1px solid var(--line);
+  }
+  .skill-phase h3 .num{
+    font-family:"Fraunces",serif;font-style:italic;color:var(--coral);
+    margin-right:6px;
+  }
+  .skill-phase ul{margin:0;padding:0;list-style:none}
+  .skill-phase li{
+    position:relative;padding:5px 0 5px 24px;font-size:13px;color:var(--ink);
+  }
+  .skill-phase li::before{
+    content:"";position:absolute;left:0;top:11px;
+    width:12px;height:12px;border-radius:3px;
+    border:1.5px solid var(--ocean-mid);background:var(--snow);
+  }
+
+  /* ===== Footer ===== */
+  footer{
+    margin-top:64px;text-align:center;
+    font-family:"Fraunces",serif;font-style:italic;
+    color:var(--ink-faint);font-size:13px;
+    padding-top:24px;border-top:1px dashed var(--line);
+  }
+  footer .wave{display:inline-block;margin:0 8px;color:var(--coral)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <span class="badge">Blender Roadmap · v1</span>
+  <div class="eyebrow">For Rishirecruit 3D Map</div>
+  <h1>
+    <span class="underline">利尻島</span>を <span class="accent">ローポリ</span>で<br>
+    作り上げるための地図
+  </h1>
+  <p class="lead">
+    Blender初挑戦から「リシリクルートの3Dマップに乗せられるglbファイル」までの全工程を
+    視覚的にまとめたロードマップ。<strong>このページを開きながら手を動かす</strong>ことを想定して作ってあります。
+  </p>
+
+  <div class="mt-row">
+    <div class="item">
+      <svg viewBox="0 0 100 80" width="64" height="51">
+        <defs><clipPath id="h-spring"><polygon points="50,6 65,28 88,72 12,72 35,28" /></clipPath></defs>
+        <g clip-path="url(#h-spring)">
+          <rect x="0" y="0" width="100" height="22" fill="#E8E4DA" />
+          <rect x="0" y="22" width="100" height="28" fill="#6FA66F" />
+          <rect x="0" y="50" width="100" height="30" fill="#9FCB85" />
+        </g>
+        <polygon points="50,6 65,28 88,72 12,72 35,28" fill="none" stroke="#0A2E4E" stroke-width="1.3" stroke-linejoin="round" />
+      </svg>
+      <div class="label">spring</div>
+    </div>
+    <div class="item">
+      <svg viewBox="0 0 100 80" width="64" height="51">
+        <defs><clipPath id="h-summer"><polygon points="50,6 65,28 88,72 12,72 35,28" /></clipPath></defs>
+        <g clip-path="url(#h-summer)">
+          <rect x="0" y="0" width="100" height="22" fill="#B8BCB8" />
+          <rect x="0" y="22" width="100" height="28" fill="#2D5F3C" />
+          <rect x="0" y="50" width="100" height="30" fill="#5AA862" />
+        </g>
+        <polygon points="50,6 65,28 88,72 12,72 35,28" fill="none" stroke="#0A2E4E" stroke-width="1.3" stroke-linejoin="round" />
+      </svg>
+      <div class="label">summer</div>
+    </div>
+    <div class="item">
+      <svg viewBox="0 0 100 80" width="64" height="51">
+        <defs><clipPath id="h-autumn"><polygon points="50,6 65,28 88,72 12,72 35,28" /></clipPath></defs>
+        <g clip-path="url(#h-autumn)">
+          <rect x="0" y="0" width="100" height="22" fill="#DFE5EB" />
+          <rect x="0" y="22" width="100" height="28" fill="#B5572E" />
+          <rect x="0" y="50" width="100" height="30" fill="#D4A04B" />
+        </g>
+        <polygon points="50,6 65,28 88,72 12,72 35,28" fill="none" stroke="#0A2E4E" stroke-width="1.3" stroke-linejoin="round" />
+      </svg>
+      <div class="label">autumn</div>
+    </div>
+    <div class="item">
+      <svg viewBox="0 0 100 80" width="64" height="51">
+        <defs><clipPath id="h-winter"><polygon points="50,6 65,28 88,72 12,72 35,28" /></clipPath></defs>
+        <g clip-path="url(#h-winter)">
+          <rect x="0" y="0" width="100" height="22" fill="#FFFFFF" />
+          <rect x="0" y="22" width="100" height="28" fill="#DCE6EE" />
+          <rect x="0" y="50" width="100" height="30" fill="#C8D4DC" />
+        </g>
+        <polygon points="50,6 65,28 88,72 12,72 35,28" fill="none" stroke="#0A2E4E" stroke-width="1.3" stroke-linejoin="round" />
+      </svg>
+      <div class="label">winter</div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== GOAL ===== -->
+<section class="goal-section">
+  <h2>到達したいゴール</h2>
+  <p class="goal-desc">
+    <strong>「リシリクルートの3Dマップとして実際にブラウザで動く」状態</strong>がゴール。
+    リアル寄りではなく、<strong>シンボル性のあるローポリ&ポップ</strong>で、利尻島の象徴的要素（利尻富士・海・主要ランドマーク）が一目で伝わるモデルを作る。
+  </p>
+
+  <div class="deliv-grid">
+    <div class="deliv">
+      <div class="file">island.glb</div>
+      <div class="desc">デスクトップ用フル版。3層メッシュ分離済みで季節色を動的に変更できる。</div>
+      <div class="meta">
+        <span>≤ 5MB</span>
+        <span>5〜10万ポリ</span>
+        <span>Draco圧縮</span>
+      </div>
+    </div>
+    <div class="deliv">
+      <div class="file">island-mobile.glb</div>
+      <div class="desc">モバイル用LOD版。ポリ数とディテールを大幅削減した軽量版。</div>
+      <div class="meta">
+        <span>≤ 2MB</span>
+        <span>≤ 2万ポリ</span>
+        <span>Meshopt推奨</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="criteria">
+    <div class="ck">合格基準 / Quality criteria</div>
+    <ul>
+      <li>形式: <code>glTF 2.0 / GLB</code>（バイナリ）</li>
+      <li>シェーディング: 全面 <code>Flat Shading</code>（ローポリ感を強調）</li>
+      <li>テクスチャ: 不使用、<code>Vertex Color</code> または マテリアル単色のみ</li>
+      <li>メッシュ構造: 山頂・中腹・麓・海面・ランドマークが独立メッシュ</li>
+      <li>マテリアル: 山の3層は別マテリアル（季節色変更のため必須）</li>
+      <li>識別性: 利尻富士のシルエット + 主要4ランドマーク（姫沼・オタトマリ沼・ペシ岬・鴛泊港）が見える</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== ROADMAP ===== -->
+<h2 class="section-title">6ステップの道のり <span class="meta">— 6-Step Production Path</span></h2>
+
+<div class="timeline">
+
+  <section class="step">
+    <div class="step-num">01</div>
+    <div class="step-card">
+      <div class="step-head">
+        <h3 class="step-name">基礎セットアップ</h3>
+        <span class="step-en">Foundation</span>
+        <span class="step-time">1〜2週間</span>
+      </div>
+      <div class="step-goal">Blender操作の基礎を身につけ、簡単な作品を一つ完成させる。利尻島に取りかかる前の「足場固め」。</div>
+      <ul class="tasks">
+        <li>Blender最新版インストール（5.x系推奨、現在使用中の5.1.1でOK）</li>
+        <li>Blender Guruの「<strong>ドーナツチュートリアル</strong>」を最後まで完走</li>
+        <li>Grant Abbitt の「Low Poly Beginner」シリーズで低ポリ感覚をつかむ</li>
+        <li>ショートカット: <code>G</code> 移動 / <code>R</code> 回転 / <code>S</code> スケール / <code>Tab</code> モード切替を体に覚えさせる</li>
+      </ul>
+      <div class="step-row">
+        <div class="info-box skills">
+          <span class="k">必要スキル</span>
+          オブジェクト操作 · Edit Mode · モディファイア概念 · マテリアル基本 · レンダリング
+        </div>
+        <div class="info-box output">
+          <span class="k">アウトプット</span>
+          ドーナツ作品1点 · Blender画面の「迷子」状態を脱出
+        </div>
+      </div>
+      <div class="pitfall">
+        <span class="k">落とし穴</span>
+        <p>このフェーズで「完璧に理解」しようとしないこと。8割わかれば十分。手を動かしながら覚える方が早い。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">02</div>
+    <div class="step-card">
+      <div class="step-head">
+        <h3 class="step-name">地形ベース作成</h3>
+        <span class="step-en">Terrain Foundation</span>
+        <span class="step-time">1週間</span>
+      </div>
+      <div class="step-goal">「四角い板に山が突き出ている」状態から「海に囲まれた島」に進化させる。</div>
+      <ul class="tasks">
+        <li><strong>国土地理院DEM</strong>から利尻島の標高データを取得（数値標高モデル 5mまたは10mメッシュ）</li>
+        <li>QGISでGeoTIFF → グレースケールPNG（16bit）に変換</li>
+        <li>BlenderでPlane作成 → Subdivide → <code>Displace</code> モディファイア</li>
+        <li>島の輪郭を <code>Boolean</code> で円形に切り抜き、または海面プレーンでマスク</li>
+        <li>海面プレーンを島より少し下に配置（深海ブルー #0A2E4E）</li>
+      </ul>
+      <div class="step-row">
+        <div class="info-box skills">
+          <span class="k">必要スキル</span>
+          Displace · Boolean · Subdivide · QGIS基礎 · DEM変換
+        </div>
+        <div class="info-box output">
+          <span class="k">アウトプット</span>
+          海に囲まれた島の形ができる · 利尻富士のシルエット出現
+        </div>
+      </div>
+      <div class="pitfall">
+        <span class="k">落とし穴</span>
+        <p>フリー素材のハイトマップを使うと利尻島の比率が狂う。国土地理院の正式データを使えば一発で「忠実な利尻島」が手に入る。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">03</div>
+    <div class="step-card">
+      <div class="step-head">
+        <h3 class="step-name">山の3層メッシュ分離</h3>
+        <span class="step-en">Layer Separation</span>
+        <span class="step-time">1〜2週間</span>
+      </div>
+      <div class="step-goal">季節色変更を実現するため、山頂・中腹・麓を<strong>別メッシュ</strong>に分割する。後からの修正は地獄なので、ここを丁寧に。</div>
+      <ul class="tasks">
+        <li>Edit Modeで標高により頂点を選択（例: 山頂=Z軸高さ800m以上）</li>
+        <li><code>P</code> キー → "Selection" でメッシュを分離（Peak / Mid / Base）</li>
+        <li>各メッシュに別マテリアル割り当て（<code>peak</code> / <code>mid</code> / <code>base</code>）</li>
+        <li>春パレットの色をデフォルトに設定（#E8E4DA / #6FA66F / #9FCB85）</li>
+        <li>各マテリアルの名前を統一規則で（コード側で参照しやすく）</li>
+      </ul>
+      <div class="step-row">
+        <div class="info-box skills">
+          <span class="k">必要スキル</span>
+          頂点選択 · メッシュ分離 (P) · マテリアル割り当て · 命名規則
+        </div>
+        <div class="info-box output">
+          <span class="k">アウトプット</span>
+          3つの独立メッシュ + 3つの別マテリアル · 季節変更の下準備完了
+        </div>
+      </div>
+      <div class="pitfall">
+        <span class="k">落とし穴</span>
+        <p>分離せず1メッシュのまま進むと、Phase 5以降で「季節色が変えられない」と気づいて全部やり直しに。<strong>このステップを必ず通過すること</strong>。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">04</div>
+    <div class="step-card">
+      <div class="step-head">
+        <h3 class="step-name">ランドマーク追加</h3>
+        <span class="step-en">Landmarks</span>
+        <span class="step-time">1週間</span>
+      </div>
+      <div class="step-goal">「これは利尻島だ」と一目でわかる象徴的要素を最小限の手数で配置する。</div>
+      <ul class="tasks">
+        <li><strong>姫沼</strong>: 利尻富士中腹に小さな青い円形プレーン（#5BB4E0）</li>
+        <li><strong>オタトマリ沼</strong>: 鬼脇エリアに同様の青い水面</li>
+        <li><strong>ペシ岬</strong>: 北側海岸に小さな凸部 + 灯台代わりの白いキューブ</li>
+        <li><strong>鴛泊港</strong>: フェリー桟橋のシンプルな板</li>
+        <li><strong>利尻空港</strong>: 滑走路を表すフラットな帯（任意）</li>
+        <li>各ランドマークの位置に <code>Empty</code> を配置（後でピン座標の参考に）</li>
+      </ul>
+      <div class="step-row">
+        <div class="info-box skills">
+          <span class="k">必要スキル</span>
+          基本オブジェクト追加 · Empty · スナップ機能 · オブジェクト整理（Collection）
+        </div>
+        <div class="info-box output">
+          <span class="k">アウトプット</span>
+          5つの主要ランドマーク + Empty による位置マーカー
+        </div>
+      </div>
+      <div class="pitfall">
+        <span class="k">落とし穴</span>
+        <p>ディテールを追いすぎないこと。「灯台」は白い小さな立方体で十分、屋根や扉まで作らない。ローポリの本質は「最小限の形で印象を残す」こと。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">05</div>
+    <div class="step-card">
+      <div class="step-head">
+        <h3 class="step-name">スタイル適用（ローポリ化）</h3>
+        <span class="step-en">Stylization</span>
+        <span class="step-time">1週間</span>
+      </div>
+      <div class="step-goal">スムーズな地形を「カクカクのローポリ」に変換し、ポップな配色を確定する。</div>
+      <ul class="tasks">
+        <li><code>Decimate</code> モディファイアを島メッシュに適用（Planarモード推奨）</li>
+        <li>各メッシュの全頂点選択 → 右クリック → <code>Shade Flat</code></li>
+        <li>マテリアル色の最終調整（4季節分のカラーを各マテリアルに保存）</li>
+        <li>必要なら低ポリの木・雲・波の凹凸などの装飾を追加</li>
+        <li>ライティングをベイク（任意、ランタイム軽量化目的）</li>
+      </ul>
+      <div class="step-row">
+        <div class="info-box skills">
+          <span class="k">必要スキル</span>
+          Decimate モディファイア · Shade Flat · マテリアルプロパティ
+        </div>
+        <div class="info-box output">
+          <span class="k">アウトプット</span>
+          ローポリ&ポップな利尻島 · ポリ数10万以下に収束
+        </div>
+      </div>
+      <div class="pitfall">
+        <span class="k">落とし穴</span>
+        <p>Decimateのratioを下げすぎると山が「ペラペラの板」になる。0.3〜0.5で様子を見ながら段階的に減らすのが安全。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">06</div>
+    <div class="step-card">
+      <div class="step-head">
+        <h3 class="step-name">書き出しと最適化</h3>
+        <span class="step-en">Export &amp; Optimize</span>
+        <span class="step-time">1週間</span>
+      </div>
+      <div class="step-goal">Webブラウザでサクサク動くglbファイルを完成させる。最後の関門。</div>
+      <ul class="tasks">
+        <li>全オブジェクト選択 → <code>Object &gt; Apply &gt; All Transforms</code></li>
+        <li>File → Export → glTF 2.0 で書き出し（Format: GLB Binary）</li>
+        <li>コマンドライン: <code>gltf-transform draco island.glb island-draco.glb</code></li>
+        <li>ファイルサイズ確認（5MB以下を目標）</li>
+        <li><a href="https://gltf-viewer.donmccurdy.com/" target="_blank">glTF Viewer</a> でブラウザ確認</li>
+        <li>モバイル用LOD版を別途書き出し（Decimateをさらに強めて）</li>
+        <li>PIN_POSITIONS用に主要ランドマークの座標を記録</li>
+      </ul>
+      <div class="step-row">
+        <div class="info-box skills">
+          <span class="k">必要スキル</span>
+          glTF Export設定 · Apply Transforms · CLIツール · ブラウザ確認
+        </div>
+        <div class="info-box output">
+          <span class="k">アウトプット</span>
+          <code>island.glb</code> + <code>island-mobile.glb</code> · 座標リスト · 完成！
+        </div>
+      </div>
+      <div class="pitfall">
+        <span class="k">落とし穴</span>
+        <p>Apply Transformsを忘れるとブラウザで位置がズレる。書き出し直前に必ず実行。</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== Big 5 Mindset ===== -->
+<h2 class="section-title">考え方の核5つ <span class="meta">— The Big Five Mindset</span></h2>
+
+<div class="mindset">
+  <div class="principle" data-num="01">
+    <div class="title">シンボル性 &gt; リアルさ</div>
+    <p class="desc">利尻富士「らしさ」が伝わればOK。地理的に正確である必要はない。象徴を抽出する。</p>
+  </div>
+  <div class="principle" data-num="02">
+    <div class="title">完璧主義は捨てる</div>
+    <p class="desc">v1は粗くてもいい。出来た時点でWeb確認、改善は後追い。リリース後も磨ける。</p>
+  </div>
+  <div class="principle" data-num="03">
+    <div class="title">メッシュ分離は最初から</div>
+    <p class="desc">山頂・中腹・麓は最初から別メッシュにする。後からの分割は本当に地獄。</p>
+  </div>
+  <div class="principle" data-num="04">
+    <div class="title">テクスチャを使わない</div>
+    <p class="desc">Vertex ColorかMaterial Colorだけで構成。容量が10倍違う。</p>
+  </div>
+  <div class="principle" data-num="05">
+    <div class="title">早く・何度も書き出す</div>
+    <p class="desc">Phase 5まで待たない。Phase 2-3でも一度glb化してWebで確認する習慣を。</p>
+  </div>
+</div>
+
+<!-- ===== Skills inventory ===== -->
+<h2 class="section-title">必要スキル一覧 <span class="meta">— Skills Inventory</span></h2>
+
+<div class="skills-grid">
+  <div class="skill-phase">
+    <h3><span class="num">A</span>基礎</h3>
+    <ul>
+      <li>Blender画面のレイアウト理解</li>
+      <li>オブジェクト操作（移動・回転・スケール）</li>
+      <li>Edit Mode と Object Mode の切替</li>
+      <li>頂点・辺・面の選択</li>
+      <li>モディファイアの基本概念</li>
+      <li>マテリアル設定（Basicレベル）</li>
+      <li>レンダリングプレビュー</li>
+    </ul>
+  </div>
+  <div class="skill-phase">
+    <h3><span class="num">B</span>地形・モディファイア</h3>
+    <ul>
+      <li>Displace モディファイア</li>
+      <li>Boolean モディファイア</li>
+      <li>Subdivision Surface</li>
+      <li>Plane の細分化（Subdivide）</li>
+      <li>テクスチャ → Displace 接続</li>
+      <li>Empty の使い方</li>
+    </ul>
+  </div>
+  <div class="skill-phase">
+    <h3><span class="num">C</span>ローポリ化・スタイル</h3>
+    <ul>
+      <li>Decimate モディファイア（Collapse / Planar）</li>
+      <li>Shade Flat / Shade Smooth</li>
+      <li>頂点グループ</li>
+      <li>メッシュ分離（P キー）</li>
+      <li>マテリアル別割り当て</li>
+      <li>Vertex Colors</li>
+    </ul>
+  </div>
+  <div class="skill-phase">
+    <h3><span class="num">D</span>書き出し・最適化</h3>
+    <ul>
+      <li>glTF/GLB 書き出し設定</li>
+      <li>Apply All Transforms</li>
+      <li>gltf-transform CLI 使用</li>
+      <li>Draco / Meshopt 圧縮の選択</li>
+      <li>glTF Viewer でブラウザ確認</li>
+      <li>LOD（低ポリ版）の書き出し</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== Checkpoints ===== -->
+<h2 class="section-title">時系列チェックポイント <span class="meta">— Decision Gates</span></h2>
+
+<div class="ck-list">
+  <div class="ck-item">
+    <div class="ck-when">3週時点<small>WEEK 3</small></div>
+    <div class="ck-criteria">
+      <div class="pass">利尻富士のシルエットがそれらしく見えている</div>
+      <div class="pass">Boolean切り抜きで島の輪郭ができている</div>
+      <div class="fallback">クリアできない場合 → <strong>外注（B案）への切替を真剣に検討する</strong>タイミング</div>
+    </div>
+  </div>
+  <div class="ck-item">
+    <div class="ck-when">6週時点<small>WEEK 6</small></div>
+    <div class="ck-criteria">
+      <div class="pass">3層メッシュ分離が完了している</div>
+      <div class="pass">主要ランドマーク3つ以上が配置されている</div>
+      <div class="fallback">遅れている場合 → スコープを縮小、ランドマーク数を5→3に減らす</div>
+    </div>
+  </div>
+  <div class="ck-item">
+    <div class="ck-when">8週時点<small>WEEK 8</small></div>
+    <div class="ck-criteria">
+      <div class="pass">初回のGLB書き出しが完了</div>
+      <div class="pass">ファイルサイズが10MB以下</div>
+      <div class="fallback">クリアできない場合 → モディファイア整理 + ジオメトリのさらなる削減</div>
+    </div>
+  </div>
+  <div class="ck-item">
+    <div class="ck-when">10週時点<small>WEEK 10</small></div>
+    <div class="ck-criteria">
+      <div class="pass">フルクオリティ版 + LOD版が完成</div>
+      <div class="pass">ファイルサイズ目標達成（≤5MB / ≤2MB）</div>
+      <div class="fallback">クリアできない場合 → さらなる最適化（ポリ削減・マテリアル統合）+ 場合により外注の力を借りる</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Resources ===== -->
+<h2 class="section-title">学習リソース <span class="meta">— Learning Resources</span></h2>
+
+<div class="res-grid">
+  <div class="res-cat">
+    <h3><span class="emoji">📺</span>無料チュートリアル</h3>
+    <ul>
+      <li>
+        <span class="title">Blender Guru「Donut」</span>
+        <span class="url">youtube.com / @BlenderGuru</span>
+        <span class="note">入門の定番。10時間ほど。基礎が一通り身につく</span>
+      </li>
+      <li>
+        <span class="title">Grant Abbitt「Low Poly」シリーズ</span>
+        <span class="url">youtube.com / @grabbitt</span>
+        <span class="note">低ポリ感覚を養うのに最適</span>
+      </li>
+      <li>
+        <span class="title">Ian Hubert「1 minute Blender」</span>
+        <span class="url">youtube.com / @IanHubert2</span>
+        <span class="note">時短テクニック集、Tips拾い読み用</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="res-cat">
+    <h3><span class="emoji">🗺️</span>地形データ</h3>
+    <ul>
+      <li>
+        <span class="title">国土地理院 基盤地図情報</span>
+        <span class="url">fgd.gsi.go.jp</span>
+        <span class="note">数値標高モデルを無料DL。日本の正式測量データ</span>
+      </li>
+      <li>
+        <span class="title">QGIS</span>
+        <span class="url">qgis.org</span>
+        <span class="note">GeoTIFFをグレースケールPNGに変換するために使用</span>
+      </li>
+      <li>
+        <span class="title">terrain.party（参考）</span>
+        <span class="url">terrain.party</span>
+        <span class="note">世界の地形を1分でDL。クオリティは粗いが手軽</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="res-cat">
+    <h3><span class="emoji">⚙️</span>書き出し・最適化</h3>
+    <ul>
+      <li>
+        <span class="title">gltf-transform CLI</span>
+        <span class="url">gltf-transform.dev</span>
+        <span class="note">Draco / Meshopt圧縮、品質チェック</span>
+      </li>
+      <li>
+        <span class="title">glTF Viewer</span>
+        <span class="url">gltf-viewer.donmccurdy.com</span>
+        <span class="note">ブラウザで即確認できる定番ビューア</span>
+      </li>
+      <li>
+        <span class="title">Three.js Editor</span>
+        <span class="url">threejs.org/editor</span>
+        <span class="note">サイトに乗せる前の最終確認に</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <span class="wave">⌇</span> Blender Roadmap for Rishirecruit · v1 <span class="wave">⌇</span>
+</footer>
+
+</div>
+</body>
+</html>
