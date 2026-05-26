@@ -9,5 +9,17 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// テーマの基本設定を登録します。
+require_once get_template_directory() . '/inc/theme-setup.php';
+
 // カスタム投稿タイプを登録します。
 require_once get_template_directory() . '/inc/cpt-registration.php';
+
+// WPGraphQLの安全性とパフォーマンス設定を登録します。
+require_once get_template_directory() . '/inc/graphql-config.php';
+
+// Next.jsフロントエンドからのCORSアクセスを制御します。
+require_once get_template_directory() . '/inc/cors-config.php';
+
+// ヘッドレス運用向けの不要機能無効化とSEO制御を登録します。
+require_once get_template_directory() . '/inc/headless-config.php';
