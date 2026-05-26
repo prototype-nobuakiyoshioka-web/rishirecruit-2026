@@ -7,7 +7,8 @@
  * ただしプラグイン互換性のため、wp_head() / wp_body_open() / wp_footer()
  * の各フックは必ず呼び出します。
  *
- * SEO: 公開URLは Next.js 側に集約するため、WordPress 側は noindex,nofollow。
+ * SEO 制御（noindex,nofollow 等）は `inc/headless-config.php` の
+ * `wp_robots` フィルタに集約します。本ファイルでは meta タグを直接書きません。
  */
 
 if (!defined('ABSPATH')) {
@@ -19,7 +20,6 @@ if (!defined('ABSPATH')) {
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="noindex,nofollow">
     <title><?php bloginfo('name'); ?></title>
     <?php wp_head(); ?>
 </head>
