@@ -48,6 +48,7 @@
 | カメラ | スクロール連動回転 + 範囲制限（左右45°目安） | 操作迷子防止 + 裏面モデリング省略 |
 | モバイル | 軽量3Dを維持（2Dフォールバックしない） | ブランド体験の一貫性 |
 | WPテーマ | ゼロから自作（既存テーマ流用しない） | ヘッドレス専用なので最小構成 |
+| ディレクトリ | WPテーマと Next.js プロジェクトを**同一ディレクトリで共存** | 単一管理 + Local 連携を簡素化 |
 
 ---
 
@@ -61,17 +62,18 @@
 
 **フロントエンド**（Phase 4 以降で導入予定）
 - React Three Fiber / `@react-three/drei` / `@react-three/postprocessing`
-- Lenis（スムーススクロール）
-- Zustand（状態管理）
+- Lenis(スムーススクロール)
+- Zustand(状態管理)
 - TanStack Query + `graphql-request` + GraphQL Codegen
-- Framer Motion（UIアニメ）
+- Framer Motion(UIアニメ)
 
 **バックエンド**
-- WordPress（ヘッドレス運用）
-- WPGraphQL / ACF Pro / ACF for WPGraphQL / CPT UI
+- WordPress(ヘッドレス運用、6.x 系)
+- PHP 8.x 系
+- WPGraphQL / ACF Pro 6.x / WPGraphQL for ACF / CPT UI
 
 **3Dアセット**
-- Blender → glTF/GLB（Draco or Meshopt 圧縮）
+- Blender → glTF/GLB(Draco or Meshopt 圧縮)
 - 国土地理院 DEM から地形ベース
 - 総ポリ目安 5〜10万 / ファイルサイズ ≤ 5MB
 
@@ -82,37 +84,68 @@
 ## ディレクトリ構造
 
 ```
-/                       WordPress テーマルート（style.css / index.php / front-page.php / functions.php）
-/app                    Next.js App Router pages
-/components
-  /scene                Canvas, Island, Pins, Lighting（3D関連）
-  /ui                   Modal, Filter, Nav（DOM側UI）
-/lib
-  /wp                   GraphQLクライアントとクエリ
-  /three                Helpers（clamp回転、Billboard等）
-/public
-  /models               island.glb / island-mobile.glb
-/store                  Zustand ストア（scene / ui / data で分離）
-/docs                   要件・スキーマ・トークン等
-/reference              完全仕様 HTML
+/                       プロジェクトルート(WP テーマ + Next.js が共存)
+├── style.css           WP テーマ必須ファイル
+├── index.php           WP テーマ最小テンプレート(ヘッドレス用)
+├── functions.php       WP テーマ機能ファイル(inc/* を読み込む)
+├── inc/                WP 機能の分割ファイル群
+│   ├── cpt-registration.php
+│   ├── theme-setup.php
+│   ├── graphql-config.php
+│   ├── cors-config.php
+│   ├── headless-config.php
+│   ├── acf-local-json.php           (Task 03 で追加予定)
+│   └── acf-fields-*.php              (Task 03-04 で追加予定)
+├── acf-json/           ACF Local JSON 保存先(Task 03 で追加予定)
+├── app/                Next.js App Router pages
+├── components/
+│   ├── scene/          Canvas, Island, Pins, Lighting(3D関連)
+│   └── ui/             Modal, Filter, Nav(DOM側UI)
+├── lib/
+│   ├── wp/             GraphQLクライアントとクエリ
+│   └── three/          Helpers(clamp回転、Billboard等)
+├── public/
+│   └── models/         island.glb / island-mobile.glb
+├── store/              Zustand ストア(scene / ui / data で分離)
+├── docs/               要件・スキーマ・トークン等
+├── reference/          完全仕様 HTML
+└── prompts/            Codex 用タスクプロンプト
 ```
+
+WordPress 側はこのディレクトリをテーマとして認識し、Next.js 側は `app/` `package.json` 等を起点に動作する。両者は干渉しない。
 
 ---
 
 ## コーディング規約
 
-- **3D関連コンポーネントは必ず `"use client"`** を冒頭に書く（R3F は Server Component に置けない）
-- **`useFrame` 内で重い処理を書かない**（オブジェクト生成・配列再生成 NG、ref 経由で書き換える）
+### TypeScript / React(Phase 4 以降中心)
+
+- **3D関連コンポーネントは必ず `"use client"`** を冒頭に書く(R3F は Server Component に置けない)
+- **`useFrame` 内で重い処理を書かない**(オブジェクト生成・配列再生成 NG、ref 経由で書き換える)
 - **状態は責務分離**: 3Dシーン状態 / UI状態 / データ状態 を別ストアで管理
-- **型は GraphQL Codegen から生成**したものを使う（手書きしない）
+- **型は GraphQL Codegen から生成**したものを使う(手書きしない)
 - 命名: コンポーネント PascalCase、フック `use` プレフィックス、ストア `<Name>Store`
 - コメントは「なぜ」を書く。「何を」はコードで表現する。
+
+### PHP / WordPress(Phase 3 中心)
+
+- すべての PHP ファイル先頭に `if (!defined('ABSPATH')) exit;`
+- インデント: スペース4つ(PSR-12 準拠)
+- 命名: 関数 snake_case / クラス PascalCase
+- 各ファイル先頭に PHPDoc 風コメントで責務を明記
+- 関数・主要ブロックに **日本語コメント**を付ける(後で見返した時に意図が分かるように)
+- 無名関数で `add_action` / `add_filter` を実行(グローバル汚染回避)
+- テキストドメイン: `'rishirecruit2026'`
+- **WordPress 6.x / PHP 8.x 互換**
+- すべての CPT・ACF フィールドに `show_in_graphql => 1`
+- ACF フィールド名は snake_case(WPGraphQL が camelCase に自動変換)
+- フックは適切なタイミングを使う(`init`, `acf/init`, `after_setup_theme`, `graphql_*` 等)
 
 ---
 
 ## 重要な実装パターン
 
-### スクロール連動回転（clamp → damp の順）
+### スクロール連動回転(clamp → damp の順)
 
 ```ts
 "use client";
@@ -140,15 +173,40 @@ useFrame((_, dt) => {
 
 デバイス判定で `island.glb` ↔ `island-mobile.glb` を切り替える。`dpr` も `[1, 1.5]` に制限し、影とポストエフェクトはオフ。
 
+### ACF フィールドキーの命名規則
+
+- フィールドグループキー: `group_<post_type>` (例: `group_job_posting`)
+- タブキー: `field_<prefix>_tab_<section>` (例: `field_jp_tab_basic`)
+- データフィールドキー: `field_<prefix>_<name>` (例: `field_jp_employment_type`)
+
+prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → ts`, `event → ev`)。
+**ACF キーは一度公開したデータと紐付くため、変更しない**。
+
 ---
 
-## やってはいけないこと（禁止事項）
+## やってはいけないこと(禁止事項)
+
+### 共通
+
+- ❌ コアファイル(wp-config.php, wp-includes, wp-admin)の編集
+- ❌ プラグイン本体のコード変更(フィルタ・アクションで対応)
+- ❌ デバッグコード(`var_dump`, `print_r`, `error_log`)の本番混入
+- ❌ スコープ外ファイルの予告なし削除(削除時はコミットメッセージで理由を1行明記)
+- ❌ Three.js と R3F のバージョンを噛み合わないものにする(`package.json` で pin)
+
+### Phase 3(WordPress 構築)固有
+
+- ❌ WP 側でテーマの表示テンプレを作り込む(ヘッドレスなので不要)
+- ❌ `Access-Control-Allow-Origin: *` のワイルドカード許可
+- ❌ `$_SERVER['HTTP_ORIGIN']` の直接出力(XSS / ヘッダインジェクションのリスク)
+- ❌ ACF フィールド名の typo(既存の typo の再現も厳禁、schema doc 修正版が正)
+- ❌ ACF キーの命名規則違反(既存データとの紐付けが切れる)
+- ❌ ピン座標 (X/Y/Z) を ACF の素の数値フィールドだけで完結させる → 編集者がまず入力できない(`pin_location` select で扱う)
+
+### Phase 4-5(フロント・3D)固有
 
 - ❌ R3F コンポーネントを Server Component に置く
-- ❌ 島の裏側（回転制限外）をモデリング・実装で考慮する（工数の無駄）
-- ❌ ピン座標 (X/Y/Z) を ACF の素の数値フィールドだけで完結させる → 編集者がまず入力できない
-- ❌ Three.js と R3F のバージョンを噛み合わないものにする（`package.json` で pin）
-- ❌ WP 側でテーマの表示テンプレを作り込む（ヘッドレスなので不要）
+- ❌ 島の裏側(回転制限外)をモデリング・実装で考慮する(工数の無駄)
 - ❌ GLB にテクスチャをベイクして容量を膨らませる → 単色＋バーテックスカラー基本
 
 ---
@@ -159,9 +217,9 @@ useFrame((_, dt) => {
 
 | コマンド | 内容 |
 | --- | --- |
-| `npm run dev` | Next.js 開発サーバ（`http://localhost:3000`） |
+| `npm run dev` | Next.js 開発サーバ(`http://localhost:3000`) |
 | `npm run build` | 本番ビルド |
-| `npm run start` | 本番起動（ビルド後） |
+| `npm run start` | 本番起動(ビルド後) |
 | `npm run lint` | ESLint |
 
 > テスト: ランナー未導入。Phase 5 以降で Vitest + Playwright を検討。
@@ -173,7 +231,8 @@ useFrame((_, dt) => {
 
 | 症状 | まず確認 |
 |---|---|
-| フロントから WP API が叩けない | CORS 設定（`functions.php` の Allow-Origin） |
+| フロントから WP API が叩けない | CORS 設定(`inc/cors-config.php` の許可オリジン) |
+| GraphQL で ACF フィールドが返ってこない | フィールドの `show_in_graphql => 1` 設定、WPGraphQL for ACF 有効化 |
 | GLB が読み込めない/キャッシュされない | サーバーの MIME `model/gltf-binary` |
 | iOS Safari で 3D がカクつく/落ちる | dpr 下げ、影オフ、LOD モデルに切替 |
 | スクロール量がズレる | Lenis と native scroll の干渉、Lenis に一元化 |
@@ -186,32 +245,43 @@ useFrame((_, dt) => {
 
 ### 新しいピン種別を追加する
 1. `docs/03-content-schema.md` に CPT / ACF フィールド定義を追記
-2. WP 側で CPT UI + ACF にスキーマ登録
-3. `lib/wp/queries/` に GraphQL クエリを追加 → `npm run codegen`
-4. `components/scene/Pins/` にピンコンポーネントを追加
-5. `store/uiStore.ts` のモーダル type に追記
+2. `inc/cpt-registration.php` に CPT 登録を追加
+3. `inc/acf-fields-<post_type>.php` を新規作成して ACF フィールドを登録
+4. `lib/wp/queries/` に GraphQL クエリを追加 → `npm run codegen`
+5. `components/scene/Pins/` にピンコンポーネントを追加
+6. `store/uiStore.ts` のモーダル type に追記
 
 ### 新しい 3D コンポーネントを追加する
 1. `"use client"` を冒頭に書く
 2. `components/scene/` 配下に配置
-3. `useFrame` を使う場合、内部でアロケーション禁止（`useRef` で外に出す）
+3. `useFrame` を使う場合、内部でアロケーション禁止(`useRef` で外に出す)
 4. `<Canvas>` の子に置く前に Drei の `<Suspense>` で囲む
 
 ### 依存パッケージを追加する
 1. Phase 範囲を AGENTS.md の「技術スタック」と突合
-2. バージョンは固定（`^` を最小限）
+2. バージョンは固定(`^` を最小限)
 3. `package.json` 編集 → `npm install` → `package-lock.json` も commit
 4. three / R3F 系は組み合わせ表で確認してから
+
+### 新しい Codex タスクを追加する
+1. `prompts/phase-X-<name>/NN-<task>.md` を作成
+2. プロンプトには共通ルール(PHP規約等)を再記述しない(AGENTS.md 参照を促す)
+3. タスク固有の内容・成果物・レビュー基準・確認手順に集中する
 
 ---
 
 ## 現在のフェーズ
 
 <!-- 作業を進めるたびにここを更新する -->
-- [ ] Phase 1: 要件定義・設計
-- [ ] Phase 2: 3Dアセット制作
-- [ ] Phase 3: WordPress 構築
-- [ ] Phase 4: フロントエンド基盤
+- [x] **Phase 1: 要件定義・設計** — 完了(`docs/` 配下 5 ファイル + `reference/` の HTML)
+- [ ] **Phase 2: 3Dアセット制作** — ロードマップあり、Blender 作業中(`reference/blender-roadmap.html`)
+- [ ] **Phase 3: WordPress 構築** — 進行中
+  - [x] Task 01: テーマ基盤 + 3CPT 登録
+  - [x] Task 02: WPGraphQL + CORS + ヘッドレス強化
+  - [ ] Task 03: ACF Local JSON + job_posting フィールド登録 ← **次やる**
+  - [ ] Task 04: touristspot / event フィールド登録
+  - [ ] Task 05: WPGraphQL for ACF 動作確認
+- [ ] **Phase 4: フロントエンド基盤** — Next.js 雛形あり(`app/page.tsx`)、本格実装はこれから
 - [ ] Phase 5: 3D シーン実装
 - [ ] Phase 6: ピン・コンテンツ実装
 - [ ] Phase 7: モバイル最適化
@@ -228,4 +298,5 @@ useFrame((_, dt) => {
 5. **デザイントークン (v2)** → `docs/04-design-tokens.md`
 6. **サイトマップ・情報設計** → `docs/05-sitemap.md`
 7. **メッセージング・コピー** → `docs/06-messaging.md`
-8. **参考サイト** → <https://haru-ni.net>
+8. **Codex タスクプロンプト** → `prompts/phase-*/`
+9. **参考サイト** → <https://haru-ni.net>
