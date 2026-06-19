@@ -79,6 +79,14 @@
 
 > 依存追加は **package.json の Phase ごと一括コミット**を原則とする。バージョンは pin で固定し、three / R3F の組み合わせ崩れを防ぐ。
 
+### バージョン指定の読み替えルール
+
+プロンプトや AGENTS.md でパッケージのバージョンを pin 指定している場合、**そのバージョンが実際に npm レジストリに存在するか事前に確認**してから `npm install` を実行する。
+
+- 指定バージョンが存在しない場合 → 同系統(同じメジャー.マイナー)の最新安定版に読み替えて進めてよい
+- 読み替えた場合は **コミットメッセージに理由を明記**する(例: `@react-three/drei は 10.3.3 が存在しないため 10.3.0 に読み替え`)
+- 読み替えにより three / R3F / drei の組み合わせが崩れる懸念がある場合は、進める前に確認を取る
+
 ---
 
 ## ディレクトリ構造
@@ -281,7 +289,9 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [ ] Task 03: ACF Local JSON + job_posting フィールド登録 ← **次やる**
   - [ ] Task 04: touristspot / event フィールド登録
   - [ ] Task 05: WPGraphQL for ACF 動作確認
-- [ ] **Phase 4: フロントエンド基盤** — Next.js 雛形あり(`app/page.tsx`)、本格実装はこれから
+- [ ] **Phase 4: フロントエンド基盤** — 進行中
+  - [x] Task 01: R3F 最小シーン + 島 GLB 表示
+  - [ ] Task 02: スクロール連動回転(clamp → damp、Lenis 導入) ← **次やる**
 - [ ] Phase 5: 3D シーン実装
 - [ ] Phase 6: ピン・コンテンツ実装
 - [ ] Phase 7: モバイル最適化
