@@ -243,7 +243,7 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 | GraphQL で ACF フィールドが返ってこない | フィールドの `show_in_graphql => 1` 設定、WPGraphQL for ACF 有効化 |
 | GLB が読み込めない/キャッシュされない | サーバーの MIME `model/gltf-binary` |
 | iOS Safari で 3D がカクつく/落ちる | dpr 下げ、影オフ、LOD モデルに切替 |
-| スクロール量がズレる | Lenis と native scroll の干渉、Lenis に一元化 |
+| スクロール量がズレる / `<ScrollControls>` の `scroll.offset` が動かない | Lenis が `window` で `preventDefault()` すると `<ScrollControls>` 内部 DOM 要素がイベントを受け取れず競合する。「同じスクロール量を見ていれば競合しない」は誤り。`<ScrollControls>` を使う場合は Lenis を `window` レベルでなく `<ScrollControls>` の内部要素に紐付けるか、`<ScrollControls>` 自体を廃止して Lenis の scroll progress を直接回転に渡す設計にする(Phase 4 Task 03 で実例あり) |
 | 回転がカクつく | clamp→damp の順序、`useFrame` 内の重い処理 |
 | WP プレビューが動かない | Next.js Draft Mode + 専用プレビューエンドポイント |
 
@@ -291,7 +291,8 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [ ] Task 05: WPGraphQL for ACF 動作確認
 - [ ] **Phase 4: フロントエンド基盤** — 進行中
   - [x] Task 01: R3F 最小シーン + 島 GLB 表示
-  - [ ] Task 02: スクロール連動回転(clamp → damp、Lenis 導入) ← **次やる**
+  - [x] Task 02: スクロール連動回転(clamp → damp)
+  - [ ] Task 03: Lenis 導入 — 方針A(見た目スムージングのみ)は `<ScrollControls>` との競合でリバート済み。方針B(Lenis主導の scroll progress)で再設計予定 ← **次やる**
 - [ ] Phase 5: 3D シーン実装
 - [ ] Phase 6: ピン・コンテンツ実装
 - [ ] Phase 7: モバイル最適化

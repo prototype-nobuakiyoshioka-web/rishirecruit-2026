@@ -1,23 +1,30 @@
 # コンテンツスキーマ定義書
 
-**Document version:** 1.0
-**作成日:** 2026-05-20
-**プロジェクト:** 利尻富士町 3Dポップ求人ポータル
+**Document version:** 2.0
+**作成日:** 2026-06-19
+**プロジェクト:** 利尻富士町 3Dポップ求人ポータル(リシリクルート)
 
 ---
 
 ## 1. 概要
 
-本サイトのコンテンツアーキテクチャは **3つのWordPressカスタム投稿タイプ (CPT) + Note RSS連携** の構成で運用する。
+本サイトのコンテンツアーキテクチャは4つのWordPressカスタム投稿タイプ(CPT)+ Note RSS連携の構成で運用する。
 
 | 構成要素 | 役割 | 編集者 |
 |---|---|---|
-| `job_posting` (CPT) | 求人情報 | 運営者 |
-| `touristspot` (CPT) | 観光地情報 | 運営者 |
-| `event` (CPT) | イベント情報 | 運営者 |
-| Note RSS連携 | コラム記事の取得・表示 | 別メンバー（noteで執筆） |
+| job_posting (CPT) | 求人情報 | 運営者 |
+| touristspot (CPT) | 観光地情報 | 運営者 |
+| event (CPT) | イベント情報 | 運営者 |
+| testimonial (CPT) New | 移住者の声 | 運営者 |
+| Note RSS連携 | コラム記事の取得・表示 | 別メンバー(noteで執筆) |
 
 column CPTは作成しない。記事コンテンツはnote側に集約し、RSSで取得して掲示板UIで表示する。
+
+### 1.1 v2 での変更点
+
+- 新規CPT testimonial(移住者の声)を追加(6章として新設、旧4-6章を5-7章に繰り下げ)
+- ヘッダーナビゲーション変更に伴い、testimonial は /voices ルートで一覧・詳細を持つ
+- testimonial はピンを持たない(3D地図上に表示しない、一覧ページのみ)
 
 ---
 
@@ -25,11 +32,11 @@ column CPTは作成しない。記事コンテンツはnote側に集約し、RSS
 
 ### 2.1 命名規則
 
-- フィールド名はすべて **`snake_case`** で統一
-- 詳細系フィールドには `_detail` サフィックスを付ける
-- 真偽値は `_available` サフィックスまたは `is_` プレフィックス
-- URL系は `_url` サフィックス
-- 画像系は `_image` サフィックス
+- フィールド名はすべて snake_case で統一
+- 詳細系フィールドには _detail サフィックスを付ける
+- 真偽値は _available サフィックスまたは is_ プレフィックス
+- URL系は _url サフィックス
+- 画像系は _image サフィックス
 
 ### 2.2 WordPress標準フィールドの活用
 
@@ -37,17 +44,17 @@ column CPTは作成しない。記事コンテンツはnote側に集約し、RSS
 
 | 標準フィールド | 用途 |
 |---|---|
-| Post Title | 投稿のメインタイトル（職種名・スポット名・イベント名） |
+| Post Title | 投稿のメインタイトル(職種名・スポット名・イベント名・移住者名) |
 | Slug | URL用識別子。touristspotではピンIDとしても機能 |
-| Published Date | 公開日（時系列ソート用） |
-| Post Status | 下書き/公開（募集中フラグの代替として使用） |
+| Published Date | 公開日(時系列ソート用) |
+| Post Status | 下書き/公開(募集中フラグの代替として使用) |
 
-### 2.3 サムネイル画像・動画の表示パターン（A仕様）
+### 2.3 サムネイル画像・動画の表示パターン(A仕様)
 
 全CPT共通のルール:
 
-- `thumbnail_video_url` に値がある場合 → **動画を表示**
-- `thumbnail_video_url` が空の場合 → **`thumbnail_image` を表示**
+- thumbnail_video_url に値がある場合 → 動画を表示
+- thumbnail_video_url が空の場合 → thumbnail_image を表示
 
 これにより、編集者は「画像/動画どちらを使うか」を明示的に選択する必要がなく、入力するフィールドだけが優先される。
 
@@ -58,32 +65,34 @@ column CPTは作成しない。記事コンテンツはnote側に集約し、RSS
 ```ts
 // /lib/three/pin-positions.ts
 export const PIN_POSITIONS: Record<string, { x: number; y: number; z: number }> = {
-  // job_posting クラスタピン（pin_location selectの値と対応）
+  // job_posting クラスタピン(pin_location selectの値と対応)
   town_hall:     { x:  0, y: 0.5, z:  0 },   // 役場本庁舎
   health_center: { x:  0, y: 0.5, z:  0 },   // 保健センター
   airport:       { x:  0, y: 0.5, z:  0 },   // 利尻空港
   oniwaki:       { x:  0, y: 0.5, z:  0 },   // 鬼脇地区
 
-  // touristspot ピン（WP slugと対応、約30個）
+  // touristspot ピン(WP slugと対応、約30個)
   himenuma:        { x:  0, y: 0.5, z:  0 }, // 姫沼
   otatomari_numa:  { x:  0, y: 0.5, z:  0 }, // オタトマリ沼
   peshi_misaki:    { x:  0, y: 0.5, z:  0 }, // ペシ岬
-  // ...
 
-  // event専用ピン（event の pin_reference と対応、必要に応じて追加）
+  // event専用ピン(event の pin_reference と対応、必要に応じて追加)
   rishirisan_opening: { x:  0, y: 0.5, z:  0 }, // 利尻山開きまつり
 };
 ```
 
-座標値はBlenderモデル完成後に微調整する。すべて初期値は `{ 0, 0.5, 0 }`。
+座標値はBlenderモデル完成後に微調整する。すべて初期値は { 0, 0.5, 0 }。
+
+testimonial CPT はこのテーブルに参加しない(ピンを持たないため、6章参照)。
 
 ### 2.5 CPTごとのピン参照方式
 
 | CPT | 参照方式 | フィールド名 | 理由 |
 |---|---|---|---|
-| `job_posting` | クラスタselect | `pin_location` | 複数の求人が同じ場所に集まるため |
-| `touristspot` | WP slug | （フィールド不要、slugを使用） | 1対1で固有の場所と紐づくため |
-| `event` | text指定 | `pin_reference` | 既存ピンの再利用または独自ピンの両方に対応 |
+| job_posting | クラスタselect | pin_location | 複数の求人が同じ場所に集まるため |
+| touristspot | WP slug | (フィールド不要、slugを使用) | 1対1で固有の場所と紐づくため |
+| event | text指定 | pin_reference | 既存ピンの再利用または独自ピンの両方に対応 |
+| testimonial New | なし | — | ピンを持たない、一覧ページのみで表示 |
 
 ### 2.6 WordPress / WPGraphQL 設定
 
@@ -100,7 +109,7 @@ register_post_type('xxx', [
 ]);
 ```
 
-ACFフィールドも `show_in_graphql: 1` を全フィールドに設定。
+ACFフィールドも show_in_graphql: 1 を全フィールドに設定。
 
 ---
 
@@ -110,103 +119,71 @@ ACFフィールドも `show_in_graphql: 1` を全フィールドに設定。
 
 | 項目 | 値 |
 |---|---|
-| Post type slug | `job_posting` |
-| GraphQL single name | `jobPosting` |
-| GraphQL plural name | `jobPostings` |
+| Post type slug | job_posting |
+| GraphQL single name | jobPosting |
+| GraphQL plural name | jobPostings |
 | Supports | title, editor, thumbnail |
-| Title 用途 | 職種名（例: 「主事補（一般事務）」） |
+| Title 用途 | 職種名(例:「主事補(一般事務)」) |
 
-### 3.2 ACFフィールド一覧（19フィールド）
+### 3.2 ACFフィールド一覧(22フィールド・5タブ)
 
 #### Tab 1: 募集の基本
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `employment_type` | 雇用形態 | select | ✓ | 正規職員 / 会計年度任用（フル） / 会計年度任用（パート） / 嘱託職員 / 任期付職員 / 臨時職員 |
-| `catch_copy` | キャッチコピー | text | | モーダル冒頭の一行 |
-| `thumbnail_image` | サムネイル画像 | image | | A仕様：動画URLがない時に表示 |
-| `thumbnail_video_url` | サムネイル動画URL | url | | YouTube/Vimeo URL。優先表示 |
+| employment_type | 雇用形態 | select | 必須 | 正規職員 / 会計年度任用(フル) / 会計年度任用(パート) / 嘱託職員 / 任期付職員 / 臨時職員 |
+| catch_copy | キャッチコピー | text | | モーダル冒頭の一行 |
+| thumbnail_image | サムネイル画像 | image | | A仕様:動画URLがない時に表示 |
+| thumbnail_video_url | サムネイル動画URL | url | | YouTube/Vimeo URL。優先表示 |
 
 #### Tab 2: 業務内容
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `description` | 業務内容 | wysiwyg | ✓ | リッチエディタ |
-| `desired_person` | 求める人材 | textarea | | |
-| `required_qualifications` | 必要資格 | textarea | | 例「普通自動車免許」 |
+| description | 業務内容 | wysiwyg | 必須 | リッチエディタ |
+| desired_person | 求める人材 | textarea | | |
+| required_qualifications | 必要資格 | textarea | | 例「普通自動車免許」 |
 
 #### Tab 3: 条件・待遇
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `salary` | 給与 | text | ✓ | 一覧表示用「月額18.5万円〜」 |
-| `salary_detail` | 給与詳細 | textarea | | モーダル詳細用 |
-| `work_hours` | 勤務時間 | text | ✓ | 「8:30〜17:15」 |
-| `work_hours_detail` | 勤務時間詳細 | textarea | | |
-| `holiday` | 休日・休暇 | textarea | | |
-| `social_insurance` | 社会保険 | text | | 「各種完備」等 |
-| `benefits` | 福利厚生 | textarea | | 住居サポート以外 |
-| `housing_support_available` | 住居サポートあり | true_false | | チェックボックス |
-| `housing_support_detail` | 住居サポート詳細 | textarea | | 上のチェックON時のみ表示（conditional logic） |
-| `smoking_policy` | 受動喫煙対策 | text | ✓ | **法的要件** |
-| `trial_period` | 試用・研修期間 | text | | |
+| salary | 給与 | text | 必須 | 一覧表示用「月額18.5万円〜」 |
+| salary_detail | 給与詳細 | textarea | | モーダル詳細用 |
+| work_hours | 勤務時間 | text | 必須 | 「8:30〜17:15」 |
+| work_hours_detail | 勤務時間詳細 | textarea | | |
+| holiday | 休日・休暇 | textarea | | |
+| social_insurance | 社会保険 | text | | 「各種完備」等 |
+| benefits | 福利厚生 | textarea | | 住居サポート以外 |
+| housing_support_available | 住居サポートあり | true_false | | チェックボックス |
+| housing_support_detail | 住居サポート詳細 | textarea | | 上のチェックON時のみ表示(conditional logic) |
+| smoking_policy | 受動喫煙対策 | text | 必須 | 法的要件 |
+| trial_period | 試用・研修期間 | text | | |
 
 #### Tab 4: 勤務地・表示位置
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `work_address` | 勤務地住所 | text | ✓ | 「北海道利尻郡利尻富士町〇〇」 |
-| `work_address_detail` | 勤務地詳細 | textarea | | 建物名・部署・フロア等 |
-| `pin_location` | 表示するピン位置 | select | ✓ | 下記参照 |
+| work_address | 勤務地住所 | text | 必須 | 「北海道利尻郡利尻富士町〇〇」 |
+| work_address_detail | 勤務地詳細 | textarea | | 建物名・部署・フロア等 |
+| pin_location | 表示するピン位置 | select | 必須 | 下記参照 |
 
 #### Tab 5: 応募
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `application_flow` | 応募後の流れ | wysiwyg | ✓ | 役場への正式手続き含む |
+| application_flow | 応募後の流れ | wysiwyg | 必須 | 役場への正式手続き含む |
 
 ### 3.3 pin_location 選択肢
 
-| value | label（編集者が最適化） | 現状求人数 |
+| value | label(編集者が最適化) | 現状求人数 |
 |---|---|---|
-| `town_hall` | 役場本庁舎 | 3 |
-| `health_center` | 保健センター | 2 |
-| `airport` | 利尻空港 | 1 |
-| `oniwaki` | 鬼脇地区 | 13 |
+| town_hall | 役場本庁舎 | 3 |
+| health_center | 保健センター | 2 |
+| airport | 利尻空港 | 1 |
+| oniwaki | 鬼脇地区 | 13 |
 
 選択肢は将来必要に応じてACFと PIN_POSITIONS の両方に追加する。
-
-### 3.4 既存ACFからの移行マッピング
-
-立て直しのため、既存の `求人情報` グループから新スキーマへの変換ルール:
-
-| 既存 name | 新 name | 備考 |
-|---|---|---|
-| `event_address`（住所） | （廃止） | `work_address` に統合 |
-| `event_latitude`（label「経度」） | （廃止） | `pin_location` で代替 |
-| `event_longitude`（label「緯度」） | （廃止） | `pin_location` で代替 |
-| `description` | `description` | type を `textarea` → `wysiwyg` に昇格 |
-| `salary` | `salary` | 変更なし |
-| `salary_detail` | `salary_detail` | 変更なし |
-| `event_address`（勤務地、重複） | `work_address` | 命名衝突を解消 |
-| `location_detail` | `work_address_detail` | リネーム |
-| `employment` | `employment_type` | type を `text` → `select` に変更 |
-| `time` | `work_hours` | リネーム |
-| `work_time_detail` | `work_hours_detail` | リネーム |
-| `holiday_detail` | `holiday` | リネーム + type を `text` → `textarea` |
-| `social_insurances` | `social_insurance` | 単数形に統一 |
-| `benefits` | `benefits` | 変更なし |
-| `prevent_smoke` | `smoking_policy` | リネーム |
-| `trial_detail` | `trial_period` | リネーム |
-| `desired_person` | `desired_person` | 変更なし |
-| `apply_enviroment_detail` | `application_flow` | typo修正 + リネーム |
-| `catch_copy` | `catch_copy` | 変更なし |
-| — | `required_qualifications` | 新規追加 |
-| — | `housing_support_available` | 新規追加 |
-| — | `housing_support_detail` | 新規追加 |
-| — | `thumbnail_image` | 新規追加 |
-| — | `thumbnail_video_url` | 新規追加 |
-| — | `pin_location` | 新規追加（緯度経度の代替） |
 
 ---
 
@@ -216,63 +193,63 @@ ACFフィールドも `show_in_graphql: 1` を全フィールドに設定。
 
 | 項目 | 値 |
 |---|---|
-| Post type slug | `touristspot` |
-| GraphQL single name | `touristspot` |
-| GraphQL plural name | `touristspots` |
+| Post type slug | touristspot |
+| GraphQL single name | touristspot |
+| GraphQL plural name | touristspots |
 | Supports | title, editor, thumbnail |
-| Title 用途 | スポット名（例: 「姫沼」） |
-| Slug 用途 | **ピンIDとしても利用**（PIN_POSITIONSのキーと一致させる） |
+| Title 用途 | スポット名(例:「姫沼」) |
+| Slug 用途 | ピンIDとしても利用(PIN_POSITIONSのキーと一致させる) |
 
-### 4.2 ACFフィールド一覧（13フィールド）
+### 4.2 ACFフィールド一覧(13フィールド)
 
 #### Tab 1: 基本情報
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `category` | カテゴリ | select | ✓ | 下記参照 |
-| `catch_copy` | キャッチコピー | text | | |
-| `thumbnail_image` | サムネイル画像 | image | ✓ | A仕様 |
-| `thumbnail_video_url` | サムネイル動画URL | url | | A仕様で優先 |
+| category | カテゴリ | select | 必須 | 下記参照 |
+| catch_copy | キャッチコピー | text | | |
+| thumbnail_image | サムネイル画像 | image | 必須 | A仕様 |
+| thumbnail_video_url | サムネイル動画URL | url | | A仕様で優先 |
 
 #### Tab 2: 詳細・解説
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `description` | 説明文 | wysiwyg | ✓ | スポットの魅力 |
-| `gallery_images` | ギャラリー画像 | gallery | | 複数枚、v1では任意 |
-| `best_season` | おすすめ季節 | text | | 「夏（7-8月）」等 |
+| description | 説明文 | wysiwyg | 必須 | スポットの魅力 |
+| gallery_images | ギャラリー画像 | gallery | | 複数枚、v1では任意 |
+| best_season | おすすめ季節 | text | | 「夏(7-8月)」等 |
 
 #### Tab 3: 訪問情報
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `address` | 住所 | text | | |
-| `access_info` | アクセス情報 | textarea | | 「鴛泊港から車で15分」等 |
-| `open_hours` | 営業時間・開放時間 | text | | 自然系は「常時開放」 |
-| `closed_days` | 定休日 | text | | |
-| `price` | 料金 | text | | 「無料」「大人500円」等 |
-| `phone` | 電話番号 | text | | |
-| `website_url` | 公式サイトURL | url | | |
+| address | 住所 | text | | |
+| access_info | アクセス情報 | textarea | | 「鴛泊港から車で15分」等 |
+| open_hours | 営業時間・開放時間 | text | | 自然系は「常時開放」 |
+| closed_days | 定休日 | text | | |
+| price | 料金 | text | | 「無料」「大人500円」等 |
+| phone | 電話番号 | text | | |
+| website_url | 公式サイトURL | url | | |
 
 ### 4.3 カテゴリ選択肢
 
 | value | label |
 |---|---|
-| `nature` | 自然・景観 |
-| `onsen` | 温泉 |
-| `gourmet` | グルメ |
-| `lodging` | 宿泊 |
-| `experience` | 体験・アクティビティ |
-| `culture` | 文化・歴史 |
-| `view` | 公園・展望 |
+| nature | 自然・景観 |
+| onsen | 温泉 |
+| gourmet | グルメ |
+| lodging | 宿泊 |
+| experience | 体験・アクティビティ |
+| culture | 文化・歴史 |
+| view | 公園・展望 |
 
 ### 4.4 slug = ピンID の運用ルール
 
-- slug は **英小文字 + アンダースコアのみ**（例: `himenuma`, `otatomari_numa`, `peshi_misaki`）
-- 一度公開した投稿のslugは原則変更しない（変更すると3Dマップからピンが消える）
+- slug は英小文字 + アンダースコアのみ(例: himenuma, otatomari_numa, peshi_misaki)
+- 一度公開した投稿のslugは原則変更しない(変更すると3Dマップからピンが消える)
 - 新スポット追加時のフロー:
-  1. WPで投稿作成、slugを命名（例: `kamuiumi_park`）
-  2. `/lib/three/pin-positions.ts` に1行追加（`kamuiumi_park: { x, y, z }`）
+  1. WPで投稿作成、slugを命名(例: kamuiumi_park)
+  2. /lib/three/pin-positions.ts に1行追加(kamuiumi_park: { x, y, z })
   3. デプロイ
 
 ---
@@ -283,114 +260,167 @@ ACFフィールドも `show_in_graphql: 1` を全フィールドに設定。
 
 | 項目 | 値 |
 |---|---|
-| Post type slug | `event` |
-| GraphQL single name | `event` |
-| GraphQL plural name | `events` |
+| Post type slug | event |
+| GraphQL single name | event |
+| GraphQL plural name | events |
 | Supports | title, editor, thumbnail |
-| Title 用途 | イベント名（例: 「鬼脇まつり」） |
+| Title 用途 | イベント名(例:「鬼脇まつり」) |
 
-### 5.2 ACFフィールド一覧（14フィールド）
+### 5.2 ACFフィールド一覧(14フィールド)
 
 #### Tab 1: 基本情報
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `category` | カテゴリ | select | ✓ | 下記参照 |
-| `catch_copy` | キャッチコピー | text | | |
-| `thumbnail_image` | サムネイル画像 | image | ✓ | A仕様 |
-| `thumbnail_video_url` | サムネイル動画URL | url | | A仕様で優先 |
+| category | カテゴリ | select | 必須 | 下記参照 |
+| catch_copy | キャッチコピー | text | | |
+| thumbnail_image | サムネイル画像 | image | 必須 | A仕様 |
+| thumbnail_video_url | サムネイル動画URL | url | | A仕様で優先 |
 
 #### Tab 2: スケジュール・開催情報
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `start_datetime` | 開始日時 | datetime | ✓ | |
-| `end_datetime` | 終了日時 | datetime | ✓ | 単日でも入力必須 |
-| `is_recurring` | 毎年開催 | true_false | | |
-| `recurrence_note` | 開催パターン | text | | 「毎年7月最終週」等 |
-| `organizer` | 主催 | text | ✓ | 利尻富士町 / 〇〇実行委員会 等 |
+| start_datetime | 開始日時 | datetime | 必須 | |
+| end_datetime | 終了日時 | datetime | 必須 | 単日でも入力必須 |
+| is_recurring | 毎年開催 | true_false | | |
+| recurrence_note | 開催パターン | text | | 「毎年7月最終週」等 |
+| organizer | 主催 | text | 必須 | 利尻富士町 / 〇〇実行委員会 等 |
 
 #### Tab 3: 詳細・解説
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `description` | 説明文 | wysiwyg | ✓ | |
-| `gallery_images` | ギャラリー画像 | gallery | | 過去開催の様子も |
+| description | 説明文 | wysiwyg | 必須 | |
+| gallery_images | ギャラリー画像 | gallery | | 過去開催の様子も |
 
 #### Tab 4: 会場・申込
 
 | name | label | type | required | options/notes |
 |---|---|---|---|---|
-| `venue_name` | 会場名 | text | ✓ | 「鬼脇地区会館」等 |
-| `address` | 住所 | text | | |
-| `access_info` | アクセス情報 | textarea | | |
-| `pin_reference` | ピン位置の参照 | text | ✓ | PIN_POSITIONSのキーを指定 |
-| `price` | 参加費 | text | | 「無料」「500円」等 |
-| `registration_url` | 申込先URL | url | | 外部フォーム等 |
-| `contact` | 問い合わせ先 | text | | |
+| venue_name | 会場名 | text | 必須 | 「鬼脇地区会館」等 |
+| address | 住所 | text | | |
+| access_info | アクセス情報 | textarea | | |
+| pin_reference | ピン位置の参照 | text | 必須 | PIN_POSITIONSのキーを指定 |
+| price | 参加費 | text | | 「無料」「500円」等 |
+| registration_url | 申込先URL | url | | 外部フォーム等 |
+| contact | 問い合わせ先 | text | | |
 
 ### 5.3 カテゴリ選択肢
 
 | value | label |
 |---|---|
-| `festival` | まつり・伝統行事 |
-| `workshop` | 体験・ワークショップ |
-| `seminar` | セミナー・講演会 |
-| `recruitment` | 募集・ボランティア |
-| `sports` | スポーツ |
-| `culture` | 文化・芸術 |
+| festival | まつり・伝統行事 |
+| workshop | 体験・ワークショップ |
+| seminar | セミナー・講演会 |
+| recruitment | 募集・ボランティア |
+| sports | スポーツ |
+| culture | 文化・芸術 |
 
 ### 5.4 pin_reference の使い方
 
-イベントは既存ピン（touristspot or job_posting cluster）を再利用するか、event専用ピンを新規追加するかを選べる:
+イベントは既存ピン(touristspot or job_posting cluster)を再利用するか、event専用ピンを新規追加するかを選べる:
 
 | パターン | 例 | pin_reference の値 |
 |---|---|---|
-| touristspot ピンを再利用 | 姫沼ハイキング | `himenuma` |
-| job_posting クラスタピンを再利用 | 鬼脇まつり | `oniwaki` |
-| event専用ピンを新規追加 | 利尻山開きまつり | `rishirisan_opening`（PIN_POSITIONSに追加） |
+| touristspot ピンを再利用 | 姫沼ハイキング | himenuma |
+| job_posting クラスタピンを再利用 | 鬼脇まつり | oniwaki |
+| event専用ピンを新規追加 | 利尻山開きまつり | rishirisan_opening(PIN_POSITIONSに追加) |
 
-### 5.5 イベント表示ロジック（フロント側）
+### 5.5 イベント表示ロジック(フロント側)
 
 ACFには「開催中/終了」フラグを持たせず、フロント側で動的に判定する:
 
 | 状態 | 判定条件 | 3Dマップ上の表示 |
 |---|---|---|
-| 開催前（予告） | `start_datetime > now` | ピン表示、「予告」バッジ |
-| 開催中 | `start_datetime <= now <= end_datetime` | ピン表示、「開催中」バッジ |
-| 終了済み | `end_datetime < now` | ピン非表示、アーカイブページのみ |
+| 開催前(予告) | start_datetime > now | ピン表示、「予告」バッジ |
+| 開催中 | start_datetime <= now <= end_datetime | ピン表示、「開催中」バッジ |
+| 終了済み | end_datetime < now | ピン非表示、アーカイブページのみ |
 
 WPGraphQLクエリ側でフィルタ条件を組み込む実装方針。
 
 ---
 
-## 6. Note RSS連携（column代替）
+## 6. testimonial CPT(New)
 
-### 6.1 構成概要
+「移住者の声」コンテンツ。1人の移住者につき1記事(インタビュー形式)を投稿する。3D地図上にピンは持たず、/voices 一覧ページからのみアクセスする。
+
+### 6.1 基本設定
+
+| 項目 | 値 |
+|---|---|
+| Post type slug | testimonial |
+| GraphQL single name | testimonial |
+| GraphQL plural name | testimonials |
+| Supports | title, editor, thumbnail |
+| Title 用途 | 投稿者名(例:「鈴木さん(2023年移住)」) |
+| 3Dマップ上のピン | なし(touristspot等と異なり、地図には表示しない) |
+
+### 6.2 ACFフィールド一覧(10フィールド・2タブ)
+
+#### Tab 1: プロフィール
+
+| name | label | type | required | options/notes |
+|---|---|---|---|---|
+| catch_copy | キャッチコピー | text | 必須 | 一覧の見出し文(例:「子育てしながら、海の近くで働く」) |
+| photo | メイン写真 | image | 必須 | 顔写真 or 暮らしの写真 |
+| profile_before | 移住前の暮らし | text | | 例:「東京都・会社員」 |
+| profile_after | 現在の暮らし | text | | 例:「利尻富士町・役場勤務」 |
+| migration_year | 移住年 | text | | 例:「2023年」 |
+| related_job | 関連求人 | post_object(job_posting) | | 任意。あれば紐付け、なくてもよい |
+
+#### Tab 2: インタビュー本文
+
+| name | label | type | required | options/notes |
+|---|---|---|---|---|
+| lead_text | リード文 | textarea | 必須 | 編集側が書く導入の要約文 |
+| interview_body | インタビュー本文 | wysiwyg | 必須 | 自由記述、写真込みでも可 |
+| gallery_images | 暮らしの写真 | gallery | | 任意、複数枚 |
+
+### 6.3 related_job の使い方
+
+「この人はこの求人で移住してきた」という紐付けを行うことで、/jobs/[slug] ページに「先輩職員の声」セクションとして表示できる(逆方向の参照表示)。あくまで任意項目で、設定がない testimonial も問題なく成立する。
+
+### 6.4 表示UIの方針
+
+- /voices 一覧: カードグリッド、各カードにメイン写真・キャッチコピー・移住年を表示
+- /voices/[slug] 詳細: メイン写真 → プロフィール(移住前/後)→ リード文 → インタビュー本文 → (任意)関連求人カード
+- ピンを持たないため、3Dマップ上での発見導線はなく、ヘッダー「移住者の声」とフッターからのアクセスが主
+
+### 6.5 運用ルール
+
+- 最初に数名分をまとめて作成し、その後はゆっくり追加していく運用を想定(高頻度更新は見込まない)
+- インタビュー取材・執筆は運営者が担当(note執筆者とは別フロー)
+
+---
+
+## 7. Note RSS連携(column代替)
+
+### 7.1 構成概要
 
 | 項目 | 内容 |
 |---|---|
-| 執筆者 | 別メンバー（noteアカウント所有） |
+| 執筆者 | 別メンバー(noteアカウント所有) |
 | 執筆場所 | note.com |
 | 取得方法 | RSS購読 |
-| 取得元URL | `https://note.com/{ユーザー名 or マガジン名}/rss` |
-| 取得側 | Next.js（フロントエンド） |
-| キャッシュ | ISR（1時間ごとなどの再生成） |
+| 取得元URL | https://note.com/{ユーザー名 or マガジン名}/rss |
+| 取得側 | Next.js(フロントエンド) |
+| キャッシュ | ISR(1時間ごとなどの再生成) |
 | 表示UI | 「掲示板」型UIコンポーネント |
 | 表示位置 | サイトTOP、求人モーダル内などで再利用可能 |
 
-### 6.2 環境変数
+### 7.2 環境変数
 
 ```env
-# /.env.local（Next.js）
+# /.env.local(Next.js)
 NEXT_PUBLIC_NOTE_RSS_URL=https://note.com/USERNAME_OR_MAGAZINE/rss
 ```
 
-### 6.3 推奨ライブラリ
+### 7.3 推奨ライブラリ
 
-- `rss-parser` または `fast-xml-parser`
+- rss-parser または fast-xml-parser
 
-### 6.4 実装方針
+### 7.4 実装方針
 
 ```ts
 // /lib/note/fetch-articles.ts (概念図)
@@ -410,28 +440,38 @@ export async function fetchNoteArticles() {
 }
 ```
 
-### 6.5 表示UI仕様（概要）
+### 7.5 表示UI仕様(概要)
 
-- **掲示板スタイル**: 直近5〜10件をカード形式で表示
+- 掲示板スタイル: 直近5〜10件をカード形式で表示
 - 各カード: サムネイル / タイトル / 投稿日 / 抜粋
-- クリック時: `target="_blank"` で note.com の元記事に遷移
-- 「もっと見る」ボタン: noteのトップページ（執筆者ページ）へ遷移
+- クリック時: target="_blank" で note.com の元記事に遷移
+- 「もっと見る」ボタン: noteのトップページ(執筆者ページ)へ遷移
 
-### 6.6 求人応募KPIへの寄与（動線設計）
+### 7.6 トップページでの表現(v2: コラム看板)
+
+v1では「TOPページに大きなnote記事掲示板」を想定していたが、v2では以下のように具体化された:
+
+- トップページ(/)では、コラムへの導線を「コラム看板」という3D Canvas上のHUD要素として表現する(05-sitemap.md 5.4節参照)
+- 看板クリックで /columns 一覧ページに遷移し、そこで実際の記事一覧(掲示板UI)を表示する
+- TOPページ自体には記事カードを直接並べない(看板経由でワンクッション置く設計)
+
+### 7.7 求人応募KPIへの寄与(動線設計)
 
 columnのCPT化を見送ったため、求人応募への動線は以下の手段で代替する:
 
 | 手段 | 実装場所 |
 |---|---|
 | 求人モーダル内に「先輩職員の声」セクション | job_posting詳細表示時、関連note記事のリンクを手動で貼る運用 |
-| TOPページに大きなnote記事掲示板 | TOP画面の重要位置に配置 |
-| note記事本文内で求人サイトへ逆リンク | 執筆者に依頼（運用ルール化） |
+| /columns 一覧の末尾に「求人を見る」CTA | コラム一覧ページ末尾に配置 |
+| note記事本文内で求人サイトへ逆リンク | 執筆者に依頼(運用ルール化) |
+
+testimonial CPT(6章)の追加により、「先輩職員の声」は note 記事だけでなく /voices のインタビュー記事でも担保できるようになった。
 
 ---
 
-## 7. WPGraphQL クエリ例
+## 8. WPGraphQL クエリ例
 
-### 7.1 job_postings 一覧取得
+### 8.1 job_postings 一覧取得
 
 ```graphql
 query AllJobPostings {
@@ -449,14 +489,13 @@ query AllJobPostings {
         pinLocation
         thumbnailImage { sourceUrl }
         thumbnailVideoUrl
-        # ...他フィールド
       }
     }
   }
 }
 ```
 
-### 7.2 touristspots 一覧取得（ピン用）
+### 8.2 touristspots 一覧取得(ピン用)
 
 ```graphql
 query AllTouristspots {
@@ -464,7 +503,7 @@ query AllTouristspots {
     nodes {
       id
       title
-      slug   # ← これがピンID
+      slug
       touristspotFields {
         category
         catchCopy
@@ -475,7 +514,7 @@ query AllTouristspots {
 }
 ```
 
-### 7.3 イベント絞り込み（開催中・開催予定のみ）
+### 8.3 イベント絞り込み(開催中・開催予定のみ)
 
 ```graphql
 query ActiveEvents($now: String!) {
@@ -504,29 +543,60 @@ query ActiveEvents($now: String!) {
 }
 ```
 
+### 8.4 testimonials 一覧取得(New)
+
+```graphql
+query AllTestimonials {
+  testimonials(first: 50, where: { status: PUBLISH }) {
+    nodes {
+      id
+      title
+      slug
+      testimonialFields {
+        catchCopy
+        photo { sourceUrl }
+        profileBefore
+        profileAfter
+        migrationYear
+        leadText
+        relatedJob {
+          ... on JobPosting {
+            id
+            slug
+            title
+          }
+        }
+      }
+    }
+  }
+}
+```
+
 ---
 
-## 8. 実装時の注意点
+## 9. 実装時の注意点
 
-### 8.1 ACFをコード管理する場合
+### 9.1 ACFをコード管理する場合
 
-ACF Pro の Local JSON 機能を有効化し、`/wp-content/themes/your-theme/acf-json/` にフィールド定義をJSON保存。Gitで管理可能になる。
+ACF Pro の Local JSON 機能を有効化し、/wp-content/themes/your-theme/acf-json/ にフィールド定義をJSON保存。Gitで管理可能になる。
 
-### 8.2 GraphQL用のフィールド名
+### 9.2 GraphQL用のフィールド名
 
-WPGraphQLは ACFフィールド名を **camelCase に自動変換** する:
+WPGraphQLは ACFフィールド名を camelCase に自動変換する:
 
 | ACF name | GraphQL field name |
 |---|---|
-| `employment_type` | `employmentType` |
-| `pin_location` | `pinLocation` |
-| `thumbnail_video_url` | `thumbnailVideoUrl` |
+| employment_type | employmentType |
+| pin_location | pinLocation |
+| thumbnail_video_url | thumbnailVideoUrl |
+| profile_before | profileBefore |
+| migration_year | migrationYear |
 
 フロント側のクエリ・型定義はcamelCaseで書くことに注意。
 
-### 8.3 画像フィールドのGraphQL取得
+### 9.3 画像フィールドのGraphQL取得
 
-ACF画像フィールドは `return_format: array` で設定。GraphQLで以下のように取得:
+ACF画像フィールドは return_format: array で設定。GraphQLで以下のように取得:
 
 ```graphql
 thumbnailImage {
@@ -536,9 +606,9 @@ thumbnailImage {
 }
 ```
 
-### 8.4 CORS設定
+### 9.4 CORS設定
 
-ヘッドレス運用のため、WPの `functions.php` で本番ドメインに対する CORS ヘッダを設定:
+ヘッドレス運用のため、WPの functions.php で本番ドメインに対する CORS ヘッダを設定:
 
 ```php
 add_action('init', function() {
@@ -552,10 +622,15 @@ add_action('init', function() {
 });
 ```
 
+### 9.5 post_object フィールド(related_job)について
+
+testimonial の related_job フィールドは ACF の post_object タイプで、参照先は job_posting CPT に限定する設定にする。WPGraphQL for ACF を使う場合、Union型(... on JobPosting)でのクエリが必要になる点に留意。
+
 ---
 
-## 9. 改訂履歴
+## 10. 改訂履歴
 
 | Version | 日付 | 内容 |
 |---|---|---|
-| 1.0 | 2026-05-20 | 初版作成（3CPT + Note RSS連携の構成で確定） |
+| 1.0 | 2026-05-20 | 初版作成(3CPT + Note RSS連携の構成で確定)。 |
+| 2.0 | 2026-06-19 | 新CPT testimonial(移住者の声)を6章として追加。旧4-6章(touristspot/event/Note RSS)を5-7章に繰り下げ。WPGraphQLクエリ例にtestimonials取得を追加。Note RSS連携セクションに「コラム看板」(v2のトップページ表現)を反映。 |
