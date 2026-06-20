@@ -8,6 +8,8 @@
   --c-text-secondary: #5C544A;
   --c-text-inverse: #FAF6EE;
   --c-border-subtle: #F0EBE0;
+  --c-warning: #F4B942;
+  --c-pin-spot: #F4B942;
   --background: #f4f7f2;
   --foreground: #172018;
   --accent: #4f6f52;
@@ -15,11 +17,16 @@
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
+  --space-5: 1.25rem;
   --space-6: 1.5rem;
   --container-max: 1200px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-full: 9999px;
   --radius-2xl: 32px;
   --shadow-md: 0 1px 0 rgba(31, 27, 22, 0.04), 0 4px 16px -6px rgba(10, 46, 78, 0.10);
+  --shadow-pop-md: 0 6px 0 -2px var(--c-deep-ocean);
+  --shadow-pop-gold: 0 6px 0 -2px #A07700;
 }
 
 @theme inline {
