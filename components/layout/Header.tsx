@@ -4,6 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
 import { useState } from "react";
+import {
+  FooterCopyright,
+  FooterLegalLinks,
+  FooterOfficeInfo,
+} from "@/components/layout/FooterInfo";
 
 const NAV_ITEMS = [
   { label: "メッセージ", href: "/message" },
@@ -115,9 +120,10 @@ export function Header() {
       </div>
 
       {isMobileMenuOpen ? (
+        // 88px = mobile header height(56px) + shell top padding(16px) + menu gap(16px)。
         <nav
           id="mobile-navigation"
-          className="mx-auto mt-[var(--space-2)] grid max-w-[var(--container-max)] gap-[var(--space-2)] rounded-[var(--radius-2xl)] border border-[color:var(--c-border-subtle)] p-[var(--space-2)] backdrop-blur-md md:hidden"
+          className="mx-auto mt-[var(--space-2)] grid max-h-[calc(100vh-88px)] max-w-[var(--container-max)] gap-[var(--space-2)] overflow-y-auto rounded-[var(--radius-2xl)] border border-[color:var(--c-border-subtle)] p-[var(--space-2)] backdrop-blur-md md:hidden"
           style={MOBILE_MENU_STYLE}
         >
           {NAV_ITEMS.map((item) => {
@@ -139,6 +145,11 @@ export function Header() {
               </Link>
             );
           })}
+          <div className="mt-[var(--space-2)] border-t border-[color:var(--c-border-subtle)] px-[var(--space-4)] pt-[var(--space-4)] text-xs leading-5 text-[color:var(--c-text-secondary)]">
+            <FooterOfficeInfo />
+            <FooterLegalLinks className="mt-[var(--space-3)] text-[color:var(--c-deep-ocean)]" />
+            <FooterCopyright className="mt-[var(--space-3)] text-[color:var(--c-text-secondary)]" />
+          </div>
         </nav>
       ) : null}
     </header>

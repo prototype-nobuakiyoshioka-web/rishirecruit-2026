@@ -2,14 +2,16 @@
 
 import { useGLTF, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { Group, Mesh } from "three";
 import type { GLTF } from "three-stdlib";
+import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
 const MODEL_PATH = "/models/rishiri-prototype1.glb";
 const MAX_ROTATION = Math.PI / 4;
 const DAMP_SPEED = 4;
+const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;
 
 type RishiriGLTF = GLTF & {
   nodes: {
@@ -23,7 +25,19 @@ type RishiriGLTF = GLTF & {
 export function IslandModel() {
   const { nodes } = useGLTF(MODEL_PATH) as unknown as RishiriGLTF;
   const groupRef = useRef<Group>(null);
+  const rotationCompleteRef = useRef(false);
   const scroll = useScroll();
+  const setRotationComplete = useScrollProgressStore(
+    (state) => state.setRotationComplete
+  );
+  const resetRotationComplete = useScrollProgressStore(
+    (state) => state.resetRotationComplete
+  );
+
+  useEffect(() => {
+    rotationCompleteRef.current = false;
+    resetRotationComplete();
+  }, [resetRotationComplete]);
 
   useFrame((_, dt) => {
     if (!groupRef.current) return;
@@ -38,6 +52,12 @@ export function IslandModel() {
       DAMP_SPEED,
       dt
     );
+
+    const isRotationComplete = scroll.offset >= FOOTER_REVEAL_SCROLL_OFFSET;
+    if (isRotationComplete !== rotationCompleteRef.current) {
+      rotationCompleteRef.current = isRotationComplete;
+      setRotationComplete(isRotationComplete);
+    }
   });
 
   return (

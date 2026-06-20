@@ -1,140 +1,81 @@
-import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+"use client";
 
-const SUPPORT_LINKS = [
-  { label: "お問い合わせ", href: "/contact" },
-  { label: "プライバシーポリシー", href: "/privacy" },
-  { label: "利用規約", href: "/terms" },
-];
+import { usePathname } from "next/navigation";
+import type { CSSProperties } from "react";
+import {
+  FooterCopyright,
+  FooterLegalLinks,
+  FooterOfficeInfo,
+} from "@/components/layout/FooterInfo";
+import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
-const CONTENT_LINKS = [
-  { label: "求人", href: "/jobs" },
-  { label: "観光地", href: "/spots" },
-  { label: "イベント", href: "/events" },
-  { label: "移住者の声", href: "/voices" },
-  { label: "コラム", href: "/columns" },
-  { label: "町からの便り", href: "/message" },
-];
-
-const EXTERNAL_LINKS = [
-  { label: "Note公式", href: "https://note.com/" },
-  {
-    label: "利尻富士町公式サイト",
-    href: "https://town.rishirifuji.hokkaido.jp/",
-  },
-];
-
-const FOOTER_STYLE: CSSProperties = {
-  // ページの締めとしてHeaderの暖白・ColumnBoardの木目と明確に分けるため、core.deep-oceanを背景に使う。
-  backgroundColor: "var(--c-deep-ocean)",
-  color: "var(--c-text-inverse)",
-  opacity: 1,
+const HOME_PANEL_STYLE: CSSProperties = {
+  // 3D Canvasを覆い隠さないよう、deep-oceanを半透明化した控えめなHUDパネルにする。
+  backgroundColor: "rgba(10, 46, 78, 0.64)",
+  backdropFilter: "blur(10px)",
+  borderColor: "rgba(250, 246, 238, 0.24)",
+  borderRadius: "var(--radius-lg)",
+  boxShadow: "var(--shadow-md)",
+  left: "var(--space-6)",
+  // Header(h-16=64px + top padding/余白)の直下に、左HUDとして重ならない位置へ置く。
+  top: "7rem",
+  // ColumnBoardや島の主表示を圧迫しない、住所情報が折り返しすぎない最小幅。
+  width: "17rem",
+  zIndex: 30,
 };
 
-const FOOTER_INNER_STYLE: CSSProperties = {
+const STATIC_FOOTER_STYLE: CSSProperties = {
+  backgroundColor: "var(--c-deep-ocean)",
+  color: "var(--c-text-inverse)",
+};
+
+const STATIC_INNER_STYLE: CSSProperties = {
   maxWidth: "var(--container-max)",
   paddingInline: "var(--space-6)",
 };
 
-const SECTION_GRID_STYLE: CSSProperties = {
-  gap: "var(--space-6)",
-};
-
-const SNS_PLACEHOLDER_STYLE: CSSProperties = {
-  borderColor: "rgba(250, 246, 238, 0.28)",
-  borderRadius: "var(--radius-lg)",
-};
-
-function FooterSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+function FooterContent({ compact = false }: { compact?: boolean }) {
   return (
-    <section>
-      <h3 className="text-sm font-bold tracking-normal text-[color:var(--c-paper)]">
-        {title}
-      </h3>
-      <div className="mt-[var(--space-3)]">{children}</div>
-    </section>
+    <div className={compact ? "text-xs leading-5" : "text-sm leading-6"}>
+      <FooterOfficeInfo />
+      <FooterLegalLinks className="mt-[var(--space-4)] text-[color:var(--c-text-inverse)]/85" />
+      <FooterCopyright className="mt-[var(--space-4)] text-[color:var(--c-text-inverse)]/75" />
+    </div>
   );
 }
 
 export function Footer() {
+  const pathname = usePathname();
+  const isRotationComplete = useScrollProgressStore(
+    (state) => state.isRotationComplete
+  );
+  const isHome = pathname === "/";
+
+  if (isHome) {
+    return (
+      <footer
+        className="fixed hidden border p-[var(--space-4)] text-[color:var(--c-text-inverse)] md:block"
+        style={{
+          ...HOME_PANEL_STYLE,
+          opacity: isRotationComplete ? 1 : 0,
+          pointerEvents: isRotationComplete ? "auto" : "none",
+          visibility: isRotationComplete ? "visible" : "hidden",
+          transition: "opacity 700ms ease, visibility 700ms ease",
+        }}
+        aria-hidden={isRotationComplete ? undefined : true}
+      >
+        <FooterContent compact />
+      </footer>
+    );
+  }
+
   return (
-    <footer className="mt-auto" style={FOOTER_STYLE}>
+    <footer className="mt-auto hidden md:block" style={STATIC_FOOTER_STYLE}>
       <div
         className="mx-auto py-[calc(var(--space-6)*2)]"
-        style={FOOTER_INNER_STYLE}
+        style={STATIC_INNER_STYLE}
       >
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-          style={SECTION_GRID_STYLE}
-        >
-          <FooterSection title="サポート">
-            <ul className="grid gap-[var(--space-2)]">
-              {SUPPORT_LINKS.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-sm font-medium tracking-normal text-[color:var(--c-text-inverse)]/85 transition-colors hover:text-[color:var(--c-paper)]"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </FooterSection>
-
-          <FooterSection title="コンテンツ">
-            <ul className="grid gap-[var(--space-2)]">
-              {CONTENT_LINKS.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-sm font-medium tracking-normal text-[color:var(--c-text-inverse)]/85 transition-colors hover:text-[color:var(--c-paper)]"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </FooterSection>
-
-          <FooterSection title="外部">
-            <ul className="grid gap-[var(--space-2)]">
-              {EXTERNAL_LINKS.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium tracking-normal text-[color:var(--c-text-inverse)]/85 transition-colors hover:text-[color:var(--c-paper)]"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </FooterSection>
-
-          <FooterSection title="SNS">
-            {/* 将来ここにSNSアイコンを追加予定。現時点では仕様通り空枠のみ確保する。 */}
-            <div
-              aria-hidden="true"
-              className="min-h-11 border border-dashed"
-              style={SNS_PLACEHOLDER_STYLE}
-            />
-          </FooterSection>
-        </div>
-
-        <div className="mt-[calc(var(--space-6)*2)] border-t border-[rgba(250,246,238,0.22)] pt-[var(--space-4)]">
-          <p className="text-sm font-medium tracking-normal text-[color:var(--c-text-inverse)]/80">
-            © 2026 rishirecruit ・ 利尻富士町
-          </p>
-        </div>
+        <FooterContent />
       </div>
     </footer>
   );
