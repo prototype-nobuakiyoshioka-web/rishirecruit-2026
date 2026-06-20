@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Spot placeholder">
+  <rect width="1200" height="800" fill="#C9E2F0"/>
+  <circle cx="910" cy="170" r="150" fill="#F4B942"/>
+  <path d="M120 610 430 250 620 510 760 320 1080 610z" fill="#2D5F3C"/>
+  <path d="M250 610 520 330 710 610z" fill="#6FA66F"/>
+  <path d="M0 640c190-70 390-70 600 0s410 70 600 0v160H0z" fill="#1B5F8C"/>
+  <path d="M445 285 520 330 490 360z" fill="#FFFFFF" opacity="0.85"/>
+</svg>
+

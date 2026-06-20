@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Job placeholder">
+  <rect width="1200" height="800" fill="#FAF6EE"/>
+  <circle cx="900" cy="180" r="160" fill="#FF7B5B" opacity="0.92"/>
+  <path d="M0 560 240 420 470 520 720 330 1200 520v280H0z" fill="#0A2E4E"/>
+  <path d="M0 610 250 500 520 590 780 430 1200 590v210H0z" fill="#1B5F8C"/>
+  <rect x="120" y="190" width="300" height="300" rx="36" fill="#FFFFFF" opacity="0.9"/>
+  <rect x="175" y="260" width="190" height="28" rx="14" fill="#0A2E4E"/>
+  <rect x="175" y="322" width="140" height="28" rx="14" fill="#FF7B5B"/>
+  <rect x="175" y="384" width="220" height="28" rx="14" fill="#E2D7C2"/>
+</svg>
+
