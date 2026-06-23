@@ -52,7 +52,18 @@ export const DUMMY_EVENTS: DummyEvent[] = [
     recurrenceNote: "毎年7月上旬",
     organizer: "利尻富士町",
     description: "安全祈願や地域企画を通して、夏の山の季節を迎えます。",
-    galleryImages: [],
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/event.svg",
+        altText: "利尻山開きの会場を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+      {
+        sourceUrl: "/placeholders/event.svg",
+        altText: "夏山行事の様子を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
     venueName: "鴛泊地区",
     address: "北海道利尻郡利尻富士町鴛泊",
     accessInfo: "鴛泊港から徒歩圏内",
@@ -81,7 +92,18 @@ export const DUMMY_EVENTS: DummyEvent[] = [
     recurrenceNote: "毎年8月頃",
     organizer: "鬼脇まつり実行委員会",
     description: "地域の出店やステージ企画を楽しめる、夏の地区イベントです。",
-    galleryImages: [],
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/event.svg",
+        altText: "鬼脇まつりの出店を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+      {
+        sourceUrl: "/placeholders/event.svg",
+        altText: "鬼脇地区の催しを表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
     venueName: "鬼脇地区会場",
     address: "北海道利尻郡利尻富士町鬼脇",
     accessInfo: "鬼脇市街地周辺",
@@ -110,7 +132,18 @@ export const DUMMY_EVENTS: DummyEvent[] = [
     recurrenceNote: "",
     organizer: "利尻富士町",
     description: "求人、住まい、冬の暮らしなどを相談できる小さな説明会です。",
-    galleryImages: [],
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/event.svg",
+        altText: "島ぐらし相談会の会場を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+      {
+        sourceUrl: "/placeholders/event.svg",
+        altText: "相談会資料を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
     venueName: "利尻富士町役場",
     address: "北海道利尻郡利尻富士町鴛泊富士野6",
     accessInfo: "鴛泊港から車で約5分",
@@ -121,4 +154,3 @@ export const DUMMY_EVENTS: DummyEvent[] = [
     status: "開催中",
   },
 ];
-

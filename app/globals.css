@@ -28,6 +28,7 @@
   --radius-2xl: 32px;
   --shadow-md: 0 1px 0 rgba(31, 27, 22, 0.04), 0 4px 16px -6px rgba(10, 46, 78, 0.10);
   --shadow-pop-md: 0 6px 0 -2px var(--c-deep-ocean);
+  --shadow-pop-coral: 0 6px 0 -2px #C84F36;
   --shadow-pop-gold: 0 6px 0 -2px #A07700;
 }
 

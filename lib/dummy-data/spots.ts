@@ -43,7 +43,18 @@ export const DUMMY_SPOTS: DummyTouristspot[] = [
     },
     thumbnailVideoUrl: null,
     description: "散策路を歩きながら、季節ごとの山と水面の表情を楽しめます。",
-    galleryImages: [],
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/spot.svg",
+        altText: "姫沼の散策路を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+      {
+        sourceUrl: "/placeholders/spot.svg",
+        altText: "姫沼から見える利尻富士を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
     bestSeason: "初夏〜秋",
     address: "北海道利尻郡利尻富士町鴛泊",
     accessInfo: "鴛泊港から車で約15分",
@@ -67,7 +78,18 @@ export const DUMMY_SPOTS: DummyTouristspot[] = [
     },
     thumbnailVideoUrl: null,
     description: "短い登りの先に、鴛泊港と日本海を望む景色が広がります。",
-    galleryImages: [],
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/spot.svg",
+        altText: "ペシ岬の展望を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+      {
+        sourceUrl: "/placeholders/spot.svg",
+        altText: "鴛泊港周辺を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
     bestSeason: "春〜秋",
     address: "北海道利尻郡利尻富士町鴛泊",
     accessInfo: "鴛泊港から徒歩圏内",
@@ -91,7 +113,18 @@ export const DUMMY_SPOTS: DummyTouristspot[] = [
     },
     thumbnailVideoUrl: null,
     description: "利尻富士を背景に、沼のまわりをゆっくり巡れます。",
-    galleryImages: [],
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/spot.svg",
+        altText: "オタトマリ沼の水辺を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+      {
+        sourceUrl: "/placeholders/spot.svg",
+        altText: "島南部の湿原を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
     bestSeason: "夏",
     address: "北海道利尻郡利尻富士町鬼脇",
     accessInfo: "鬼脇市街地から車で約10分",
@@ -102,4 +135,3 @@ export const DUMMY_SPOTS: DummyTouristspot[] = [
     websiteUrl: "",
   },
 ];
-

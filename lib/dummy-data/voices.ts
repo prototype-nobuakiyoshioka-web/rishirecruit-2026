@@ -34,8 +34,15 @@ export const DUMMY_VOICES: DummyTestimonial[] = [
     migrationYear: "2023年",
     relatedJob: { slug: "honchou-jimu-2026", title: "主事補(一般事務)" },
     leadText: "仕事の内容と暮らしの距離感を、移住後の視点で聞きました。",
-    interviewBody: "朝の海や町の人とのやりとりが、日々の仕事の支えになっています。",
-    galleryImages: [],
+    interviewBody:
+      "朝の海や町の人とのやりとりが、日々の仕事の支えになっています。\n\n最初は距離感に戸惑う場面もありましたが、窓口で顔を覚えてもらううちに、ここで働く実感が少しずつ増えていきました。",
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/voice.svg",
+        altText: "佐藤さんの仕事風景を表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
   },
   {
     id: "voice-2",
@@ -52,8 +59,15 @@ export const DUMMY_VOICES: DummyTestimonial[] = [
     migrationYear: "2022年",
     relatedJob: { slug: "oniwaki-community-2026", title: "地域活動サポートスタッフ" },
     leadText: "家族で移ってきた後の生活リズムについて聞きました。",
-    interviewBody: "不便なこともありますが、相談できる顔が近くにある安心感があります。",
-    galleryImages: [],
+    interviewBody:
+      "不便なこともありますが、相談できる顔が近くにある安心感があります。\n\n子どもの予定と仕事の予定を調整しながら、地域の行事にも少しずつ関わるようになりました。",
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/voice.svg",
+        altText: "田中さんの暮らしを表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
   },
   {
     id: "voice-3",
@@ -70,8 +84,14 @@ export const DUMMY_VOICES: DummyTestimonial[] = [
     migrationYear: "2024年",
     relatedJob: { slug: "health-center-support-2026", title: "保健センター支援員" },
     leadText: "冬を越えて見えてきた、島で働く実感を聞きました。",
-    interviewBody: "季節の変化が大きい分、町の人との会話が自然に増えました。",
-    galleryImages: [],
+    interviewBody:
+      "季節の変化が大きい分、町の人との会話が自然に増えました。\n\n冬の暮らしは準備がいりますが、その分、日々の仕事で役立つ声を聞ける場面も多くあります。",
+    galleryImages: [
+      {
+        sourceUrl: "/placeholders/voice.svg",
+        altText: "山田さんの冬の暮らしを表すプレースホルダー",
+        mediaDetails: { width: 1200, height: 800 },
+      },
+    ],
   },
 ];
-
