@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { ApplyForm } from "@/components/job/ApplyForm";
 import { StickyApplyCta } from "@/components/layout/StickyApplyCta";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { DetailSection, FieldList } from "@/components/ui/DetailSection";
@@ -116,9 +117,11 @@ export default async function JobDetailPage({ params }: PageProps) {
           <DetailSection title="応募">
             <FieldList items={[{ label: "応募後の流れ", value: job.applicationFlow }]} />
           </DetailSection>
+
+          <ApplyForm jobTitle={job.title} jobSlug={job.slug} />
         </div>
       </div>
-      <StickyApplyCta jobSlug={job.slug} />
+      <StickyApplyCta />
     </main>
   );
 }
