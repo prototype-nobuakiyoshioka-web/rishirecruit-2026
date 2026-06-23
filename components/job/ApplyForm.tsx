@@ -10,10 +10,8 @@ interface ApplyFormProps {
 }
 
 type FormState = {
-  lastName: string;
-  firstName: string;
-  lastNameKana: string;
-  firstNameKana: string;
+  fullName: string;
+  fullNameKana: string;
   gender: string;
   birthDate: string;
   phone: string;
@@ -39,16 +37,14 @@ type ZipCloudResponse = {
   message: string | null;
 };
 
-const REQUIRED_MESSAGE = "あ、ここをもう一度お願いします。";
+const REQUIRED_MESSAGE = "入力してください";
 const EMAIL_MESSAGE = "メールアドレスを確認してください。";
 const KANA_MESSAGE = "カタカナで入力してください。";
 const ZIP_NOT_FOUND_MESSAGE = "該当する住所が見つかりませんでした。";
 
 const INITIAL_FORM_STATE: FormState = {
-  lastName: "",
-  firstName: "",
-  lastNameKana: "",
-  firstNameKana: "",
+  fullName: "",
+  fullNameKana: "",
   gender: "",
   birthDate: "",
   phone: "",
@@ -124,10 +120,8 @@ function isValidEmail(value: string) {
 function validateForm(form: FormState) {
   const errors: ValidationErrors = {};
   const requiredFields: FieldName[] = [
-    "lastName",
-    "firstName",
-    "lastNameKana",
-    "firstNameKana",
+    "fullName",
+    "fullNameKana",
     "gender",
     "phone",
     "email",
@@ -143,19 +137,15 @@ function validateForm(form: FormState) {
       if (!value) errors[field] = REQUIRED_MESSAGE;
       return;
     }
-    if (!value.trim()) errors[field] = REQUIRED_MESSAGE;
+    if (typeof value !== "string" || !value.trim()) errors[field] = REQUIRED_MESSAGE;
   });
 
   if (form.email.trim() && !isValidEmail(form.email)) {
     errors.email = EMAIL_MESSAGE;
   }
 
-  if (form.lastNameKana.trim() && !isKatakana(form.lastNameKana)) {
-    errors.lastNameKana = KANA_MESSAGE;
-  }
-
-  if (form.firstNameKana.trim() && !isKatakana(form.firstNameKana)) {
-    errors.firstNameKana = KANA_MESSAGE;
+  if (form.fullNameKana.trim() && !isKatakana(form.fullNameKana)) {
+    errors.fullNameKana = KANA_MESSAGE;
   }
 
   return errors;
@@ -306,71 +296,36 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
 
         <div className="grid gap-[var(--space-4)] md:grid-cols-2">
           <div>
-            <label htmlFor="last-name" className={labelClassName}>
-              姓(漢字) <span aria-label="必須">*</span>
+            <label htmlFor="full-name" className={labelClassName}>
+              氏名 <span aria-label="必須">*</span>
             </label>
             <input
-              id="last-name"
-              name="last_name"
+              id="full-name"
+              name="full_name"
               type="text"
-              autoComplete="family-name"
-              value={form.lastName}
-              onChange={handleTextChange("lastName")}
+              autoComplete="name"
+              value={form.fullName}
+              onChange={handleTextChange("fullName")}
               className={`${inputClassName} mt-[var(--space-2)]`}
               required
             />
-            <FieldError message={errors.lastName} />
+            <FieldError message={errors.fullName} />
           </div>
 
           <div>
-            <label htmlFor="first-name" className={labelClassName}>
-              名(漢字) <span aria-label="必須">*</span>
+            <label htmlFor="full-name-kana" className={labelClassName}>
+              氏名(フリガナ) <span aria-label="必須">*</span>
             </label>
             <input
-              id="first-name"
-              name="first_name"
+              id="full-name-kana"
+              name="full_name_kana"
               type="text"
-              autoComplete="given-name"
-              value={form.firstName}
-              onChange={handleTextChange("firstName")}
+              value={form.fullNameKana}
+              onChange={handleTextChange("fullNameKana")}
               className={`${inputClassName} mt-[var(--space-2)]`}
               required
             />
-            <FieldError message={errors.firstName} />
-          </div>
-        </div>
-
-        <div className="grid gap-[var(--space-4)] md:grid-cols-2">
-          <div>
-            <label htmlFor="last-name-kana" className={labelClassName}>
-              姓(カナ) <span aria-label="必須">*</span>
-            </label>
-            <input
-              id="last-name-kana"
-              name="last_name_kana"
-              type="text"
-              value={form.lastNameKana}
-              onChange={handleTextChange("lastNameKana")}
-              className={`${inputClassName} mt-[var(--space-2)]`}
-              required
-            />
-            <FieldError message={errors.lastNameKana} />
-          </div>
-
-          <div>
-            <label htmlFor="first-name-kana" className={labelClassName}>
-              名(カナ) <span aria-label="必須">*</span>
-            </label>
-            <input
-              id="first-name-kana"
-              name="first_name_kana"
-              type="text"
-              value={form.firstNameKana}
-              onChange={handleTextChange("firstNameKana")}
-              className={`${inputClassName} mt-[var(--space-2)]`}
-              required
-            />
-            <FieldError message={errors.firstNameKana} />
+            <FieldError message={errors.fullNameKana} />
           </div>
         </div>
 
