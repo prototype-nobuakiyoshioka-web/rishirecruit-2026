@@ -161,27 +161,31 @@ export default function ContactPage() {
             onSubmit={handleSubmit}
             className="grid gap-[var(--space-5)] rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] p-[var(--space-6)] shadow-[var(--shadow-md)]"
           >
-            <div>
-              <label htmlFor="inquiry-type" className={labelClassName}>
+            <fieldset>
+              <legend className={labelClassName}>
                 問い合わせ項目 <span aria-label="必須">*</span>
-              </label>
-              <select
-                id="inquiry-type"
-                name="inquiry_type"
-                value={form.inquiryType}
-                onChange={handleTextChange("inquiryType")}
-                className={`${inputClassName} mt-[var(--space-2)]`}
-                required
-              >
-                <option value="">選択してください</option>
+              </legend>
+              <div className="mt-[var(--space-2)] grid grid-cols-2 gap-[var(--space-3)] md:grid-cols-4">
                 {INQUIRY_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
+                  <label
+                    key={option}
+                    className="flex min-h-12 cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-paper)] px-[var(--space-3)] text-center text-sm font-bold text-[color:var(--c-text-primary)] transition-colors has-checked:border-[color:var(--c-deep-ocean)] has-checked:bg-[color:var(--c-deep-ocean)] has-checked:text-[color:var(--c-text-inverse)]"
+                  >
+                    <input
+                      type="radio"
+                      name="inquiry_type"
+                      value={option}
+                      checked={form.inquiryType === option}
+                      onChange={(event) => updateField("inquiryType", event.target.value)}
+                      className="sr-only"
+                      required
+                    />
                     {option}
-                  </option>
+                  </label>
                 ))}
-              </select>
+              </div>
               <FieldError message={errors.inquiryType} />
-            </div>
+            </fieldset>
 
             <div className="grid gap-[var(--space-4)] md:grid-cols-2">
               <div>
