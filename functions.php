@@ -23,3 +23,9 @@ require_once get_template_directory() . '/inc/cors-config.php';
 
 // ヘッドレス運用向けの不要機能無効化とSEO制御を登録します。
 require_once get_template_directory() . '/inc/headless-config.php';
+
+// ACF Local JSON の保存先・読み込み元を登録します。
+require_once get_template_directory() . '/inc/acf-local-json.php';
+
+// 求人CPTのACFフィールドグループを登録します。
+require_once get_template_directory() . '/inc/acf-fields-job-posting.php';
