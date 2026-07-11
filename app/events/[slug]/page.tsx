@@ -3,7 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { DetailSection, FieldList } from "@/components/ui/DetailSection";
-import { DUMMY_EVENTS } from "@/lib/dummy-data/events";
+import { eventStatus, galleryFromField, htmlToText, imageFromField, selectFirst } from "@/lib/wp/format";
+import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
+import { getEventBySlug, getEvents } from "@/lib/wp/queries/events";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -17,15 +19,29 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
   minute: "2-digit",
 });
 
-export function generateStaticParams() {
-  return DUMMY_EVENTS.map((event) => ({ slug: event.slug }));
+export async function generateStaticParams() {
+  const events = await getEvents();
+
+  return events.map((event) => ({ slug: event.slug }));
 }
 
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const event = DUMMY_EVENTS.find((item) => item.slug === slug);
+  const event = await getEventBySlug(slug);
 
   if (!event) notFound();
+
+  const fields = event.eventFields;
+  const category = selectFirst(fields?.category);
+  const categoryLabel = category ? EVENT_CATEGORY_LABELS[category] ?? category : null;
+  const thumbnailImage = imageFromField(
+    fields?.thumbnailImage,
+    "/placeholders/event.svg",
+    "イベント情報のプレースホルダー",
+  );
+  const galleryImages = galleryFromField(fields?.galleryImages);
+  const startDate = fields?.startDatetime ? new Date(fields.startDatetime) : null;
+  const endDate = fields?.endDatetime ? new Date(fields.endDatetime) : null;
 
   return (
     <main className="bg-[color:var(--c-paper)] pb-[calc(var(--space-6)*4)]">
@@ -41,18 +57,18 @@ export default async function EventDetailPage({ params }: PageProps) {
         <section className="grid gap-[var(--space-6)] py-[calc(var(--space-6)*2)] lg:grid-cols-[1fr_32rem]">
           <div>
             <p className="text-sm font-bold text-[color:var(--c-deep-ocean)]">
-              {event.categoryLabel} ・ {event.status}
+              {categoryLabel} ・ {eventStatus(fields?.startDatetime)}
             </p>
             <h1 className="mt-[var(--space-4)] text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
               {event.title}
             </h1>
             <p className="mt-[var(--space-5)] max-w-2xl text-lg font-medium leading-8 text-[color:var(--c-text-secondary)]">
-              {event.catchCopy}
+              {fields?.catchCopy}
             </p>
           </div>
           <Image
-            src={event.thumbnailImage.sourceUrl}
-            alt={event.thumbnailImage.altText}
+            src={thumbnailImage.sourceUrl}
+            alt={thumbnailImage.altText}
             width={1200}
             height={800}
             priority
@@ -64,11 +80,11 @@ export default async function EventDetailPage({ params }: PageProps) {
           <DetailSection title="スケジュール・開催情報">
             <FieldList
               items={[
-                { label: "開始日時", value: DATE_FORMATTER.format(new Date(event.startDatetime)) },
-                { label: "終了日時", value: DATE_FORMATTER.format(new Date(event.endDatetime)) },
-                { label: "毎年開催", value: event.isRecurring ? "はい" : "いいえ" },
-                { label: "開催パターン", value: event.recurrenceNote },
-                { label: "主催", value: event.organizer },
+                { label: "開始日時", value: startDate ? DATE_FORMATTER.format(startDate) : "" },
+                { label: "終了日時", value: endDate ? DATE_FORMATTER.format(endDate) : "" },
+                { label: "毎年開催", value: fields?.isRecurring ? "はい" : "いいえ" },
+                { label: "開催パターン", value: fields?.recurrenceNote },
+                { label: "主催", value: fields?.organizer },
               ]}
             />
           </DetailSection>
@@ -76,17 +92,17 @@ export default async function EventDetailPage({ params }: PageProps) {
           <DetailSection title="詳細・解説">
             <FieldList
               items={[
-                { label: "説明文", value: event.description },
-                { label: "サムネイル動画URL", value: event.thumbnailVideoUrl },
+                { label: "説明文", value: htmlToText(fields?.description) },
+                { label: "サムネイル動画URL", value: fields?.thumbnailVideoUrl },
               ]}
             />
           </DetailSection>
 
           <DetailSection title="ギャラリー">
             <div className="grid gap-[var(--space-4)] md:grid-cols-2">
-              {event.galleryImages.map((image) => (
+              {galleryImages.map((image) => (
                 <Image
-                  key={image.altText}
+                  key={image.sourceUrl}
                   src={image.sourceUrl}
                   alt={image.altText}
                   width={1200}
@@ -100,27 +116,27 @@ export default async function EventDetailPage({ params }: PageProps) {
           <DetailSection title="会場・申込">
             <FieldList
               items={[
-                { label: "会場名", value: event.venueName },
-                { label: "住所", value: event.address },
-                { label: "アクセス情報", value: event.accessInfo },
-                { label: "ピン位置の参照", value: event.pinReference },
-                { label: "参加費", value: event.price },
+                { label: "会場名", value: fields?.venueName },
+                { label: "住所", value: fields?.address },
+                { label: "アクセス情報", value: fields?.accessInfo },
+                { label: "ピン位置の参照", value: fields?.pinReference },
+                { label: "参加費", value: fields?.price },
                 {
                   label: "申込先URL",
-                  value: event.registrationUrl ? (
+                  value: fields?.registrationUrl ? (
                     <a
-                      href={event.registrationUrl}
+                      href={fields.registrationUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[color:var(--c-deep-ocean)] underline"
                     >
-                      {event.registrationUrl}
+                      {fields.registrationUrl}
                     </a>
                   ) : (
                     ""
                   ),
                 },
-                { label: "問い合わせ先", value: event.contact },
+                { label: "問い合わせ先", value: fields?.contact },
               ]}
             />
           </DetailSection>
@@ -138,4 +154,3 @@ export default async function EventDetailPage({ params }: PageProps) {
     </main>
   );
 }
-

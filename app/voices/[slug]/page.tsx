@@ -3,26 +3,35 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { DetailSection, FieldList } from "@/components/ui/DetailSection";
-import { DUMMY_JOBS } from "@/lib/dummy-data/jobs";
-import { DUMMY_VOICES } from "@/lib/dummy-data/voices";
+import { galleryFromField, htmlToText, imageFromField, selectFirst } from "@/lib/wp/format";
+import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
+import { getTestimonials, getTestimonialBySlug } from "@/lib/wp/queries/voices";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return DUMMY_VOICES.map((voice) => ({ slug: voice.slug }));
+export async function generateStaticParams() {
+  const voices = await getTestimonials();
+
+  return voices.map((voice) => ({ slug: voice.slug }));
 }
 
 export default async function VoiceDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const voice = DUMMY_VOICES.find((item) => item.slug === slug);
+  const voice = await getTestimonialBySlug(slug);
 
   if (!voice) notFound();
 
-  const relatedJob = voice.relatedJob
-    ? DUMMY_JOBS.find((job) => job.slug === voice.relatedJob?.slug)
-    : null;
+  const fields = voice.testimonialFields;
+  const relatedJob = fields?.relatedJob?.nodes[0] ?? null;
+  const relatedEmploymentType = selectFirst(relatedJob?.jobPostingFields?.employmentType);
+  const photo = imageFromField(
+    fields?.photo,
+    "/placeholders/voice.svg",
+    "移住者の声のプレースホルダー",
+  );
+  const galleryImages = galleryFromField(fields?.galleryImages);
 
   return (
     <main className="bg-[color:var(--c-paper)] pb-[calc(var(--space-6)*4)]">
@@ -38,18 +47,18 @@ export default async function VoiceDetailPage({ params }: PageProps) {
         <section className="grid gap-[var(--space-6)] py-[calc(var(--space-6)*2)] lg:grid-cols-[1fr_32rem]">
           <div>
             <p className="text-sm font-bold text-[color:var(--c-deep-ocean)]">
-              {voice.migrationYear} 移住
+              {fields?.migrationYear} 移住
             </p>
             <h1 className="mt-[var(--space-4)] text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
-              {voice.catchCopy}
+              {fields?.catchCopy}
             </h1>
             <p className="mt-[var(--space-5)] max-w-2xl text-lg font-medium leading-8 text-[color:var(--c-text-secondary)]">
               {voice.title}
             </p>
           </div>
           <Image
-            src={voice.photo.sourceUrl}
-            alt={voice.photo.altText}
+            src={photo.sourceUrl}
+            alt={photo.altText}
             width={1200}
             height={800}
             priority
@@ -61,33 +70,35 @@ export default async function VoiceDetailPage({ params }: PageProps) {
           <DetailSection title="プロフィール">
             <FieldList
               items={[
-                { label: "移住前の暮らし", value: voice.profileBefore },
-                { label: "現在の暮らし", value: voice.profileAfter },
-                { label: "移住年", value: voice.migrationYear },
-                { label: "関連求人", value: voice.relatedJob?.title ?? "" },
+                { label: "移住前の暮らし", value: fields?.profileBefore },
+                { label: "現在の暮らし", value: fields?.profileAfter },
+                { label: "移住年", value: fields?.migrationYear },
+                { label: "関連求人", value: relatedJob?.title ?? "" },
               ]}
             />
           </DetailSection>
 
           <DetailSection title="リード文">
             <p className="text-lg font-medium leading-8 text-[color:var(--c-text-primary)]">
-              {voice.leadText}
+              {fields?.leadText}
             </p>
           </DetailSection>
 
           <DetailSection title="インタビュー本文">
             <div className="grid gap-[var(--space-4)] text-base leading-8 text-[color:var(--c-text-primary)]">
-              {voice.interviewBody.split("\n\n").map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
+              {htmlToText(fields?.interviewBody)
+                .split("\n\n")
+                .map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
             </div>
           </DetailSection>
 
           <DetailSection title="暮らしの写真">
             <div className="grid gap-[var(--space-4)] md:grid-cols-2">
-              {voice.galleryImages.map((image) => (
+              {galleryImages.map((image) => (
                 <Image
-                  key={image.altText}
+                  key={image.sourceUrl}
                   src={image.sourceUrl}
                   alt={image.altText}
                   width={1200}
@@ -102,13 +113,15 @@ export default async function VoiceDetailPage({ params }: PageProps) {
             <DetailSection title="関連する求人">
               <article className="rounded-[var(--radius-md)] border border-[color:var(--c-border-subtle)] p-[var(--space-5)]">
                 <p className="text-sm font-bold text-[color:var(--c-text-secondary)]">
-                  {relatedJob.employmentType}
+                  {relatedEmploymentType
+                    ? EMPLOYMENT_TYPE_LABELS[relatedEmploymentType] ?? relatedEmploymentType
+                    : "求人"}
                 </p>
                 <h2 className="mt-[var(--space-2)] text-xl font-bold text-[color:var(--c-text-primary)]">
                   {relatedJob.title}
                 </h2>
                 <p className="mt-[var(--space-2)] text-sm leading-6 text-[color:var(--c-text-secondary)]">
-                  {relatedJob.catchCopy}
+                  {relatedJob.jobPostingFields?.catchCopy}
                 </p>
                 <Link
                   href={`/jobs/${relatedJob.slug}`}

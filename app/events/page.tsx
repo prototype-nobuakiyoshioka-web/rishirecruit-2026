@@ -2,7 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { CardGrid } from "@/components/ui/CardGrid";
 import { PageHero } from "@/components/ui/PageHero";
-import { DUMMY_EVENTS } from "@/lib/dummy-data/events";
+import { eventStatus, imageFromField, selectFirst } from "@/lib/wp/format";
+import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
+import { getEvents } from "@/lib/wp/queries/events";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -12,7 +14,9 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
   minute: "2-digit",
 });
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  const events = await getEvents();
+
   return (
     <main className="bg-[color:var(--c-paper)]">
       <PageHero
@@ -22,56 +26,67 @@ export default function EventsPage() {
       />
       <section className="mx-auto max-w-[var(--container-max)] px-[var(--space-6)] pb-[calc(var(--space-6)*4)]">
         <CardGrid>
-          {DUMMY_EVENTS.map((event) => (
-            <article
-              key={event.id}
-              className="overflow-hidden rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] shadow-[var(--shadow-md)]"
-            >
-              <Image
-                src={event.thumbnailImage.sourceUrl}
-                alt={event.thumbnailImage.altText}
-                width={1200}
-                height={800}
-                className="aspect-[3/2] w-full object-cover"
-              />
-              <div className="p-[var(--space-6)]">
-                <div className="flex flex-wrap gap-[var(--space-2)]">
-                  <span className="rounded-[var(--radius-full)] bg-[color:var(--c-pin-event)] px-[var(--space-3)] py-[var(--space-1)] text-xs font-bold text-[color:var(--c-text-primary)]">
-                    {event.categoryLabel}
-                  </span>
-                  <span className="rounded-[var(--radius-full)] bg-[color:var(--c-border-subtle)] px-[var(--space-3)] py-[var(--space-1)] text-xs font-bold text-[color:var(--c-text-secondary)]">
-                    {event.status}
-                  </span>
+          {events.map((event) => {
+            const fields = event.eventFields;
+            const category = selectFirst(fields?.category);
+            const thumbnailImage = imageFromField(
+              fields?.thumbnailImage,
+              "/placeholders/event.svg",
+              "イベント情報のプレースホルダー",
+            );
+            const startDate = fields?.startDatetime ? new Date(fields.startDatetime) : null;
+
+            return (
+              <article
+                key={event.id}
+                className="overflow-hidden rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] shadow-[var(--shadow-md)]"
+              >
+                <Image
+                  src={thumbnailImage.sourceUrl}
+                  alt={thumbnailImage.altText}
+                  width={1200}
+                  height={800}
+                  className="aspect-[3/2] w-full object-cover"
+                />
+                <div className="p-[var(--space-6)]">
+                  <div className="flex flex-wrap gap-[var(--space-2)]">
+                    <span className="rounded-[var(--radius-full)] bg-[color:var(--c-pin-event)] px-[var(--space-3)] py-[var(--space-1)] text-xs font-bold text-[color:var(--c-text-primary)]">
+                      {category ? EVENT_CATEGORY_LABELS[category] ?? category : "未設定"}
+                    </span>
+                    <span className="rounded-[var(--radius-full)] bg-[color:var(--c-border-subtle)] px-[var(--space-3)] py-[var(--space-1)] text-xs font-bold text-[color:var(--c-text-secondary)]">
+                      {eventStatus(fields?.startDatetime)}
+                    </span>
+                  </div>
+                  <h2 className="mt-[var(--space-4)] text-xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
+                    {event.title}
+                  </h2>
+                  <p className="mt-[var(--space-3)] text-sm leading-6 text-[color:var(--c-text-secondary)]">
+                    {fields?.catchCopy}
+                  </p>
+                  <dl className="mt-[var(--space-5)] grid gap-[var(--space-2)] text-sm">
+                    <div>
+                      <dt className="text-[color:var(--c-text-secondary)]">開催日</dt>
+                      <dd className="mt-[var(--space-1)] font-bold text-[color:var(--c-text-primary)]">
+                        {startDate ? DATE_FORMATTER.format(startDate) : "未設定"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[color:var(--c-text-secondary)]">会場</dt>
+                      <dd className="mt-[var(--space-1)] font-bold text-[color:var(--c-text-primary)]">
+                        {fields?.venueName}
+                      </dd>
+                    </div>
+                  </dl>
+                  <Link
+                    href={`/events/${event.slug}`}
+                    className="mt-[var(--space-6)] inline-flex min-h-11 items-center font-bold text-[color:var(--c-deep-ocean)] hover:underline"
+                  >
+                    詳細を見る →
+                  </Link>
                 </div>
-                <h2 className="mt-[var(--space-4)] text-xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
-                  {event.title}
-                </h2>
-                <p className="mt-[var(--space-3)] text-sm leading-6 text-[color:var(--c-text-secondary)]">
-                  {event.catchCopy}
-                </p>
-                <dl className="mt-[var(--space-5)] grid gap-[var(--space-2)] text-sm">
-                  <div>
-                    <dt className="text-[color:var(--c-text-secondary)]">開催日</dt>
-                    <dd className="mt-[var(--space-1)] font-bold text-[color:var(--c-text-primary)]">
-                      {DATE_FORMATTER.format(new Date(event.startDatetime))}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[color:var(--c-text-secondary)]">会場</dt>
-                    <dd className="mt-[var(--space-1)] font-bold text-[color:var(--c-text-primary)]">
-                      {event.venueName}
-                    </dd>
-                  </div>
-                </dl>
-                <Link
-                  href={`/events/${event.slug}`}
-                  className="mt-[var(--space-6)] inline-flex min-h-11 items-center font-bold text-[color:var(--c-deep-ocean)] hover:underline"
-                >
-                  詳細を見る →
-                </Link>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </CardGrid>
         <div className="mt-[calc(var(--space-6)*2)]">
           <Link

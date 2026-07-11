@@ -3,21 +3,35 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { DetailSection, FieldList } from "@/components/ui/DetailSection";
-import { DUMMY_SPOTS } from "@/lib/dummy-data/spots";
+import { galleryFromField, htmlToText, imageFromField, selectFirst } from "@/lib/wp/format";
+import { SPOT_CATEGORY_LABELS } from "@/lib/wp/labels";
+import { getTouristspotBySlug, getTouristspots } from "@/lib/wp/queries/spots";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return DUMMY_SPOTS.map((spot) => ({ slug: spot.slug }));
+export async function generateStaticParams() {
+  const spots = await getTouristspots();
+
+  return spots.map((spot) => ({ slug: spot.slug }));
 }
 
 export default async function SpotDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const spot = DUMMY_SPOTS.find((item) => item.slug === slug);
+  const spot = await getTouristspotBySlug(slug);
 
   if (!spot) notFound();
+
+  const fields = spot.touristspotFields;
+  const category = selectFirst(fields?.category);
+  const categoryLabel = category ? SPOT_CATEGORY_LABELS[category] ?? category : null;
+  const thumbnailImage = imageFromField(
+    fields?.thumbnailImage,
+    "/placeholders/spot.svg",
+    "観光地情報のプレースホルダー",
+  );
+  const galleryImages = galleryFromField(fields?.galleryImages);
 
   return (
     <main className="bg-[color:var(--c-paper)] pb-[calc(var(--space-6)*4)]">
@@ -33,18 +47,18 @@ export default async function SpotDetailPage({ params }: PageProps) {
         <section className="grid gap-[var(--space-6)] py-[calc(var(--space-6)*2)] lg:grid-cols-[1fr_32rem]">
           <div>
             <p className="text-sm font-bold text-[color:var(--c-deep-ocean)]">
-              {spot.categoryLabel}
+              {categoryLabel}
             </p>
             <h1 className="mt-[var(--space-4)] text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
               {spot.title}
             </h1>
             <p className="mt-[var(--space-5)] max-w-2xl text-lg font-medium leading-8 text-[color:var(--c-text-secondary)]">
-              {spot.catchCopy}
+              {fields?.catchCopy}
             </p>
           </div>
           <Image
-            src={spot.thumbnailImage.sourceUrl}
-            alt={spot.thumbnailImage.altText}
+            src={thumbnailImage.sourceUrl}
+            alt={thumbnailImage.altText}
             width={1200}
             height={800}
             priority
@@ -56,18 +70,18 @@ export default async function SpotDetailPage({ params }: PageProps) {
           <DetailSection title="詳細・解説">
             <FieldList
               items={[
-                { label: "説明文", value: spot.description },
-                { label: "おすすめ季節", value: spot.bestSeason },
-                { label: "サムネイル動画URL", value: spot.thumbnailVideoUrl },
+                { label: "説明文", value: htmlToText(fields?.description) },
+                { label: "おすすめ季節", value: fields?.bestSeason },
+                { label: "サムネイル動画URL", value: fields?.thumbnailVideoUrl },
               ]}
             />
           </DetailSection>
 
           <DetailSection title="ギャラリー">
             <div className="grid gap-[var(--space-4)] md:grid-cols-2">
-              {spot.galleryImages.map((image) => (
+              {galleryImages.map((image) => (
                 <Image
-                  key={image.altText}
+                  key={image.sourceUrl}
                   src={image.sourceUrl}
                   alt={image.altText}
                   width={1200}
@@ -81,22 +95,22 @@ export default async function SpotDetailPage({ params }: PageProps) {
           <DetailSection title="訪問情報">
             <FieldList
               items={[
-                { label: "住所", value: spot.address },
-                { label: "アクセス情報", value: spot.accessInfo },
-                { label: "営業時間・開放時間", value: spot.openHours },
-                { label: "定休日", value: spot.closedDays },
-                { label: "料金", value: spot.price },
-                { label: "電話番号", value: spot.phone },
+                { label: "住所", value: fields?.address },
+                { label: "アクセス情報", value: fields?.accessInfo },
+                { label: "営業時間・開放時間", value: fields?.openHours },
+                { label: "定休日", value: fields?.closedDays },
+                { label: "料金", value: fields?.price },
+                { label: "電話番号", value: fields?.phone },
                 {
                   label: "公式サイトURL",
-                  value: spot.websiteUrl ? (
+                  value: fields?.websiteUrl ? (
                     <a
-                      href={spot.websiteUrl}
+                      href={fields.websiteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[color:var(--c-deep-ocean)] underline"
                     >
-                      {spot.websiteUrl}
+                      {fields.websiteUrl}
                     </a>
                   ) : (
                     ""

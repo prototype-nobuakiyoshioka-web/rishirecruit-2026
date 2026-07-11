@@ -55,3 +55,8 @@ npm run dev   # http://localhost:3000
 | `npm run build` | 本番ビルド |
 | `npm run start` | 本番起動 |
 | `npm run lint` | ESLint |
+
+
+###作業者（人間）
+確認方法
+npm run dev → http://localhost:3000 
