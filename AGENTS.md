@@ -283,18 +283,27 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 <!-- 作業を進めるたびにここを更新する -->
 - [x] **Phase 1: 要件定義・設計** — 完了(`docs/` 配下 5 ファイル + `reference/` の HTML)
 - [ ] **Phase 2: 3Dアセット制作** — ロードマップあり、Blender 作業中(`reference/blender-roadmap.html`)
-- [ ] **Phase 3: WordPress 構築** — 進行中
-  - [x] Task 01: テーマ基盤 + 3CPT 登録
+- [x] **Phase 3: WordPress 構築** — **完了**
+  - [x] Task 01: テーマ基盤 + 4CPT 登録(job_posting/touristspot/event/testimonial)
   - [x] Task 02: WPGraphQL + CORS + ヘッドレス強化
   - [x] Task 03: ACF Local JSON + job_posting フィールド登録(22フィールド・5タブ、employment_type英語スラッグ化済み)
   - [x] Task 04a: touristspot フィールド登録
   - [x] Task 04b: event フィールド登録
   - [x] Task 04c: testimonial フィールド登録(9フィールド・post_object含む)
-  - [ ] Task 05: WPGraphQL for ACF 動作確認 ← **次やる**
+  - [x] Task 05: WPGraphQL for ACF 動作確認 — 全4CPT正常動作確認済み。select フィールドは WPGraphQL for ACF 2.x の仕様で `[String]`(配列)で返る。フロント側で `[0]` で取り出す対応が必要(Task 13で対応)
 - [ ] **Phase 4: フロントエンド基盤** — 進行中
   - [x] Task 01: R3F 最小シーン + 島 GLB 表示
   - [x] Task 02: スクロール連動回転(clamp → damp)
-  - [ ] Task 03: Lenis 導入 — 方針A(見た目スムージングのみ)は `<ScrollControls>` との競合でリバート済み。方針B(Lenis主導の scroll progress)で再設計予定 ← **次やる**
+  - [ ] Task 03: Lenis 導入 — 方針A(見た目スムージングのみ)は `<ScrollControls>` との競合でリバート済み。方針B(Lenis主導の scroll progress)で再設計予定
+  - [x] Task 04: Header(HUD・6項目ナビ)
+  - [x] Task 05: ColumnBoard(HUD・コラム看板)
+  - [x] Task 08: Footer(最小限情報パネル・役場情報+法的リンク)
+  - [x] Task 09: 一覧系ページ(5ページ、ダミーデータ)
+  - [x] Task 10: 詳細系ページ(4ページ、固定CTA含む)
+  - [x] Task 11: フォーム系(応募フォームページ内統合・/contact)
+  - [x] Task 12: 静的系ページ(/message・/privacy・/terms)
+  - [ ] Task 13: WPGraphQL クライアントセットアップ + 実データ接続 ← **次やる**
+    - select フィールドは `[String]` で返るため、フロント側で `[0]` で取り出す対応が必要
 - [ ] Phase 5: 3D シーン実装
 - [ ] Phase 6: ピン・コンテンツ実装
 - [ ] Phase 7: モバイル最適化
