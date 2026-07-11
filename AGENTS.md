@@ -286,9 +286,11 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 - [ ] **Phase 3: WordPress 構築** — 進行中
   - [x] Task 01: テーマ基盤 + 3CPT 登録
   - [x] Task 02: WPGraphQL + CORS + ヘッドレス強化
-  - [ ] Task 03: ACF Local JSON + job_posting フィールド登録 ← **次やる**
-  - [ ] Task 04: touristspot / event フィールド登録
-  - [ ] Task 05: WPGraphQL for ACF 動作確認
+  - [x] Task 03: ACF Local JSON + job_posting フィールド登録(22フィールド・5タブ、employment_type英語スラッグ化済み)
+  - [x] Task 04a: touristspot フィールド登録
+  - [x] Task 04b: event フィールド登録
+  - [x] Task 04c: testimonial フィールド登録(9フィールド・post_object含む)
+  - [ ] Task 05: WPGraphQL for ACF 動作確認 ← **次やる**
 - [ ] **Phase 4: フロントエンド基盤** — 進行中
   - [x] Task 01: R3F 最小シーン + 島 GLB 表示
   - [x] Task 02: スクロール連動回転(clamp → damp)
