@@ -32,3 +32,6 @@ require_once get_template_directory() . '/inc/acf-fields-job-posting.php';
 
 // 観光地CPTのACFフィールドグループを登録します。
 require_once get_template_directory() . '/inc/acf-fields-touristspot.php';
+
+// イベントCPTのACFフィールドグループを登録します。
+require_once get_template_directory() . '/inc/acf-fields-event.php';
