@@ -82,7 +82,6 @@ export interface WPEvent {
     endDatetime: string | null;
     isRecurring: boolean | null;
     recurrenceNote: string | null;
-    organizer: string | null;
     description: string | null;
     venueName: string | null;
     address: string | null;
