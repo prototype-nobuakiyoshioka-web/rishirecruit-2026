@@ -52,7 +52,6 @@ const GET_EVENT_BY_SLUG = gql`
         endDatetime
         isRecurring
         recurrenceNote
-        organizer
         description
         venueName
         address

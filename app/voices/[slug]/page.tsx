@@ -24,7 +24,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
   if (!voice) notFound();
 
   const fields = voice.testimonialFields;
-  const relatedJob = fields?.relatedJob?.nodes[0] ?? null;
+  const relatedJob = fields?.relatedJob?.nodes?.[0] ?? null;
   const relatedEmploymentType = selectFirst(relatedJob?.jobPostingFields?.employmentType);
   const photo = imageFromField(
     fields?.photo,

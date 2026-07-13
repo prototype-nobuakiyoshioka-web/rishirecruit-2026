@@ -15,8 +15,6 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
   month: "long",
   day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
 });
 
 export async function generateStaticParams() {
@@ -84,7 +82,6 @@ export default async function EventDetailPage({ params }: PageProps) {
                 { label: "終了日時", value: endDate ? DATE_FORMATTER.format(endDate) : "" },
                 { label: "毎年開催", value: fields?.isRecurring ? "はい" : "いいえ" },
                 { label: "開催パターン", value: fields?.recurrenceNote },
-                { label: "主催", value: fields?.organizer },
               ]}
             />
           </DetailSection>
