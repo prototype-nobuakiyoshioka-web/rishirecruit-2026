@@ -2,28 +2,28 @@
 
 import { useGLTF, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import * as THREE from "three";
 import type { Group, Mesh } from "three";
 import type { GLTF } from "three-stdlib";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
-const MODEL_PATH = "/models/rishiri-prototype1.glb";
+const MODEL_PATH = "/models/rshiri-prototype02.glb?v=terrain-height";
 const MAX_ROTATION = Math.PI / 4;
 const DAMP_SPEED = 4;
 const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;
 
 type RishiriGLTF = GLTF & {
-  nodes: {
-    base: Mesh;
-    "海面": Mesh;
-    peak: Mesh;
-    mid: Mesh;
-  };
+  nodes: Record<string, THREE.Object3D>;
 };
 
-export function IslandModel() {
+interface IslandModelProps {
+  children?: ReactNode;
+}
+
+export function IslandModel({ children }: IslandModelProps) {
   const { nodes } = useGLTF(MODEL_PATH) as unknown as RishiriGLTF;
+  const islandMesh = nodes["平面"] as Mesh | undefined;
   const groupRef = useRef<Group>(null);
   const rotationCompleteRef = useRef(false);
   const scroll = useScroll();
@@ -61,11 +61,9 @@ export function IslandModel() {
   });
 
   return (
-    <group ref={groupRef}>
-      <primitive object={nodes.base} />
-      <primitive object={nodes["海面"]} />
-      <primitive object={nodes.peak} />
-      <primitive object={nodes.mid} />
+    <group ref={groupRef} position={[-2, -1, 0]}>
+      {islandMesh && <primitive object={islandMesh} />}
+      {children}
     </group>
   );
 }

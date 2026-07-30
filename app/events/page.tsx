@@ -2,17 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { CardGrid } from "@/components/ui/CardGrid";
 import { PageHero } from "@/components/ui/PageHero";
+import { formatEventDate } from "@/lib/utils/format-date";
 import { eventStatus, imageFromField, selectFirst } from "@/lib/wp/format";
 import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getEvents } from "@/lib/wp/queries/events";
-
-const DATE_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
 
 export default async function EventsPage() {
   const events = await getEvents();
@@ -34,7 +27,7 @@ export default async function EventsPage() {
               "/placeholders/event.svg",
               "イベント情報のプレースホルダー",
             );
-            const startDate = fields?.startDatetime ? new Date(fields.startDatetime) : null;
+            const startDate = formatEventDate(fields?.startDatetime ?? null);
 
             return (
               <article
@@ -67,7 +60,7 @@ export default async function EventsPage() {
                     <div>
                       <dt className="text-[color:var(--c-text-secondary)]">開催日</dt>
                       <dd className="mt-[var(--space-1)] font-bold text-[color:var(--c-text-primary)]">
-                        {startDate ? DATE_FORMATTER.format(startDate) : "未設定"}
+                        {startDate || "未設定"}
                       </dd>
                     </div>
                     <div>

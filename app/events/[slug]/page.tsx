@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { DetailSection, FieldList } from "@/components/ui/DetailSection";
+import { formatEventDate } from "@/lib/utils/format-date";
 import { eventStatus, galleryFromField, htmlToText, imageFromField, selectFirst } from "@/lib/wp/format";
 import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getEventBySlug, getEvents } from "@/lib/wp/queries/events";
@@ -10,12 +11,6 @@ import { getEventBySlug, getEvents } from "@/lib/wp/queries/events";
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
-
-const DATE_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
 
 export async function generateStaticParams() {
   const events = await getEvents();
@@ -38,8 +33,8 @@ export default async function EventDetailPage({ params }: PageProps) {
     "イベント情報のプレースホルダー",
   );
   const galleryImages = galleryFromField(fields?.galleryImages);
-  const startDate = fields?.startDatetime ? new Date(fields.startDatetime) : null;
-  const endDate = fields?.endDatetime ? new Date(fields.endDatetime) : null;
+  const startDate = formatEventDate(fields?.startDatetime ?? null);
+  const endDate = formatEventDate(fields?.endDatetime ?? null);
 
   return (
     <main className="bg-[color:var(--c-paper)] pb-[calc(var(--space-6)*4)]">
@@ -78,8 +73,8 @@ export default async function EventDetailPage({ params }: PageProps) {
           <DetailSection title="スケジュール・開催情報">
             <FieldList
               items={[
-                { label: "開始日時", value: startDate ? DATE_FORMATTER.format(startDate) : "" },
-                { label: "終了日時", value: endDate ? DATE_FORMATTER.format(endDate) : "" },
+                { label: "開始日時", value: startDate },
+                { label: "終了日時", value: endDate },
                 { label: "毎年開催", value: fields?.isRecurring ? "はい" : "いいえ" },
                 { label: "開催パターン", value: fields?.recurrenceNote },
               ]}

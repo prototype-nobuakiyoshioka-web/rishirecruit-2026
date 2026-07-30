@@ -60,3 +60,13 @@ npm run dev   # http://localhost:3000
 ###作業者（人間）
 確認方法
 npm run dev → http://localhost:3000 
+
+【オブジェクトの位置変更　position/左右/上下/前後】
+<group ref={groupRef} position={[0, -1, 0]}>
+
+【カメラの角度調整】
+<Canvas camera={{ position: [0, 6, 16], fov: 45 }}>
+
+(少しアップ)[0, 6, 16] fov45島が少し大きく
+(かなりアップ)[0, 6, 12]fov40島がかなり大きく
+(fovのみ)[0, 6, 20]35望遠レンズ的なアップ
