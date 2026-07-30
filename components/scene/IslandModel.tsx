@@ -61,7 +61,7 @@ export function IslandModel({ children }: IslandModelProps) {
   });
 
   return (
-    <group ref={groupRef} position={[-2, -1, 0]}>
+    <group ref={groupRef} position={[-4, -1, 0]} scale={[3, 3, 3]}>
       {islandMesh && <primitive object={islandMesh} />}
       {children}
     </group>
