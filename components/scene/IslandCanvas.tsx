@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import type { PinItem } from "@/lib/wp/queries/pins";
+import { Background } from "./Background";
 import { IslandModel } from "./IslandModel";
 import { PinLayer } from "./PinLayer";
 
@@ -31,7 +32,8 @@ export function IslandCanvas({ pins }: IslandCanvasProps) {
 
   return (
     <>
-      <Canvas camera={{ position: [-6, 6, 12], fov: 55 }}>
+      <Canvas camera={{ position: [-6, 5, 12], fov: 55 }}>
+        <Background />
         <ambientLight intensity={0.6} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
         <ScrollControls pages={3} damping={0}>

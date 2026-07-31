@@ -33,6 +33,9 @@ export function IslandModel({ children }: IslandModelProps) {
   const resetRotationComplete = useScrollProgressStore(
     (state) => state.resetRotationComplete
   );
+  const setRotationAngle = useScrollProgressStore(
+    (state) => state.setRotationAngle
+  );
 
   useEffect(() => {
     rotationCompleteRef.current = false;
@@ -52,6 +55,7 @@ export function IslandModel({ children }: IslandModelProps) {
       DAMP_SPEED,
       dt
     );
+    setRotationAngle(groupRef.current.rotation.y);
 
     const isRotationComplete = scroll.offset >= FOOTER_REVEAL_SCROLL_OFFSET;
     if (isRotationComplete !== rotationCompleteRef.current) {
@@ -61,7 +65,7 @@ export function IslandModel({ children }: IslandModelProps) {
   });
 
   return (
-    <group ref={groupRef} position={[-4, -1, 0]} scale={[3, 3, 3]}>
+    <group ref={groupRef} position={[-4, 1, 0]} scale={[3, 3, 3]}>
       {islandMesh && <primitive object={islandMesh} />}
       {children}
     </group>

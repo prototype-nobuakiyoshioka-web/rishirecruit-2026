@@ -10,8 +10,8 @@ export default async function Home() {
       <main
         className="h-screen w-screen overflow-hidden"
         style={{
-          background:
-            "linear-gradient(to bottom, #87CEEB 0%, #B0E0F5 35%, #E8F4FD 50%, #1B5F8C 55%, #0A2E4E 100%)",
+          width: "100vw",
+          height: "100vh",
         }}
       >
         <IslandCanvas pins={pins} />
