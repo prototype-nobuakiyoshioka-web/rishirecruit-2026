@@ -7,6 +7,13 @@ const TOURISTSPOT_CARD_FIELDS = gql`
     id
     slug
     title
+    areas {
+      nodes {
+        id
+        name
+        slug
+      }
+    }
     touristspotFields {
       category
       catchCopy
@@ -43,6 +50,13 @@ const GET_TOURISTSPOT_BY_SLUG = gql`
       id
       slug
       title
+      areas {
+        nodes {
+          id
+          name
+          slug
+        }
+      }
       touristspotFields {
         category
         catchCopy

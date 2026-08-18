@@ -15,6 +15,9 @@ require_once get_template_directory() . '/inc/theme-setup.php';
 // カスタム投稿タイプを登録します。
 require_once get_template_directory() . '/inc/cpt-registration.php';
 
+// 共有タクソノミーを登録します。
+require_once get_template_directory() . '/inc/taxonomy-registration.php';
+
 // WPGraphQLの安全性とパフォーマンス設定を登録します。
 require_once get_template_directory() . '/inc/graphql-config.php';
 

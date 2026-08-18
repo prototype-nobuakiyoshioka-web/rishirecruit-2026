@@ -1,38 +1,9 @@
 import Link from "next/link";
 import { CardGrid } from "@/components/ui/CardGrid";
 import { PageHero } from "@/components/ui/PageHero";
+import { fetchNoteArticles } from "@/lib/note/fetch-articles";
 
-type DummyColumn = {
-  id: string;
-  title: string;
-  excerpt: string;
-  publishedAt: string;
-  url: string;
-};
-
-const DUMMY_COLUMNS: DummyColumn[] = [
-  {
-    id: "column-1",
-    title: "港から始まる一日",
-    excerpt: "朝の鴛泊港で見える景色と、出勤前の小さな時間について。",
-    publishedAt: "2026-06-01",
-    url: "https://note.com/",
-  },
-  {
-    id: "column-2",
-    title: "冬の買いもの、夏の寄り道",
-    excerpt: "季節で変わる島の動き方を、暮らしの目線で書きました。",
-    publishedAt: "2026-05-18",
-    url: "https://note.com/",
-  },
-  {
-    id: "column-3",
-    title: "役場の窓口から見える町",
-    excerpt: "仕事を通して少しずつ知っていく、町の顔と日々のこと。",
-    publishedAt: "2026-05-04",
-    url: "https://note.com/",
-  },
-];
+export const revalidate = 3600;
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",
@@ -40,7 +11,14 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
   day: "numeric",
 });
 
-export default function ColumnsPage() {
+function formatPublishedAt(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : DATE_FORMATTER.format(date);
+}
+
+export default async function ColumnsPage() {
+  const articles = await fetchNoteArticles();
+
   return (
     <main className="bg-[color:var(--c-paper)]">
       <PageHero
@@ -50,30 +28,50 @@ export default function ColumnsPage() {
       />
       <section className="mx-auto max-w-[var(--container-max)] px-[var(--space-6)] pb-[calc(var(--space-6)*4)]">
         <CardGrid>
-          {DUMMY_COLUMNS.map((column) => (
-            <article
-              key={column.id}
-              className="rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] p-[var(--space-6)] shadow-[var(--shadow-md)]"
-            >
-              <p className="text-sm font-bold text-[color:var(--c-text-secondary)]">
-                {DATE_FORMATTER.format(new Date(column.publishedAt))}
-              </p>
-              <h2 className="mt-[var(--space-4)] text-xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
-                {column.title}
-              </h2>
-              <p className="mt-[var(--space-3)] text-sm leading-6 text-[color:var(--c-text-secondary)]">
-                {column.excerpt}
-              </p>
-              <a
-                href={column.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-[var(--space-6)] inline-flex min-h-11 items-center font-bold text-[color:var(--c-deep-ocean)] hover:underline"
+          {articles.length > 0 ? (
+            articles.map((article) => (
+              <article
+                key={article.link}
+                className="rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] p-[var(--space-6)] shadow-[var(--shadow-md)]"
               >
-                Noteで読む →
-              </a>
-            </article>
-          ))}
+                {article.imageUrl && (
+                  <div
+                    role="img"
+                    aria-label={`${article.title}のサムネイル`}
+                    className="mb-[var(--space-6)] aspect-video rounded-[var(--radius-md)] bg-[color:var(--c-border-subtle)] bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(${JSON.stringify(article.imageUrl)})`,
+                    }}
+                  />
+                )}
+                <p className="text-sm font-bold text-[color:var(--c-text-secondary)]">
+                  {formatPublishedAt(article.publishedAt)}
+                </p>
+                <h2 className="mt-[var(--space-4)] text-xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
+                  {article.title}
+                </h2>
+                {article.excerpt && (
+                  <p className="mt-[var(--space-3)] text-sm leading-6 text-[color:var(--c-text-secondary)]">
+                    {article.excerpt}
+                  </p>
+                )}
+                <a
+                  href={article.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-[var(--space-6)] inline-flex min-h-11 items-center font-bold text-[color:var(--c-deep-ocean)] hover:underline"
+                >
+                  Noteで読む →
+                </a>
+              </article>
+            ))
+          ) : (
+            <div className="rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] p-[var(--space-6)] shadow-[var(--shadow-md)]">
+              <p className="text-sm leading-6 text-[color:var(--c-text-secondary)]">
+                現在、表示できるコラム記事はありません。
+              </p>
+            </div>
+          )}
         </CardGrid>
         <div className="mt-[calc(var(--space-6)*2)]">
           <Link
@@ -87,4 +85,3 @@ export default function ColumnsPage() {
     </main>
   );
 }
-

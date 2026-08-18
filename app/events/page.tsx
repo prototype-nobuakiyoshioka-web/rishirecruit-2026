@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CardGrid } from "@/components/ui/CardGrid";
 import { PageHero } from "@/components/ui/PageHero";
-import { formatEventDate } from "@/lib/utils/format-date";
+import { formatEventPeriod } from "@/lib/utils/format-date";
 import { eventStatus, imageFromField, selectFirst } from "@/lib/wp/format";
 import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getEvents } from "@/lib/wp/queries/events";
@@ -27,7 +27,13 @@ export default async function EventsPage() {
               "/placeholders/event.svg",
               "イベント情報のプレースホルダー",
             );
-            const startDate = formatEventDate(fields?.startDatetime ?? null);
+            const periodText = formatEventPeriod(
+              fields?.dateDisplayType?.[0] ?? null,
+              fields?.startDatetime ?? null,
+              fields?.endDatetime ?? null,
+              fields?.periodMonth?.[0] ?? null,
+              fields?.periodRange?.[0] ?? null,
+            );
 
             return (
               <article
@@ -60,7 +66,7 @@ export default async function EventsPage() {
                     <div>
                       <dt className="text-[color:var(--c-text-secondary)]">開催日</dt>
                       <dd className="mt-[var(--space-1)] font-bold text-[color:var(--c-text-primary)]">
-                        {startDate || "未設定"}
+                        {periodText}
                       </dd>
                     </div>
                     <div>

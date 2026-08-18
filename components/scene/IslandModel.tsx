@@ -1,7 +1,7 @@
 "use client";
 
 import { useGLTF, useScroll } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, type ReactNode } from "react";
 import * as THREE from "three";
 import type { Group, Mesh } from "three";
@@ -19,13 +19,17 @@ type RishiriGLTF = GLTF & {
 
 interface IslandModelProps {
   children?: ReactNode;
+  isMobile?: boolean;
 }
 
-export function IslandModel({ children }: IslandModelProps) {
+export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   const { nodes } = useGLTF(MODEL_PATH) as unknown as RishiriGLTF;
   const islandMesh = nodes["平面"] as Mesh | undefined;
+  const viewportHeight = useThree((state) => state.size.height);
+  const mobileScale = viewportHeight <= 720 ? 3.12 : 2.63;
   const groupRef = useRef<Group>(null);
   const rotationCompleteRef = useRef(false);
+  const currentAreaRef = useRef<string>("oshidomari");
   const scroll = useScroll();
   const setRotationComplete = useScrollProgressStore(
     (state) => state.setRotationComplete
@@ -35,6 +39,9 @@ export function IslandModel({ children }: IslandModelProps) {
   );
   const setRotationAngle = useScrollProgressStore(
     (state) => state.setRotationAngle
+  );
+  const setActiveAreaSlug = useScrollProgressStore(
+    (state) => state.setActiveAreaSlug
   );
 
   useEffect(() => {
@@ -55,7 +62,20 @@ export function IslandModel({ children }: IslandModelProps) {
       DAMP_SPEED,
       dt
     );
+    if (isMobile) {
+      groupRef.current.position.x = THREE.MathUtils.lerp(
+        -0.15,
+        0.45,
+        scroll.offset
+      );
+    }
     setRotationAngle(groupRef.current.rotation.y);
+
+    const nextArea = scroll.offset < 0.5 ? "oshidomari" : "oniwaki";
+    if (nextArea !== currentAreaRef.current) {
+      currentAreaRef.current = nextArea;
+      setActiveAreaSlug(nextArea);
+    }
 
     const isRotationComplete = scroll.offset >= FOOTER_REVEAL_SCROLL_OFFSET;
     if (isRotationComplete !== rotationCompleteRef.current) {
@@ -65,7 +85,11 @@ export function IslandModel({ children }: IslandModelProps) {
   });
 
   return (
-    <group ref={groupRef} position={[-4, 1, 0]} scale={[3, 3, 3]}>
+    <group
+      ref={groupRef}
+      position={isMobile ? [-0.15, 3, 0] : [-4, 1, 0]}
+      scale={isMobile ? [mobileScale, mobileScale, mobileScale] : [3, 3, 3]}
+    >
       {islandMesh && <primitive object={islandMesh} />}
       {children}
     </group>

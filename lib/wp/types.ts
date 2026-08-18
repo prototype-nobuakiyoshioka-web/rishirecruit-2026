@@ -19,10 +19,17 @@ export interface WPGalleryNodes {
   }>;
 }
 
+export interface AreaTerm {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface JobPosting {
   id: string;
   slug: string;
   title: string;
+  areas: { nodes: AreaTerm[] } | null;
   jobPostingFields: {
     employmentType: string[] | null;
     catchCopy: string | null;
@@ -53,6 +60,7 @@ export interface Touristspot {
   id: string;
   slug: string;
   title: string;
+  areas: { nodes: AreaTerm[] } | null;
   touristspotFields: {
     category: string[] | null;
     catchCopy: string | null;
@@ -75,9 +83,13 @@ export interface WPEvent {
   id: string;
   slug: string;
   title: string;
+  areas: { nodes: AreaTerm[] } | null;
   eventFields: {
     category: string[] | null;
     catchCopy: string | null;
+    dateDisplayType: string[] | null;
+    periodMonth: string[] | null;
+    periodRange: string[] | null;
     startDatetime: string | null;
     endDatetime: string | null;
     isRecurring: boolean | null;

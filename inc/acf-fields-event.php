@@ -86,6 +86,80 @@ add_action('acf/init', function (): void {
                 'show_in_graphql' => 1,
             ],
             [
+                'key' => 'field_ev_date_display_type',
+                'label' => '日程の表示方法',
+                'name' => 'date_display_type',
+                'type' => 'select',
+                'required' => 1,
+                'choices' => [
+                    'exact' => '日付を指定する',
+                    'period' => '期間で表現する(上旬・中旬・下旬)',
+                ],
+                'default_value' => 'exact',
+                'return_format' => 'value',
+                'multiple' => 0,
+                'ui' => 0,
+                'show_in_graphql' => 1,
+                'instructions' => '開催日が確定していない場合は「期間で表現する」を選択してください。',
+            ],
+            [
+                'key' => 'field_ev_period_month',
+                'label' => '開催月',
+                'name' => 'period_month',
+                'type' => 'select',
+                'required' => 0,
+                'choices' => [
+                    '1' => '1月',
+                    '2' => '2月',
+                    '3' => '3月',
+                    '4' => '4月',
+                    '5' => '5月',
+                    '6' => '6月',
+                    '7' => '7月',
+                    '8' => '8月',
+                    '9' => '9月',
+                    '10' => '10月',
+                    '11' => '11月',
+                    '12' => '12月',
+                ],
+                'return_format' => 'value',
+                'multiple' => 0,
+                'show_in_graphql' => 1,
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'field_ev_date_display_type',
+                            'operator' => '==',
+                            'value' => 'period',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'key' => 'field_ev_period_range',
+                'label' => '時期',
+                'name' => 'period_range',
+                'type' => 'select',
+                'required' => 0,
+                'choices' => [
+                    'early' => '上旬',
+                    'mid' => '中旬',
+                    'late' => '下旬',
+                ],
+                'return_format' => 'value',
+                'multiple' => 0,
+                'show_in_graphql' => 1,
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'field_ev_date_display_type',
+                            'operator' => '==',
+                            'value' => 'period',
+                        ],
+                    ],
+                ],
+            ],
+            [
                 'key' => 'field_ev_start_datetime',
                 'label' => '開始日時',
                 'name' => 'start_datetime',
@@ -96,6 +170,15 @@ add_action('acf/init', function (): void {
                 'return_format' => 'Y-m-d',
                 'first_day' => 1,
                 'show_in_graphql' => 1,
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'field_ev_date_display_type',
+                            'operator' => '==',
+                            'value' => 'exact',
+                        ],
+                    ],
+                ],
             ],
             [
                 'key' => 'field_ev_end_datetime',
@@ -108,6 +191,15 @@ add_action('acf/init', function (): void {
                 'return_format' => 'Y-m-d',
                 'first_day' => 1,
                 'show_in_graphql' => 1,
+                'conditional_logic' => [
+                    [
+                        [
+                            'field' => 'field_ev_date_display_type',
+                            'operator' => '==',
+                            'value' => 'exact',
+                        ],
+                    ],
+                ],
             ],
             [
                 'key' => 'field_ev_is_recurring',

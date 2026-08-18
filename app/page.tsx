@@ -1,9 +1,18 @@
 import { IslandCanvas } from "@/components/scene/IslandCanvas";
 import { ColumnBoard } from "@/components/scene/ColumnBoard";
-import { getPinData } from "@/lib/wp/queries/pins";
+import { AreaSidePanels } from "@/components/scene/AreaSidePanels";
+import { getAreaWithPosts } from "@/lib/wp/queries/areas";
 
 export default async function Home() {
-  const pins = await getPinData();
+  const [oshidomariData, oniwakiData] = await Promise.all([
+    getAreaWithPosts("oshidomari"),
+    getAreaWithPosts("oniwaki"),
+  ]);
+
+  const areaData = {
+    oshidomari: oshidomariData,
+    oniwaki: oniwakiData,
+  };
 
   return (
     <>
@@ -14,9 +23,10 @@ export default async function Home() {
           height: "100vh",
         }}
       >
-        <IslandCanvas pins={pins} />
+        <IslandCanvas />
       </main>
       <ColumnBoard />
+      <AreaSidePanels areaData={areaData} />
     </>
   );
 }

@@ -1,30 +1,34 @@
 "use client";
 
-import { PIN_POSITIONS } from "@/lib/three/pin-positions";
-import type { PinItem } from "@/lib/wp/queries/pins";
+import { AREA_POSITIONS } from "@/lib/three/pin-positions";
 import { Pin } from "./Pin";
 
+const AREAS = [
+  { slug: "oshidomari", name: "鴛泊" },
+  { slug: "oniwaki", name: "鬼脇" },
+];
+
 interface PinLayerProps {
-  pins: PinItem[];
-  onSelect: (pin: PinItem) => void;
+  activeAreaSlug: string;
 }
 
-export function PinLayer({ pins, onSelect }: PinLayerProps) {
+export function PinLayer({ activeAreaSlug }: PinLayerProps) {
   return (
-    <>
-      {pins.map((pin) => {
-        const position = PIN_POSITIONS[pin.positionKey];
-        if (!position) return null;
+    <group>
+      {AREAS.map((area) => {
+        const pos = AREA_POSITIONS[area.slug];
+        if (!pos) return null;
 
         return (
           <Pin
-            key={pin.id}
-            pin={pin}
-            position={[position.x, position.y, position.z]}
-            onSelect={onSelect}
+            key={area.slug}
+            areaSlug={area.slug}
+            areaName={area.name}
+            position={[pos.x, pos.y, pos.z]}
+            isActive={area.slug === activeAreaSlug}
           />
         );
       })}
-    </>
+    </group>
   );
 }

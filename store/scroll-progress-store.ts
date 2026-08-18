@@ -6,6 +6,8 @@ type ScrollProgressState = {
   resetRotationComplete: () => void;
   rotationAngle: number;
   setRotationAngle: (angle: number) => void;
+  activeAreaSlug: string;
+  setActiveAreaSlug: (slug: string) => void;
 };
 
 export const useScrollProgressStore = create<ScrollProgressState>((set) => ({
@@ -14,4 +16,6 @@ export const useScrollProgressStore = create<ScrollProgressState>((set) => ({
   resetRotationComplete: () => set({ isRotationComplete: false }),
   rotationAngle: 0,
   setRotationAngle: (angle) => set({ rotationAngle: angle }),
+  activeAreaSlug: "oshidomari",
+  setActiveAreaSlug: (slug) => set({ activeAreaSlug: slug }),
 }));

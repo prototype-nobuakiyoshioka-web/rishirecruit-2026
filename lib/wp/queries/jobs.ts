@@ -7,6 +7,13 @@ const JOB_POSTING_CARD_FIELDS = gql`
     id
     slug
     title
+    areas {
+      nodes {
+        id
+        name
+        slug
+      }
+    }
     jobPostingFields {
       employmentType
       catchCopy
@@ -45,6 +52,13 @@ const GET_JOB_POSTING_BY_SLUG = gql`
       id
       slug
       title
+      areas {
+        nodes {
+          id
+          name
+          slug
+        }
+      }
       jobPostingFields {
         employmentType
         catchCopy

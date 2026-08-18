@@ -7,9 +7,19 @@ const EVENT_CARD_FIELDS = gql`
     id
     slug
     title
+    areas {
+      nodes {
+        id
+        name
+        slug
+      }
+    }
     eventFields {
       category
       catchCopy
+      dateDisplayType
+      periodMonth
+      periodRange
       startDatetime
       endDatetime
       venueName
@@ -45,9 +55,19 @@ const GET_EVENT_BY_SLUG = gql`
       id
       slug
       title
+      areas {
+        nodes {
+          id
+          name
+          slug
+        }
+      }
       eventFields {
         category
         catchCopy
+        dateDisplayType
+        periodMonth
+        periodRange
         startDatetime
         endDatetime
         isRecurring
