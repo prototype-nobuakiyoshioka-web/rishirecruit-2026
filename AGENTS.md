@@ -322,7 +322,7 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
     - [x] 全4CPTのslugを半角英小文字 + ハイフンへ統一(25件)
     - [x] エリア・ピン参照値の整合は対象外(個別投稿にはピン付けしない)
     - [ ] 公開中のテスト投稿を非公開化または削除
-  - [ ] 応募フォーム・お問い合わせフォームの実送信(現在は送信成功のモック)
+  - [x] 応募フォーム・お問い合わせフォームの実送信 — Contact Form 7 REST(feedback)接続済み。お問い合わせ=form ID 176 / 求人応募=177。フロントは `lib/wp/submit-cf7.ts` 経由で送信(`_wpcf7_unit_tag` 等の制御フィールド付与が必須)。curl で両フォーム `mail_sent` 確認済み。実ブラウザでの手動送信テストは吉岡さん側で最終確認
   - [ ] WordPress更新のISRまたはOn-demand Revalidation
 - [ ] **Phase 7: モバイル最適化** — レイアウト調整は進行済み、性能最適化は未着手
   - [ ] モバイル用軽量GLB切替

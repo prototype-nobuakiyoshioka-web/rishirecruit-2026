@@ -3,6 +3,12 @@
 import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
+import { submitCf7, isCf7Success } from "@/lib/wp/submit-cf7";
+
+// CF7 求人応募フォームの数値ID（管理画面の post=ID）
+const CF7_APPLY_ID = process.env.NEXT_PUBLIC_CF7_APPLY_ID ?? "177";
+const SUBMIT_ERROR_MESSAGE =
+  "送信に失敗しました。時間をおいて、もう一度お試しください。";
 
 interface ApplyFormProps {
   jobTitle: string;
@@ -166,6 +172,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [isZipLoading, setIsZipLoading] = useState(false);
   const [zipLookupError, setZipLookupError] = useState("");
 
@@ -239,10 +246,31 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
     if (Object.keys(nextErrors).length > 0) return;
 
     setIsSubmitting(true);
-    // TODO: 実際の送信処理を後で実装
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitted(true);
-    setIsSubmitting(false);
+    setSubmitError("");
+    try {
+      const result = await submitCf7(CF7_APPLY_ID, {
+        full_name: form.fullName,
+        full_name_kana: form.fullNameKana,
+        gender: form.gender,
+        birth_date: form.birthDate,
+        phone: form.phone,
+        email: form.email,
+        zip_code: form.zipCode,
+        prefecture: form.prefecture,
+        address_line: form.addressLine,
+        job_slug: jobSlug,
+        privacy: form.privacy ? "1" : "",
+      });
+      if (isCf7Success(result)) {
+        setIsSubmitted(true);
+      } else {
+        setSubmitError(result.message || SUBMIT_ERROR_MESSAGE);
+      }
+    } catch {
+      setSubmitError(SUBMIT_ERROR_MESSAGE);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (isSubmitted) {
@@ -494,6 +522,12 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
           </label>
           <FieldError message={errors.privacy} />
         </div>
+
+        {submitError && (
+          <p role="alert" className="text-sm font-bold text-[color:var(--c-pin-job)]">
+            {submitError}
+          </p>
+        )}
 
         <button
           type="submit"

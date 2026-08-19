@@ -4,6 +4,12 @@ import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
+import { submitCf7, isCf7Success } from "@/lib/wp/submit-cf7";
+
+// CF7 お問い合わせフォームの数値ID（管理画面の post=ID）
+const CF7_CONTACT_ID = process.env.NEXT_PUBLIC_CF7_CONTACT_ID ?? "176";
+const SUBMIT_ERROR_MESSAGE =
+  "送信に失敗しました。時間をおいて、もう一度お試しください。";
 
 type ContactFormState = {
   inquiryType: string;
@@ -80,6 +86,7 @@ export default function ContactPage() {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const isReadyToSubmit = Object.keys(validateForm(form)).length === 0;
 
   function updateField(field: FieldName, value: string | boolean) {
@@ -105,10 +112,27 @@ export default function ContactPage() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setIsSubmitting(true);
-    // TODO: メール送信基盤の確定後、実際の送信APIへ接続する。
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSubmitted(true);
-    setIsSubmitting(false);
+    setSubmitError("");
+    try {
+      const result = await submitCf7(CF7_CONTACT_ID, {
+        inquiry_type: form.inquiryType,
+        name: form.name,
+        furigana: form.furigana,
+        email: form.email,
+        phone: form.phone,
+        message: form.message,
+        privacy: form.privacy ? "1" : "",
+      });
+      if (isCf7Success(result)) {
+        setIsSubmitted(true);
+      } else {
+        setSubmitError(result.message || SUBMIT_ERROR_MESSAGE);
+      }
+    } catch {
+      setSubmitError(SUBMIT_ERROR_MESSAGE);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const inputClass =
@@ -191,6 +215,12 @@ export default function ContactPage() {
                 <label className="flex cursor-pointer gap-3 text-sm font-bold leading-6 text-[color:var(--c-text-primary)]"><input name="privacy" type="checkbox" checked={form.privacy} onChange={(event) => updateField("privacy", event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[color:var(--c-pin-job)]" required /><span><Link href="/privacy" target="_blank" className="text-[color:var(--c-deep-ocean)] underline">プライバシーポリシー</Link>に同意します <span aria-hidden="true">*</span></span></label>
                 <FieldError message={errors.privacy} />
               </div>
+
+              {submitError && (
+                <p role="alert" className="text-sm font-bold text-[color:var(--c-pin-job)]">
+                  {submitError}
+                </p>
+              )}
 
               <button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting} className="min-h-14 w-full rounded-[var(--radius-full)] bg-[color:var(--c-pin-job)] px-8 text-base font-black text-white shadow-[var(--shadow-pop-coral)] transition-[filter] hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70 md:w-fit">
                 {isSubmitting ? "送信中..." : isReadyToSubmit ? "送信する" : "必須項目を入力してください"}
