@@ -1,77 +1,46 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import Image from "next/image";
-import { CardGrid } from "@/components/ui/CardGrid";
-import { PageHero } from "@/components/ui/PageHero";
+import Link from "next/link";
+import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { imageFromField, selectFirst } from "@/lib/wp/format";
 import { SPOT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getTouristspots } from "@/lib/wp/queries/spots";
 
+export const metadata: Metadata = { title: "利尻島の観光地", description: "利尻島の観光地と、島で暮らす人の身近な風景を紹介します。" };
+
 export default async function SpotsPage() {
   const spots = await getTouristspots();
-
   return (
-    <main className="bg-[color:var(--c-paper)]">
-      <PageHero
-        eyebrow="Spots"
-        title="島を、知る。"
-        lead="あなたが暮らす島の、見どころを巡る。"
-      />
-      <section className="mx-auto max-w-[var(--container-max)] px-[var(--space-6)] pb-[calc(var(--space-6)*4)]">
-        <CardGrid>
-          {spots.map((spot) => {
+    <EditorialIndexShell
+      eyebrow="Places on the island"
+      title={<>島を知ることは、<br />暮らしを知ること。</>}
+      lead={<>休日に歩く場所、季節を感じる景色。<br />働く先にある島の日常を巡ります。</>}
+      introEyebrow="Island guide"
+      introLabel="島の風景と場所"
+      introTitle={<>観光地の先にある、<br />いつもの景色。</>}
+      introBody="訪れる人にとっての名所は、暮らす人にとっては休日の散歩道や季節を知る場所でもあります。求人条件だけでは見えない、島で過ごす時間を想像してみてください。"
+    >
+      <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
+        <div className="grid gap-x-8 gap-y-14 md:grid-cols-2">
+          {spots.map((spot, index) => {
             const fields = spot.touristspotFields;
             const category = selectFirst(fields?.category);
-            const thumbnailImage = imageFromField(
-              fields?.thumbnailImage,
-              "/placeholders/spot.svg",
-              "観光地情報のプレースホルダー",
-            );
-
+            const image = imageFromField(fields?.thumbnailImage, "/placeholders/spot.svg");
             return (
-              <article
-                key={spot.id}
-                className="overflow-hidden rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] shadow-[var(--shadow-md)]"
-              >
-                <Image
-                  src={thumbnailImage.sourceUrl}
-                  alt={thumbnailImage.altText}
-                  width={1200}
-                  height={800}
-                  className="aspect-[3/2] w-full object-cover"
-                />
-                <div className="p-[var(--space-6)]">
-                  <span className="rounded-[var(--radius-full)] bg-[color:var(--c-pin-spot)] px-[var(--space-3)] py-[var(--space-1)] text-xs font-bold text-[color:var(--c-text-primary)]">
-                    {category ? SPOT_CATEGORY_LABELS[category] ?? category : "未設定"}
-                  </span>
-                  <h2 className="mt-[var(--space-4)] text-xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
-                    {spot.title}
-                  </h2>
-                  <p className="mt-[var(--space-3)] text-sm leading-6 text-[color:var(--c-text-secondary)]">
-                    {fields?.catchCopy}
-                  </p>
-                  <p className="mt-[var(--space-5)] text-sm font-medium text-[color:var(--c-text-secondary)]">
-                    {fields?.accessInfo}
-                  </p>
-                  <Link
-                    href={`/spots/${spot.slug}`}
-                    className="mt-[var(--space-6)] inline-flex min-h-11 items-center font-bold text-[color:var(--c-deep-ocean)] hover:underline"
-                  >
-                    詳細を見る →
-                  </Link>
+              <article key={spot.id} className={index % 3 === 0 ? "md:col-span-2" : undefined}>
+                <Link href={`/spots/${spot.slug}`} aria-label={`${spot.title}の詳細を見る`}>
+                  <Image src={image.sourceUrl} alt={image.altText || `${spot.title}の風景`} width={1600} height={1000} className={`w-full rounded-[var(--radius-2xl)] object-cover transition-transform duration-500 hover:scale-[1.01] ${index % 3 === 0 ? "aspect-[16/8]" : "aspect-[4/3]"}`} />
+                </Link>
+                <div className="mt-6 grid gap-4 md:grid-cols-[1fr_auto] md:items-start">
+                  <div><p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">{category ? SPOT_CATEGORY_LABELS[category] ?? category : "Spot"}</p><h2 className="mt-3 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">{spot.title}</h2>{fields?.catchCopy ? <p className="mt-3 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}</div>
+                  <Link href={`/spots/${spot.slug}`} className="inline-flex min-h-11 items-center font-black text-[color:var(--c-deep-ocean)] hover:underline">この場所を知る →</Link>
                 </div>
               </article>
             );
           })}
-        </CardGrid>
-        <div className="mt-[calc(var(--space-6)*2)]">
-          <Link
-            href="/jobs"
-            className="inline-flex min-h-11 items-center rounded-[var(--radius-full)] bg-[color:var(--c-deep-ocean)] px-[var(--space-6)] font-bold text-[color:var(--c-text-inverse)]"
-          >
-            この島で働く →
-          </Link>
         </div>
+        <div className="mt-20 border-t border-[color:var(--c-deep-ocean)]/15 pt-10"><Link href="/jobs" className="font-black text-[color:var(--c-deep-ocean)] hover:underline">この島で働く →</Link></div>
       </section>
-    </main>
+    </EditorialIndexShell>
   );
 }

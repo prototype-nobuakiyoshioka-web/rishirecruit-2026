@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
-import { PageHero } from "@/components/ui/PageHero";
+import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 
 type ContactFormState = {
   inquiryType: string;
@@ -25,10 +25,6 @@ const INQUIRY_OPTIONS = [
   "その他",
 ];
 
-const REQUIRED_MESSAGE = "入力してください";
-const EMAIL_MESSAGE = "メールアドレスを確認してください。";
-const KANA_MESSAGE = "カタカナで入力してください。";
-
 const INITIAL_FORM_STATE: ContactFormState = {
   inquiryType: "",
   name: "",
@@ -39,13 +35,7 @@ const INITIAL_FORM_STATE: ContactFormState = {
   privacy: false,
 };
 
-function isKatakana(value: string) {
-  return /^[ァ-ヶー・　\s]+$/.test(value);
-}
-
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
+const REQUIRED_MESSAGE = "入力してください";
 
 function validateForm(form: ContactFormState) {
   const errors: ValidationErrors = {};
@@ -62,30 +52,27 @@ function validateForm(form: ContactFormState) {
     const value = form[field];
     if (typeof value === "boolean") {
       if (!value) errors[field] = REQUIRED_MESSAGE;
-      return;
+    } else if (!value.trim()) {
+      errors[field] = REQUIRED_MESSAGE;
     }
-    if (typeof value !== "string" || !value.trim()) errors[field] = REQUIRED_MESSAGE;
   });
 
-  if (form.email.trim() && !isValidEmail(form.email)) {
-    errors.email = EMAIL_MESSAGE;
+  if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    errors.email = "メールアドレスを確認してください。";
   }
-
-  if (form.furigana.trim() && !isKatakana(form.furigana)) {
-    errors.furigana = KANA_MESSAGE;
+  if (form.furigana.trim() && !/^[ァ-ヶー・　\s]+$/.test(form.furigana)) {
+    errors.furigana = "カタカナで入力してください。";
   }
 
   return errors;
 }
 
 function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-
-  return (
-    <p className="mt-[var(--space-2)] text-sm font-bold text-[color:var(--c-pin-job)]">
+  return message ? (
+    <p className="mt-2 text-sm font-bold text-[color:var(--c-pin-job)]" role="alert">
       {message}
     </p>
-  );
+  ) : null;
 }
 
 export default function ContactPage() {
@@ -93,9 +80,7 @@ export default function ContactPage() {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const validationErrors = validateForm(form);
-  const isReadyToSubmit = Object.keys(validationErrors).length === 0;
+  const isReadyToSubmit = Object.keys(validateForm(form)).length === 0;
 
   function updateField(field: FieldName, value: string | boolean) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -109,203 +94,111 @@ export default function ContactPage() {
 
   function handleTextChange(field: FieldName) {
     return (
-      event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-    ) => {
-      updateField(field, event.target.value);
-    };
+      event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => updateField(field, event.target.value);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const nextErrors = validateForm(form);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
     setIsSubmitting(true);
-    // TODO: 実際の送信処理を後で実装
+    // TODO: メール送信基盤の確定後、実際の送信APIへ接続する。
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsSubmitted(true);
     setIsSubmitting(false);
   }
 
-  const inputClassName =
-    "min-h-12 w-full rounded-[var(--radius-md)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-paper)] px-[var(--space-4)] text-base text-[color:var(--c-text-primary)] outline-none transition-colors focus:border-[color:var(--c-deep-ocean)] focus:bg-[color:var(--c-snow)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--c-deep-ocean)]";
-  const labelClassName =
-    "text-sm font-bold tracking-normal text-[color:var(--c-text-primary)]";
+  const inputClass =
+    "mt-2 min-h-13 w-full rounded-[var(--radius-lg)] border border-[color:var(--c-deep-ocean)]/15 bg-white/70 px-4 text-base text-[color:var(--c-text-primary)] outline-none transition-[border-color,background-color,box-shadow] focus:border-[color:var(--c-deep-ocean)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(27,95,140,0.1)]";
+  const labelClass = "text-sm font-black text-[color:var(--c-text-primary)]";
 
   return (
-    <main className="bg-[color:var(--c-paper)]">
-      <PageHero
-        eyebrow="Contact"
-        title="お気軽にどうぞ。"
-        lead="求人・暮らし・取材まで、なんでも。"
-      />
-
-      <section className="mx-auto max-w-[var(--container-max)] px-[var(--space-6)] pb-[calc(var(--space-6)*4)]">
+    <EditorialIndexShell
+      eyebrow="Contact rishirecruit"
+      title={<>気になることを、<br />話すところから。</>}
+      lead={<>求人のことも、島での暮らしも。<br />まだ決めていない段階から相談できます。</>}
+      introEyebrow="Before you contact"
+      introLabel="お問い合わせの前に"
+      introTitle={<>応募する前でも、<br />聞いて大丈夫です。</>}
+      introBody="住まい、冬の生活、働き方、イベントや観光について。情報を見ても分からないことや、誰に聞けばよいか迷うことをお送りください。正式な求人応募は、各求人詳細ページの応募フォームから受け付けています。"
+    >
+      <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
         {isSubmitted ? (
-          <div className="rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] p-[var(--space-6)] shadow-[var(--shadow-md)]">
-            <p className="text-2xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
-              お問い合わせを受け付けました。
+          <div className="border-y border-[color:var(--c-deep-ocean)]/15 py-20 md:py-28" aria-live="polite">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+              Thank you
             </p>
-            <Link
-              href="/jobs"
-              className="mt-[var(--space-6)] inline-flex min-h-11 items-center font-bold text-[color:var(--c-deep-ocean)] hover:underline"
-            >
-              求人を見る →
-            </Link>
+            <h2 className="mt-5 text-balance text-3xl font-black leading-tight text-[color:var(--c-deep-ocean)] md:text-5xl">
+              お問い合わせを受け付けました。
+            </h2>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">
+              内容を確認のうえ、ご入力いただいたメールアドレスへご連絡します。
+            </p>
+            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-4 font-black text-[color:var(--c-deep-ocean)]">
+              <Link href="/jobs" className="hover:underline">募集中の仕事を見る →</Link>
+              <Link href="/" className="hover:underline">トップへ戻る →</Link>
+            </div>
           </div>
         ) : (
-          <form
-            noValidate
-            onSubmit={handleSubmit}
-            className="grid gap-[var(--space-5)] rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] p-[var(--space-6)] shadow-[var(--shadow-md)]"
-          >
-            <fieldset>
-              <legend className={labelClassName}>
-                問い合わせ項目 <span aria-label="必須">*</span>
-              </legend>
-              <div className="mt-[var(--space-2)] grid grid-cols-2 gap-[var(--space-3)] md:grid-cols-4">
-                {INQUIRY_OPTIONS.map((option) => (
-                  <label
-                    key={option}
-                    className="flex min-h-12 cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-paper)] px-[var(--space-3)] text-center text-sm font-bold text-[color:var(--c-text-primary)] transition-colors has-checked:border-[color:var(--c-deep-ocean)] has-checked:bg-[color:var(--c-deep-ocean)] has-checked:text-[color:var(--c-text-inverse)]"
-                  >
-                    <input
-                      type="radio"
-                      name="inquiry_type"
-                      value={option}
-                      checked={form.inquiryType === option}
-                      onChange={(event) => updateField("inquiryType", event.target.value)}
-                      className="sr-only"
-                      required
-                    />
-                    {option}
-                  </label>
-                ))}
+          <div className="grid gap-12 border-t border-[color:var(--c-deep-ocean)]/15 pt-14 md:grid-cols-[15rem_1fr] md:gap-20 md:pt-20">
+            <aside>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+                Contact form
+              </p>
+              <h2 className="mt-4 text-2xl font-black text-[color:var(--c-deep-ocean)]">
+                お問い合わせ
+              </h2>
+              <div className="mt-6 grid gap-4 text-sm leading-7 text-[color:var(--c-text-secondary)]">
+                <p><span className="font-black text-[color:var(--c-text-primary)]">*</span> は必須項目です。</p>
+                <p>求人への応募は、求人詳細ページの「応募する」からお進みください。</p>
+                <Link href="/jobs" className="font-black text-[color:var(--c-deep-ocean)] hover:underline">
+                  求人一覧を見る →
+                </Link>
               </div>
-              <FieldError message={errors.inquiryType} />
-            </fieldset>
+            </aside>
 
-            <div className="grid gap-[var(--space-4)] md:grid-cols-2">
-              <div>
-                <label htmlFor="name" className={labelClassName}>
-                  名前 <span aria-label="必須">*</span>
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  value={form.name}
-                  onChange={handleTextChange("name")}
-                  className={`${inputClassName} mt-[var(--space-2)]`}
-                  required
-                />
-                <FieldError message={errors.name} />
+            <form noValidate onSubmit={handleSubmit} className="grid gap-10">
+              <fieldset>
+                <legend className={labelClass}>問い合わせ項目 <span aria-hidden="true">*</span></legend>
+                <p className="mt-2 text-sm text-[color:var(--c-text-secondary)]">最も近いものを選んでください。</p>
+                <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+                  {INQUIRY_OPTIONS.map((option) => (
+                    <label key={option} className="flex min-h-14 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border border-[color:var(--c-deep-ocean)]/15 bg-white/60 px-3 text-center text-sm font-black text-[color:var(--c-text-primary)] transition-colors has-checked:border-[color:var(--c-deep-ocean)] has-checked:bg-[color:var(--c-deep-ocean)] has-checked:text-white">
+                      <input type="radio" name="inquiry_type" value={option} checked={form.inquiryType === option} onChange={(event) => updateField("inquiryType", event.target.value)} className="sr-only" required />
+                      {option}
+                    </label>
+                  ))}
+                </div>
+                <FieldError message={errors.inquiryType} />
+              </fieldset>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div><label htmlFor="name" className={labelClass}>名前 <span aria-hidden="true">*</span></label><input id="name" name="name" autoComplete="name" value={form.name} onChange={handleTextChange("name")} className={inputClass} required /><FieldError message={errors.name} /></div>
+                <div><label htmlFor="furigana" className={labelClass}>フリガナ <span aria-hidden="true">*</span></label><input id="furigana" name="furigana" value={form.furigana} onChange={handleTextChange("furigana")} className={inputClass} required /><FieldError message={errors.furigana} /></div>
               </div>
 
-              <div>
-                <label htmlFor="furigana" className={labelClassName}>
-                  フリガナ <span aria-label="必須">*</span>
-                </label>
-                <input
-                  id="furigana"
-                  name="furigana"
-                  type="text"
-                  value={form.furigana}
-                  onChange={handleTextChange("furigana")}
-                  className={`${inputClassName} mt-[var(--space-2)]`}
-                  required
-                />
-                <FieldError message={errors.furigana} />
-              </div>
-            </div>
-
-            <div className="grid gap-[var(--space-4)] md:grid-cols-2">
-              <div>
-                <label htmlFor="email" className={labelClassName}>
-                  メールアドレス <span aria-label="必須">*</span>
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={form.email}
-                  onChange={handleTextChange("email")}
-                  className={`${inputClassName} mt-[var(--space-2)]`}
-                  required
-                />
-                <FieldError message={errors.email} />
+              <div className="grid gap-6 md:grid-cols-2">
+                <div><label htmlFor="email" className={labelClass}>メールアドレス <span aria-hidden="true">*</span></label><input id="email" name="email" type="email" autoComplete="email" value={form.email} onChange={handleTextChange("email")} className={inputClass} required /><FieldError message={errors.email} /></div>
+                <div><label htmlFor="phone" className={labelClass}>電話番号 <span className="ml-2 font-normal text-[color:var(--c-text-secondary)]">任意</span></label><input id="phone" name="phone" type="tel" autoComplete="tel" value={form.phone} onChange={handleTextChange("phone")} className={inputClass} /></div>
               </div>
 
-              <div>
-                <label htmlFor="phone" className={labelClassName}>
-                  電話番号
-                </label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  value={form.phone}
-                  onChange={handleTextChange("phone")}
-                  className={`${inputClassName} mt-[var(--space-2)]`}
-                />
+              <div><label htmlFor="message" className={labelClass}>問い合わせ内容 <span aria-hidden="true">*</span></label><textarea id="message" name="message" value={form.message} onChange={handleTextChange("message")} className={`${inputClass} min-h-48 py-4 leading-8`} placeholder="気になっていることや、確認したいことをご記入ください。" required /><FieldError message={errors.message} /></div>
+
+              <div className="border-t border-[color:var(--c-deep-ocean)]/15 pt-8">
+                <label className="flex cursor-pointer gap-3 text-sm font-bold leading-6 text-[color:var(--c-text-primary)]"><input name="privacy" type="checkbox" checked={form.privacy} onChange={(event) => updateField("privacy", event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[color:var(--c-pin-job)]" required /><span><Link href="/privacy" target="_blank" className="text-[color:var(--c-deep-ocean)] underline">プライバシーポリシー</Link>に同意します <span aria-hidden="true">*</span></span></label>
+                <FieldError message={errors.privacy} />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="message" className={labelClassName}>
-                問い合わせ内容 <span aria-label="必須">*</span>
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                value={form.message}
-                onChange={handleTextChange("message")}
-                className={`${inputClassName} mt-[var(--space-2)] min-h-40 py-[var(--space-3)] leading-7`}
-                required
-              />
-              <FieldError message={errors.message} />
-            </div>
-
-            <div>
-              <label className="flex gap-[var(--space-3)] text-sm font-bold leading-6 text-[color:var(--c-text-primary)]">
-                <input
-                  name="privacy"
-                  type="checkbox"
-                  checked={form.privacy}
-                  onChange={(event) => updateField("privacy", event.target.checked)}
-                  className="mt-[0.2rem] size-5 rounded border-[color:var(--c-border-subtle)] accent-[color:var(--c-pin-job)]"
-                  required
-                />
-                <span>
-                  <Link href="/privacy" className="text-[color:var(--c-deep-ocean)] underline">
-                    プライバシーポリシー
-                  </Link>
-                  に同意します <span aria-label="必須">*</span>
-                </span>
-              </label>
-              <FieldError message={errors.privacy} />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              aria-disabled={!isReadyToSubmit || isSubmitting}
-              className="min-h-14 rounded-[var(--radius-full)] bg-[color:var(--c-pin-job)] px-[var(--space-6)] text-base font-bold text-[color:var(--c-snow)] shadow-[var(--shadow-pop-coral)] transition-[filter] hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70 md:w-fit"
-            >
-              {isSubmitting
-                ? "送信中..."
-                : isReadyToSubmit
-                  ? "送信する"
-                  : "必須項目を入力してください"}
-            </button>
-          </form>
+              <button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting} className="min-h-14 w-full rounded-[var(--radius-full)] bg-[color:var(--c-pin-job)] px-8 text-base font-black text-white shadow-[var(--shadow-pop-coral)] transition-[filter] hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70 md:w-fit">
+                {isSubmitting ? "送信中..." : isReadyToSubmit ? "送信する" : "必須項目を入力してください"}
+              </button>
+            </form>
+          </div>
         )}
       </section>
-    </main>
+    </EditorialIndexShell>
   );
 }

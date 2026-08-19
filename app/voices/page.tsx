@@ -1,72 +1,180 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import Image from "next/image";
-import { CardGrid } from "@/components/ui/CardGrid";
-import { PageHero } from "@/components/ui/PageHero";
+import Link from "next/link";
 import { imageFromField } from "@/lib/wp/format";
 import { getTestimonials } from "@/lib/wp/queries/voices";
+
+export const metadata: Metadata = {
+  title: "移住者の声",
+  description:
+    "利尻富士町へ移住し、島で働く人たちの声。移住前の暮らし、仕事、冬の生活、人とのつながりを本人の言葉で紹介します。",
+};
 
 export default async function VoicesPage() {
   const voices = await getTestimonials();
 
   return (
-    <main className="bg-[color:var(--c-paper)]">
-      <PageHero
-        eyebrow="Voices"
-        title="ここに来た人たちの、声。"
-        lead="利尻富士町で暮らし、働く人たちの話を集めました。"
-      />
-      <section className="mx-auto max-w-[var(--container-max)] px-[var(--space-6)] pb-[calc(var(--space-6)*4)]">
-        <CardGrid>
-          {voices.map((voice) => {
-            const fields = voice.testimonialFields;
-            const photo = imageFromField(
-              fields?.photo,
-              "/placeholders/voice.svg",
-              "移住者の声のプレースホルダー",
-            );
-
-            return (
-              <article
-                key={voice.id}
-                className="overflow-hidden rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] shadow-[var(--shadow-md)]"
-              >
-                <Image
-                  src={photo.sourceUrl}
-                  alt={photo.altText}
-                  width={1200}
-                  height={800}
-                  className="aspect-[3/2] w-full object-cover"
-                />
-                <div className="p-[var(--space-6)]">
-                  <span className="rounded-[var(--radius-full)] bg-[color:var(--c-border-subtle)] px-[var(--space-3)] py-[var(--space-1)] text-xs font-bold text-[color:var(--c-text-secondary)]">
-                    {fields?.migrationYear} 移住
-                  </span>
-                  <h2 className="mt-[var(--space-4)] text-xl font-bold leading-8 tracking-normal text-[color:var(--c-text-primary)]">
-                    {fields?.catchCopy}
-                  </h2>
-                  <p className="mt-[var(--space-3)] text-sm font-medium text-[color:var(--c-text-secondary)]">
-                    {voice.title}
-                  </p>
-                  <Link
-                    href={`/voices/${voice.slug}`}
-                    className="mt-[var(--space-6)] inline-flex min-h-11 items-center font-bold text-[color:var(--c-deep-ocean)] hover:underline"
-                  >
-                    詳細を見る →
-                  </Link>
-                </div>
-              </article>
-            );
-          })}
-        </CardGrid>
-        <div className="mt-[calc(var(--space-6)*2)]">
-          <Link
-            href="/jobs"
-            className="inline-flex min-h-11 items-center rounded-[var(--radius-full)] bg-[color:var(--c-deep-ocean)] px-[var(--space-6)] font-bold text-[color:var(--c-text-inverse)]"
-          >
-            現在募集中の求人を見る →
-          </Link>
+    <main className="overflow-hidden bg-[#1a8fa8]">
+      <section
+        className="relative pb-32 pt-40 md:pb-44 md:pt-48"
+        style={{
+          background:
+            "radial-gradient(circle at 78% 18%, rgba(201, 226, 240, 0.78), transparent 27%), linear-gradient(160deg, #5BB4E0 0%, #37A9C7 55%, #1A8FA8 100%)",
+        }}
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-repeat opacity-[0.14] mix-blend-multiply"
+          style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }}
+        />
+        <div className="relative mx-auto max-w-[var(--container-max)] px-[var(--space-6)]">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)] md:text-base">
+            Voices from the island
+          </p>
+          <h1 className="mt-5 max-w-4xl text-balance text-5xl font-black leading-[1.12] tracking-[-0.035em] text-[color:var(--c-deep-ocean)] md:text-7xl">
+            ここに来た人たちの、
+            <br />
+            声。
+          </h1>
+          <p className="mt-6 max-w-2xl text-base font-bold leading-8 text-[color:var(--c-deep-ocean)]/80 md:text-xl md:leading-9">
+            仕事、住まい、冬のこと、人との距離。
+            <br />
+            島を選んだ人の言葉から、移住後の日常をたどります。
+          </p>
         </div>
       </section>
+
+      <article className="relative z-10 mx-auto -mt-16 max-w-[1320px] overflow-hidden rounded-t-[2.5rem] bg-[color:var(--c-paper)] md:-mt-24 md:rounded-t-[4rem]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-repeat opacity-[0.035]"
+          style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }}
+        />
+
+        <header className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+              Real stories
+            </p>
+            <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
+              島で働く人たち
+            </p>
+          </div>
+          <div>
+            <h2 className="text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-5xl md:leading-[1.2]">
+              求人票の向こうにある、
+              <br />
+              一人ひとりの暮らし。
+            </h2>
+            <p className="mt-8 max-w-3xl text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg md:leading-9">
+              島での暮らしに、ひとつの正解はありません。移住前に感じていたこと、働き始めて分かったこと、今も戸惑うこと。実際に暮らす人の経験を、あなたの判断材料として読んでください。
+            </p>
+          </div>
+        </header>
+
+        <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
+          {voices.length > 0 ? (
+            <div>
+              {voices.map((voice, index) => {
+                const fields = voice.testimonialFields;
+                const photo = imageFromField(
+                  fields?.photo,
+                  "/placeholders/voice.svg",
+                  "移住者の声のプレースホルダー",
+                );
+
+                return (
+                  <article
+                    key={voice.id}
+                    className="grid gap-10 border-t border-[color:var(--c-deep-ocean)]/15 py-14 md:grid-cols-[1.05fr_0.95fr] md:items-center md:gap-20 md:py-20"
+                  >
+                    <Link
+                      href={`/voices/${voice.slug}`}
+                      aria-label={`${voice.title}の話を読む`}
+                      className={index % 2 === 1 ? "md:order-2" : undefined}
+                    >
+                      <Image
+                        src={photo.sourceUrl}
+                        alt={photo.altText || `${voice.title}の写真`}
+                        width={1200}
+                        height={900}
+                        className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover transition-transform duration-500 hover:scale-[1.015]"
+                      />
+                    </Link>
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+                        Voice {String(index + 1).padStart(2, "0")}
+                      </p>
+                      <p className="mt-4 text-sm font-bold text-[color:var(--c-text-secondary)]">
+                        {fields?.migrationYear
+                          ? `${fields.migrationYear} 移住`
+                          : "移住者インタビュー"}
+                      </p>
+                      <h2 className="mt-5 text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-4xl">
+                        {fields?.catchCopy ?? voice.title}
+                      </h2>
+                      <p className="mt-5 text-base font-bold text-[color:var(--c-text-primary)]">
+                        {voice.title}
+                      </p>
+                      {fields?.profileBefore || fields?.profileAfter ? (
+                        <p className="mt-3 text-sm leading-7 text-[color:var(--c-text-secondary)]">
+                          {[fields.profileBefore, fields.profileAfter]
+                            .filter(Boolean)
+                            .join("  →  ")}
+                        </p>
+                      ) : null}
+                      <Link
+                        href={`/voices/${voice.slug}`}
+                        className="mt-8 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 text-base font-black text-[color:var(--c-deep-ocean)] transition-opacity hover:opacity-65"
+                      >
+                        この人の話を読む →
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="border-y border-[color:var(--c-deep-ocean)]/15 py-16 text-center md:py-24">
+              <p className="text-2xl font-black text-[color:var(--c-deep-ocean)]">
+                新しいインタビューを準備しています。
+              </p>
+              <p className="mt-4 text-base leading-8 text-[color:var(--c-text-secondary)]">
+                公開まで、募集中の仕事をご覧ください。
+              </p>
+            </div>
+          )}
+        </section>
+
+        <aside className="relative overflow-hidden bg-[color:var(--c-deep-ocean)] px-[var(--space-6)] py-20 text-[color:var(--c-text-inverse)] md:py-28">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-repeat opacity-[0.08]"
+            style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }}
+          />
+          <div className="relative mx-auto grid max-w-[1080px] gap-10 md:grid-cols-[1fr_auto] md:items-end md:gap-20">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+                Next / Jobs
+              </p>
+              <h2 className="mt-5 text-balance text-3xl font-black leading-snug tracking-[-0.025em] md:text-5xl md:leading-tight">
+                誰かの経験を、
+                <br />
+                自分の選択肢へ。
+              </h2>
+              <p className="mt-6 max-w-2xl text-base leading-8 text-[color:var(--c-ice)] md:text-lg md:leading-9">
+                島で働くイメージが少し見えてきたら、現在募集中の仕事を確かめてみてください。
+              </p>
+            </div>
+            <Link
+              href="/jobs"
+              className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-full)] bg-[color:var(--c-pin-job)] px-8 text-base font-black text-[color:var(--c-snow)] shadow-[var(--shadow-pop-coral)] transition-[filter,transform] hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--c-snow)] md:w-fit"
+            >
+              募集中の仕事を見る →
+            </Link>
+          </div>
+        </aside>
+      </article>
     </main>
   );
 }

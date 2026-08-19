@@ -2,6 +2,9 @@
 
 :root {
   --c-deep-ocean: #0A2E4E;
+  --c-sea: #1B5F8C;
+  --c-sky: #5BB4E0;
+  --c-ice: #C9E2F0;
   --c-snow: #FFFFFF;
   --c-paper: #FAF6EE;
   --c-text-primary: #1F1B16;
@@ -50,4 +53,120 @@ body {
     "Noto Sans JP",
     "Segoe UI",
     sans-serif;
+}
+
+.page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+  color: var(--c-deep-ocean);
+  background:
+    radial-gradient(circle at 75% 20%, rgba(127, 227, 232, 0.58), transparent 28%),
+    linear-gradient(180deg, var(--c-sky), #2ba8c4 62%, #1a8fa8);
+  transform: translate3d(0, 105%, 0);
+  border-radius: 50% 50% 0 0 / 8vh 8vh 0 0;
+  will-change: transform;
+}
+
+.page-transition__texture {
+  position: absolute;
+  inset: 0;
+  background-image: url("/images/message/bg-textre.webp");
+  background-repeat: repeat;
+  opacity: 0.14;
+  mix-blend-mode: multiply;
+}
+
+.page-transition__message {
+  position: relative;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(1rem);
+}
+
+.page-transition__message p:first-child {
+  color: var(--c-warning);
+  font-size: 0.875rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.page-transition__message p:last-child {
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.page-transition--covering {
+  visibility: visible;
+  pointer-events: auto;
+  animation: page-transition-cover 620ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+.page-transition--covering .page-transition__message {
+  animation: page-transition-message-in 320ms ease 220ms forwards;
+}
+
+.page-transition--revealing {
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
+  border-radius: 0;
+  animation: page-transition-reveal 700ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+.page-transition--revealing .page-transition__message {
+  opacity: 1;
+  animation: page-transition-message-out 220ms ease forwards;
+}
+
+@keyframes page-transition-cover {
+  from {
+    transform: translate3d(0, 105%, 0);
+    border-radius: 50% 50% 0 0 / 8vh 8vh 0 0;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+    border-radius: 0;
+  }
+}
+
+@keyframes page-transition-reveal {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, -105%, 0);
+  }
+}
+
+@keyframes page-transition-message-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-transition-message-out {
+  to {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    display: none;
+  }
 }

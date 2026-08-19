@@ -10,6 +10,8 @@ const TESTIMONIAL_CARD_FIELDS = gql`
     testimonialFields {
       catchCopy
       migrationYear
+      profileBefore
+      profileAfter
       photo {
         node {
           sourceUrl

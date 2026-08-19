@@ -1,135 +1,22 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { DetailSection, FieldList } from "@/components/ui/DetailSection";
+import { EditorialDetailSection, EditorialDetailShell, EditorialFieldList } from "@/components/ui/EditorialDetailShell";
 import { galleryFromField, htmlToText, imageFromField, selectFirst } from "@/lib/wp/format";
 import { SPOT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getTouristspotBySlug, getTouristspots } from "@/lib/wp/queries/spots";
 
-type PageProps = {
-  params: Promise<{ slug: string }>;
-};
+type PageProps={params:Promise<{slug:string}>};
+export async function generateStaticParams(){return(await getTouristspots()).map(spot=>({slug:spot.slug}));}
+export async function generateMetadata({params}:PageProps):Promise<Metadata>{const{slug}=await params;const spot=await getTouristspotBySlug(slug);return spot?{title:`${spot.title}｜利尻島の観光地`,description:spot.touristspotFields?.catchCopy??undefined}:{};}
 
-export async function generateStaticParams() {
-  const spots = await getTouristspots();
-
-  return spots.map((spot) => ({ slug: spot.slug }));
-}
-
-export default async function SpotDetailPage({ params }: PageProps) {
-  const { slug } = await params;
-  const spot = await getTouristspotBySlug(slug);
-
-  if (!spot) notFound();
-
-  const fields = spot.touristspotFields;
-  const category = selectFirst(fields?.category);
-  const categoryLabel = category ? SPOT_CATEGORY_LABELS[category] ?? category : null;
-  const thumbnailImage = imageFromField(
-    fields?.thumbnailImage,
-    "/placeholders/spot.svg",
-    "観光地情報のプレースホルダー",
-  );
-  const galleryImages = galleryFromField(fields?.galleryImages);
-
-  return (
-    <main className="bg-[color:var(--c-paper)] pb-[calc(var(--space-6)*4)]">
-      <div className="mx-auto max-w-[var(--container-max)] px-[var(--space-6)] pt-[calc(var(--space-6)*6)]">
-        <Breadcrumbs
-          items={[
-            { label: "ホーム", href: "/" },
-            { label: "観光地", href: "/spots" },
-            { label: spot.title },
-          ]}
-        />
-
-        <section className="grid gap-[var(--space-6)] py-[calc(var(--space-6)*2)] lg:grid-cols-[1fr_32rem]">
-          <div>
-            <p className="text-sm font-bold text-[color:var(--c-deep-ocean)]">
-              {categoryLabel}
-            </p>
-            <h1 className="mt-[var(--space-4)] text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
-              {spot.title}
-            </h1>
-            <p className="mt-[var(--space-5)] max-w-2xl text-lg font-medium leading-8 text-[color:var(--c-text-secondary)]">
-              {fields?.catchCopy}
-            </p>
-          </div>
-          <Image
-            src={thumbnailImage.sourceUrl}
-            alt={thumbnailImage.altText}
-            width={1200}
-            height={800}
-            priority
-            className="aspect-[3/2] w-full rounded-[var(--radius-lg)] object-cover shadow-[var(--shadow-md)]"
-          />
-        </section>
-
-        <div className="grid gap-[var(--space-6)]">
-          <DetailSection title="詳細・解説">
-            <FieldList
-              items={[
-                { label: "説明文", value: htmlToText(fields?.description) },
-                { label: "おすすめ季節", value: fields?.bestSeason },
-                { label: "サムネイル動画URL", value: fields?.thumbnailVideoUrl },
-              ]}
-            />
-          </DetailSection>
-
-          <DetailSection title="ギャラリー">
-            <div className="grid gap-[var(--space-4)] md:grid-cols-2">
-              {galleryImages.map((image) => (
-                <Image
-                  key={image.sourceUrl}
-                  src={image.sourceUrl}
-                  alt={image.altText}
-                  width={1200}
-                  height={800}
-                  className="aspect-[3/2] w-full rounded-[var(--radius-md)] object-cover"
-                />
-              ))}
-            </div>
-          </DetailSection>
-
-          <DetailSection title="訪問情報">
-            <FieldList
-              items={[
-                { label: "住所", value: fields?.address },
-                { label: "アクセス情報", value: fields?.accessInfo },
-                { label: "営業時間・開放時間", value: fields?.openHours },
-                { label: "定休日", value: fields?.closedDays },
-                { label: "料金", value: fields?.price },
-                { label: "電話番号", value: fields?.phone },
-                {
-                  label: "公式サイトURL",
-                  value: fields?.websiteUrl ? (
-                    <a
-                      href={fields.websiteUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[color:var(--c-deep-ocean)] underline"
-                    >
-                      {fields.websiteUrl}
-                    </a>
-                  ) : (
-                    ""
-                  ),
-                },
-              ]}
-            />
-          </DetailSection>
-        </div>
-
-        <div className="mt-[calc(var(--space-6)*2)]">
-          <Link
-            href="/jobs"
-            className="inline-flex min-h-11 items-center rounded-[var(--radius-full)] bg-[color:var(--c-deep-ocean)] px-[var(--space-6)] font-bold text-[color:var(--c-text-inverse)]"
-          >
-            現在募集中の求人を見る →
-          </Link>
-        </div>
-      </div>
-    </main>
-  );
+export default async function SpotDetailPage({params}:PageProps){
+  const{slug}=await params;const spot=await getTouristspotBySlug(slug);if(!spot)notFound();const fields=spot.touristspotFields;const category=selectFirst(fields?.category);const categoryLabel=category?(SPOT_CATEGORY_LABELS[category]??category):"Spot";const image=imageFromField(fields?.thumbnailImage,"/placeholders/spot.svg");const gallery=galleryFromField(fields?.galleryImages);
+  return <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"観光地",href:"/spots"},{label:spot.title}]} eyebrow="Place / Island guide" meta={categoryLabel} title={spot.title} lead={fields?.catchCopy} image={{...image,altText:image.altText||`${spot.title}の風景`}}>
+    <EditorialDetailSection eyebrow="About this place" label="この場所について"><div className="grid gap-7 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">{htmlToText(fields?.description).split(/\n+/).filter(Boolean).map(p=><p key={p}>{p}</p>)}</div></EditorialDetailSection>
+    {gallery.length?<EditorialDetailSection eyebrow="Scenery" label="この場所の風景"><div className="grid gap-5 md:grid-cols-2">{gallery.map((img,index)=><Image key={`${img.sourceUrl}-${index}`} src={img.sourceUrl} alt={img.altText||`${spot.title}の風景 ${index+1}`} width={1200} height={900} className={`aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover ${index===0&&gallery.length%2===1?"md:col-span-2":""}`} />)}</div></EditorialDetailSection>:null}
+    <EditorialDetailSection eyebrow="Visit" label="訪れる前に"><EditorialFieldList items={[{label:"おすすめ季節",value:fields?.bestSeason},{label:"住所",value:fields?.address},{label:"アクセス",value:fields?.accessInfo},{label:"開放時間",value:fields?.openHours},{label:"定休日",value:fields?.closedDays},{label:"料金",value:fields?.price},{label:"電話番号",value:fields?.phone},{label:"公式サイト",value:fields?.websiteUrl?<a href={fields.websiteUrl} target="_blank" rel="noopener noreferrer" className="underline">公式サイトを開く ↗</a>:null}]} /></EditorialDetailSection>
+    <aside className="relative bg-[color:var(--c-deep-ocean)] px-6 py-20 text-[color:var(--c-text-inverse)]"><div className="mx-auto grid max-w-[1080px] gap-8 md:grid-cols-[1fr_auto] md:items-end"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">Next / Jobs</p><h2 className="mt-5 text-3xl font-black md:text-5xl">この景色の近くで、働く。</h2></div><Link href="/jobs" className="inline-flex min-h-14 items-center justify-center rounded-full bg-[color:var(--c-pin-job)] px-8 font-black text-white">募集中の仕事を見る →</Link></div></aside>
+  </EditorialDetailShell>;
 }
