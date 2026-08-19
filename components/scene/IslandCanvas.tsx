@@ -30,7 +30,7 @@ export function IslandCanvas() {
     <Canvas
       camera={
         isMobile
-          ? { position: [-6, 12, 19], fov: 60 }
+          ? { position: [-6, 14, 18], fov: 60 }
           : { position: [-6, 5, 12], fov: 55 }
       }
     >
