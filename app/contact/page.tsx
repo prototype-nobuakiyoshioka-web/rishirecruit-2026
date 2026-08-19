@@ -5,6 +5,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { submitCf7, isCf7Success } from "@/lib/wp/submit-cf7";
+import { Button } from "@/components/ui/Button";
 
 // CF7 お問い合わせフォームの数値ID（管理画面の post=ID）
 const CF7_CONTACT_ID = process.env.NEXT_PUBLIC_CF7_CONTACT_ID ?? "176";
@@ -222,9 +223,9 @@ export default function ContactPage() {
                 </p>
               )}
 
-              <button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting} className="min-h-14 w-full rounded-[var(--radius-full)] bg-[color:var(--c-pin-job)] px-8 text-base font-black text-white shadow-[var(--shadow-pop-coral)] transition-[filter] hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70 md:w-fit">
+              <Button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>
                 {isSubmitting ? "送信中..." : isReadyToSubmit ? "送信する" : "必須項目を入力してください"}
-              </button>
+              </Button>
             </form>
           </div>
         )}

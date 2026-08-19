@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { galleryFromField, imageFromField, selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
@@ -265,12 +266,12 @@ export default async function VoiceDetailPage({ params }: PageProps) {
                 </p>
               )}
             </div>
-            <Link
+            <Button
+              variant="primary"
               href={relatedJob ? `/jobs/${relatedJob.slug}` : "/jobs"}
-              className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-full)] bg-[color:var(--c-pin-job)] px-8 text-base font-black text-[color:var(--c-snow)] shadow-[var(--shadow-pop-coral)] transition-[filter,transform] hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--c-snow)] md:w-fit"
             >
               {relatedJob ? "関連する求人を見る →" : "求人一覧を見る →"}
-            </Link>
+            </Button>
           </div>
           <div className="relative mx-auto mt-10 max-w-[1080px] border-t border-white/15 pt-8">
             <Link

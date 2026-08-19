@@ -283,6 +283,7 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 
 ## 現在のフェーズ
 
+
 <!-- 作業を進めるたびにここを更新する -->
 - [x] **Phase 1: 要件定義・設計** — 完了(`docs/` 配下 5 ファイル + `reference/` の HTML)
 - [ ] **Phase 2: 3Dアセット制作** — ロードマップあり、Blender 作業中(`reference/blender-roadmap.html`)

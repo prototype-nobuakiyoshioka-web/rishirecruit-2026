@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { CardGrid } from "@/components/ui/CardGrid";
 import { PageHero } from "@/components/ui/PageHero";
 import { fetchNoteArticles } from "@/lib/note/fetch-articles";
@@ -74,12 +74,9 @@ export default async function ColumnsPage() {
           )}
         </CardGrid>
         <div className="mt-[calc(var(--space-6)*2)]">
-          <Link
-            href="/jobs"
-            className="inline-flex min-h-11 items-center rounded-[var(--radius-full)] bg-[color:var(--c-deep-ocean)] px-[var(--space-6)] font-bold text-[color:var(--c-text-inverse)]"
-          >
+          <Button variant="primary" size="md" href="/jobs" className="md:w-auto">
             求人を見る →
-          </Link>
+          </Button>
         </div>
       </section>
     </main>

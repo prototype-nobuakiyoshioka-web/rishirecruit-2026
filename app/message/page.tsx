@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: "利尻富士町で働くということ",
@@ -202,12 +203,9 @@ export default function MessagePage() {
                 気になる求人があるか、仕事内容や条件が自分に合うか。応募するかどうかは、それを確かめてからでかまいません。
               </p>
             </div>
-            <Link
-              href="/jobs"
-              className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-full)] bg-[color:var(--c-warning)] px-8 text-base font-black text-[color:var(--c-deep-ocean)] shadow-[var(--shadow-pop-gold)] transition-[filter,transform] hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--c-snow)] md:w-fit"
-            >
+            <Button variant="primary" href="/jobs">
               募集中の仕事を見る →
-            </Link>
+            </Button>
           </div>
           <div className="relative mx-auto mt-10 flex max-w-[1080px] flex-wrap gap-x-8 gap-y-4 border-t border-white/15 pt-8 text-sm font-bold text-[color:var(--c-ice)] md:text-base">
             <Link href="/voices" className="hover:underline">

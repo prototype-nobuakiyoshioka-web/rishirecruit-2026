@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
 import { submitCf7, isCf7Success } from "@/lib/wp/submit-cf7";
+import { Button } from "@/components/ui/Button";
 
 // CF7 求人応募フォームの数値ID（管理画面の post=ID）
 const CF7_APPLY_ID = process.env.NEXT_PUBLIC_CF7_APPLY_ID ?? "177";
@@ -529,18 +530,17 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
           </p>
         )}
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
           aria-disabled={!isReadyToSubmit || isSubmitting}
-          className="min-h-14 rounded-[var(--radius-full)] bg-[color:var(--c-pin-job)] px-[var(--space-6)] text-base font-bold text-[color:var(--c-snow)] shadow-[var(--shadow-pop-coral)] transition-[filter] hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-70 md:w-fit"
         >
           {isSubmitting
             ? "送信中..."
             : isReadyToSubmit
               ? "応募する"
               : "必須項目を入力してください"}
-        </button>
+        </Button>
       </form>
     </section>
   );

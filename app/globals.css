@@ -33,6 +33,8 @@
   --shadow-pop-md: 0 6px 0 -2px var(--c-deep-ocean);
   --shadow-pop-coral: 0 6px 0 -2px #C84F36;
   --shadow-pop-gold: 0 6px 0 -2px #A07700;
+  --shadow-pop-sky: 0 6px 0 -2px #2E7DA6;
+  --shadow-pop-teal: 0 6px 0 -2px #17788C;
 }
 
 @theme inline {

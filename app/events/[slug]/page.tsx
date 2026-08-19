@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/Button";
 import { EditorialDetailSection, EditorialDetailShell, EditorialFieldList } from "@/components/ui/EditorialDetailShell";
 import { formatEventPeriod } from "@/lib/utils/format-date";
 import { eventStatus, galleryFromField, htmlToText, imageFromField, selectFirst } from "@/lib/wp/format";
@@ -19,6 +19,6 @@ export default async function EventDetailPage({params}:PageProps){
     <EditorialDetailSection eyebrow="About" label="イベントについて"><div className="grid gap-7 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">{htmlToText(fields?.description).split(/\n+/).filter(Boolean).map(p=><p key={p}>{p}</p>)}</div></EditorialDetailSection>
     {gallery.length?<EditorialDetailSection eyebrow="Scenes" label="会場の風景"><div className="grid gap-5 md:grid-cols-2">{gallery.map((img,index)=><Image key={`${img.sourceUrl}-${index}`} src={img.sourceUrl} alt={img.altText||`${event.title}の写真 ${index+1}`} width={1200} height={900} className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover" />)}</div></EditorialDetailSection>:null}
     <EditorialDetailSection eyebrow="Join" label="参加・アクセス"><EditorialFieldList items={[{label:"アクセス",value:fields?.accessInfo},{label:"参加費",value:fields?.price},{label:"問い合わせ",value:fields?.contact},{label:"申込",value:fields?.registrationUrl?<a href={fields.registrationUrl} target="_blank" rel="noopener noreferrer" className="underline">申込ページを開く ↗</a>:null}]} /></EditorialDetailSection>
-    <aside className="relative bg-[color:var(--c-deep-ocean)] px-6 py-20 text-[color:var(--c-text-inverse)]"><div className="mx-auto grid max-w-[1080px] gap-8 md:grid-cols-[1fr_auto] md:items-end"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">Next / Jobs</p><h2 className="mt-5 text-3xl font-black md:text-5xl">島の日常を、仕事から知る。</h2></div><Link href="/jobs" className="inline-flex min-h-14 items-center justify-center rounded-full bg-[color:var(--c-pin-job)] px-8 font-black text-white">求人一覧を見る →</Link></div></aside>
+    <aside className="relative bg-[color:var(--c-deep-ocean)] px-6 py-20 text-[color:var(--c-text-inverse)]"><div className="mx-auto grid max-w-[1080px] gap-8 md:grid-cols-[1fr_auto] md:items-end"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">Next / Jobs</p><h2 className="mt-5 text-3xl font-black md:text-5xl">島の日常を、仕事から知る。</h2></div><Button variant="primary" href="/jobs" className="md:w-auto">求人一覧を見る →</Button></div></aside>
   </EditorialDetailShell>;
 }

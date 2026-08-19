@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { imageFromField } from "@/lib/wp/format";
+import { Button } from "@/components/ui/Button";
 import { getTestimonials } from "@/lib/wp/queries/voices";
 
 export const metadata: Metadata = {
@@ -166,12 +167,9 @@ export default async function VoicesPage() {
                 島で働くイメージが少し見えてきたら、現在募集中の仕事を確かめてみてください。
               </p>
             </div>
-            <Link
-              href="/jobs"
-              className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-full)] bg-[color:var(--c-pin-job)] px-8 text-base font-black text-[color:var(--c-snow)] shadow-[var(--shadow-pop-coral)] transition-[filter,transform] hover:-translate-y-0.5 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--c-snow)] md:w-fit"
-            >
+            <Button variant="primary" href="/jobs">
               募集中の仕事を見る →
-            </Link>
+            </Button>
           </div>
         </aside>
       </article>
