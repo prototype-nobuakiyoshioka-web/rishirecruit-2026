@@ -59,12 +59,15 @@
 - React 19 / React DOM 19
 - Tailwind CSS v4（`@tailwindcss/postcss`）
 - ESLint 9 + `eslint-config-next`
+- Three.js / React Three Fiber / `@react-three/drei`
+- Zustand(3Dシーンのスクロール・エリア状態管理)
+- `graphql-request` + GraphQL(WPGraphQL実データ接続)
+- `rss-parser`(Note RSS連携)
 
-**フロントエンド**（Phase 4 以降で導入予定）
-- React Three Fiber / `@react-three/drei` / `@react-three/postprocessing`
-- Lenis(スムーススクロール)
-- Zustand(状態管理)
-- TanStack Query + `graphql-request` + GraphQL Codegen
+**フロントエンド**（未導入・必要性を再確認してから導入）
+- Lenis(スムーススクロール): `<ScrollControls>` との競合により一度リバート済み
+- `@react-three/postprocessing`
+- TanStack Query + GraphQL Codegen
 - Framer Motion(UIアニメ)
 
 **バックエンド**
@@ -102,9 +105,9 @@
 │   ├── graphql-config.php
 │   ├── cors-config.php
 │   ├── headless-config.php
-│   ├── acf-local-json.php           (Task 03 で追加予定)
-│   └── acf-fields-*.php              (Task 03-04 で追加予定)
-├── acf-json/           ACF Local JSON 保存先(Task 03 で追加予定)
+│   ├── acf-local-json.php
+│   └── acf-fields-*.php
+├── acf-json/           ACF Local JSON 保存先
 ├── app/                Next.js App Router pages
 ├── components/
 │   ├── scene/          Canvas, Island, Pins, Lighting(3D関連)
@@ -113,8 +116,8 @@
 │   ├── wp/             GraphQLクライアントとクエリ
 │   └── three/          Helpers(clamp回転、Billboard等)
 ├── public/
-│   └── models/         island.glb / island-mobile.glb
-├── store/              Zustand ストア(scene / ui / data で分離)
+│   └── models/         現行の島GLBプロトタイプ
+├── store/              Zustand ストア(現在はスクロール・エリア状態)
 ├── docs/               要件・スキーマ・トークン等
 ├── reference/          完全仕様 HTML
 └── prompts/            Codex 用タスクプロンプト
@@ -131,7 +134,7 @@ WordPress 側はこのディレクトリをテーマとして認識し、Next.js
 - **3D関連コンポーネントは必ず `"use client"`** を冒頭に書く(R3F は Server Component に置けない)
 - **`useFrame` 内で重い処理を書かない**(オブジェクト生成・配列再生成 NG、ref 経由で書き換える)
 - **状態は責務分離**: 3Dシーン状態 / UI状態 / データ状態 を別ストアで管理
-- **型は GraphQL Codegen から生成**したものを使う(手書きしない)
+- 現在のWPGraphQL型は `lib/wp/types.ts` で手書き管理。GraphQL Codegen導入後は生成型へ移行する
 - 命名: コンポーネント PascalCase、フック `use` プレフィックス、ストア `<Name>Store`
 - コメントは「なぜ」を書く。「何を」はコードで表現する。
 
@@ -290,24 +293,54 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [x] Task 04a: touristspot フィールド登録
   - [x] Task 04b: event フィールド登録
   - [x] Task 04c: testimonial フィールド登録(9フィールド・post_object含む)
-  - [x] Task 05: WPGraphQL for ACF 動作確認 — 全4CPT正常動作確認済み。select フィールドは WPGraphQL for ACF 2.x の仕様で `[String]`(配列)で返る。フロント側で `[0]` で取り出す対応が必要(Task 13で対応)
-- [ ] **Phase 4: フロントエンド基盤** — 進行中
+  - [x] Task 05: WPGraphQL for ACF 動作確認 — 全4CPT正常動作確認済み。select フィールドは WPGraphQL for ACF 2.x の仕様で `[String]`(配列)で返り、フロント側で `[0]` を取り出す対応済み
+- [x] **Phase 4: フロントエンド基盤** — 完了
   - [x] Task 01: R3F 最小シーン + 島 GLB 表示
   - [x] Task 02: スクロール連動回転(clamp → damp)
-  - [ ] Task 03: Lenis 導入 — 方針A(見た目スムージングのみ)は `<ScrollControls>` との競合でリバート済み。方針B(Lenis主導の scroll progress)で再設計予定
+  - [ ] Task 03: Lenis 導入 — `<ScrollControls>` との競合によりリバート済み。現行体験の必須条件ではないため保留し、導入時はLenis主導のscroll progressとして再設計する
   - [x] Task 04: Header(HUD・6項目ナビ)
   - [x] Task 05: ColumnBoard(HUD・コラム看板)
   - [x] Task 08: Footer(最小限情報パネル・役場情報+法的リンク)
-  - [x] Task 09: 一覧系ページ(5ページ、ダミーデータ)
+  - [x] Task 09: 一覧系ページ(5ページ)
   - [x] Task 10: 詳細系ページ(4ページ、固定CTA含む)
   - [x] Task 11: フォーム系(応募フォームページ内統合・/contact)
   - [x] Task 12: 静的系ページ(/message・/privacy・/terms)
-  - [ ] Task 13: WPGraphQL クライアントセットアップ + 実データ接続 ← **次やる**
-    - select フィールドは `[String]` で返るため、フロント側で `[0]` で取り出す対応が必要
-- [ ] Phase 5: 3D シーン実装
-- [ ] Phase 6: ピン・コンテンツ実装
-- [ ] Phase 7: モバイル最適化
-- [ ] Phase 8: テスト・デプロイ
+  - [x] Task 13: WPGraphQL クライアントセットアップ + 一覧ページ実データ接続
+  - [x] Task 14: 詳細ページ実データ接続 + `generateStaticParams`
+- [ ] **Phase 5: 3Dシーン実装** — 進行中
+  - [x] 鴛泊・鬼脇のエリアピン + Billboard表示
+  - [x] スクロール量によるエリア自動切替
+  - [x] エリア情報パネル + WordPress実データ投稿スライダー
+  - [x] PC/SPレスポンシブレイアウト + SPカルーセル
+  - [x] ColumnBoard HUD再設計
+  - [x] Task 10: SP時の島の位置・俯瞰角度調整
+  - [x] Task 11: バウンディングボックスによる島サイズ自動フィット
+  - [ ] 求人・観光地・イベント別のコンテンツピン + モーダル + フィルタ — エリアUIとの併用方針を確定後に実装
+- [ ] **Phase 6: コンテンツ実装** — 一部着手
+  - [x] Note RSS取得 + `/columns` 一覧表示(1時間再検証)
+  - [ ] WordPress公開データの整備(エリア・ピン参照値・slug・テスト投稿)
+  - [ ] 応募フォーム・お問い合わせフォームの実送信(現在は送信成功のモック)
+  - [ ] WordPress更新のISRまたはOn-demand Revalidation
+- [ ] **Phase 7: モバイル最適化** — レイアウト調整は進行済み、性能最適化は未着手
+  - [ ] モバイル用軽量GLB切替
+  - [ ] DPR制限・影/ポストエフェクト制御
+  - [ ] iOS Safari / Android Chrome実機確認
+- [ ] **Phase 8: テスト・デプロイ** — 未着手
+  - [ ] 応募・問い合わせのスパム対策とサーバー側検証
+  - [ ] metadata / OGP / sitemap / robots / 構造化データ
+  - [ ] GA4・主要KPI計測
+  - [ ] Vitest / Playwright・アクセシビリティ・Lighthouse
+  - [ ] 本番ホスティング・環境変数・監視
+
+### 次に進める順序
+
+1. エリアUIとコンテンツ別ピンをどう併用するか仕様を確定する
+2. WordPress公開データの不整合を修正する
+3. 応募・お問い合わせフォームの実送信を実装する
+4. WordPress更新の再検証方式を実装する
+5. SEO・計測・テスト・モバイル性能最適化へ進む
+
+> `CLAUDE.md` はClaude Code固有ルールの入口として使用し、共通仕様・規約・進捗の更新は同ファイルの指示どおり `AGENTS.md` に集約する。
 
 ---
 
