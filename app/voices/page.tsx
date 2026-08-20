@@ -4,6 +4,7 @@ import Link from "next/link";
 import { imageFromField } from "@/lib/wp/format";
 import { Button } from "@/components/ui/Button";
 import { getTestimonials } from "@/lib/wp/queries/voices";
+import { gridSpanClass } from "@/lib/utils/grid-spans";
 
 export const metadata: Metadata = {
   title: "移住者の声",
@@ -75,7 +76,7 @@ export default async function VoicesPage() {
 
         <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
           {voices.length > 0 ? (
-            <div>
+            <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-12">
               {voices.map((voice, index) => {
                 const fields = voice.testimonialFields;
                 const photo = imageFromField(
@@ -85,36 +86,34 @@ export default async function VoicesPage() {
                 );
 
                 return (
-                  <article
-                    key={voice.id}
-                    className="grid gap-10 border-t border-[color:var(--c-deep-ocean)]/15 py-14 md:grid-cols-[1.05fr_0.95fr] md:items-center md:gap-20 md:py-20"
-                  >
+                  <article key={voice.id} className={gridSpanClass(index)}>
                     <Link
                       href={`/voices/${voice.slug}`}
                       aria-label={`${voice.title}の話を読む`}
-                      className={index % 2 === 1 ? "md:order-2" : undefined}
                     >
-                      <Image
-                        src={photo.sourceUrl}
-                        alt={photo.altText || `${voice.title}の写真`}
-                        width={1200}
-                        height={900}
-                        className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover transition-transform duration-500 hover:scale-[1.015]"
-                      />
+                      <div className="relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)]">
+                        <Image
+                          src={photo.sourceUrl}
+                          alt={photo.altText || `${voice.title}の写真`}
+                          fill
+                          sizes="(min-width: 768px) 50vw, 100vw"
+                          className="object-cover transition-transform duration-500 hover:scale-[1.02]"
+                        />
+                      </div>
                     </Link>
-                    <div>
+                    <div className="mt-6">
                       <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
                         Voice {String(index + 1).padStart(2, "0")}
                       </p>
-                      <p className="mt-4 text-sm font-bold text-[color:var(--c-text-secondary)]">
+                      <p className="mt-3 text-sm font-bold text-[color:var(--c-text-secondary)]">
                         {fields?.migrationYear
                           ? `${fields.migrationYear} 移住`
                           : "移住者インタビュー"}
                       </p>
-                      <h2 className="mt-5 text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-4xl">
+                      <h2 className="mt-3 text-balance text-2xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-3xl">
                         {fields?.catchCopy ?? voice.title}
                       </h2>
-                      <p className="mt-5 text-base font-bold text-[color:var(--c-text-primary)]">
+                      <p className="mt-3 text-base font-bold text-[color:var(--c-text-primary)]">
                         {voice.title}
                       </p>
                       {fields?.profileBefore || fields?.profileAfter ? (
@@ -126,7 +125,7 @@ export default async function VoicesPage() {
                       ) : null}
                       <Link
                         href={`/voices/${voice.slug}`}
-                        className="mt-8 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 text-base font-black text-[color:var(--c-deep-ocean)] transition-opacity hover:opacity-65"
+                        className="mt-5 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 text-base font-black text-[color:var(--c-deep-ocean)] transition-opacity hover:opacity-65"
                       >
                         この人の話を読む →
                       </Link>

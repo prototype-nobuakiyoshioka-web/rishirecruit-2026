@@ -5,6 +5,7 @@ import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { imageFromField, selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { getJobPostings } from "@/lib/wp/queries/jobs";
+import { gridSpanClass } from "@/lib/utils/grid-spans";
 
 export const metadata: Metadata = {
   title: "利尻富士町の求人",
@@ -26,15 +27,17 @@ export default async function JobsPage() {
       introBody="職種名だけでなく、仕事内容、給与、勤務時間、住居サポートまで。気になる求人を開き、自分の経験や希望と重なる部分があるかを確かめてください。"
     >
       <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
-        <div className="grid gap-8 md:grid-cols-2">
-          {jobs.map((job) => {
+        <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-12">
+          {jobs.map((job, index) => {
             const fields = job.jobPostingFields;
             const employmentType = selectFirst(fields?.employmentType);
             const image = imageFromField(fields?.thumbnailImage, "/placeholders/job.svg");
             return (
-              <article key={job.id} className="overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--c-deep-ocean)]/10 bg-white/55">
+              <article key={job.id} className={`${gridSpanClass(index)} overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--c-deep-ocean)]/10 bg-white/55`}>
                 <Link href={`/jobs/${job.slug}`} aria-label={`${job.title}の求人詳細を見る`}>
-                  <Image src={image.sourceUrl} alt={image.altText || `${job.title}の求人写真`} width={1200} height={800} className="aspect-[3/2] w-full object-cover transition-transform duration-500 hover:scale-[1.015]" />
+                  <div className="relative aspect-video w-full overflow-hidden bg-[color:var(--c-ice)]">
+                    <Image src={image.sourceUrl} alt={image.altText || `${job.title}の求人写真`} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-contain transition-transform duration-500 hover:scale-[1.02]" />
+                  </div>
                 </Link>
                 <div className="p-6 md:p-8">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">
