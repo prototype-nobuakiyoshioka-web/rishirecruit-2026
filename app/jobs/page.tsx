@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
+import { buildMetadata } from "@/lib/seo";
 import { imageFromField, selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { getJobPostings } from "@/lib/wp/queries/jobs";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "利尻富士町の求人",
   description:
     "利尻富士町で募集中の求人一覧。仕事内容、雇用形態、給与、勤務時間、住居サポートを確認できます。",
-};
+  path: "/jobs",
+});
 
 export default async function JobsPage() {
   const jobs = await getJobPostings();

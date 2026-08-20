@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
+import { buildMetadata } from "@/lib/seo";
 import { fetchNoteArticles } from "@/lib/note/fetch-articles";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "島ぐらしコラム",
   description:
     "利尻富士町の暮らしを綴る、Note連載の島ぐらしコラム。島の四季や人、小さな日常を言葉で紹介します。",
-};
+  path: "/columns",
+});
 
 export const revalidate = 3600;
 

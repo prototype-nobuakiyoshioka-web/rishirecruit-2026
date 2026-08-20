@@ -324,14 +324,14 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
     - [x] エリア・ピン参照値の整合は対象外(個別投稿にはピン付けしない)
     - [ ] 公開中のテスト投稿を非公開化または削除
   - [x] 応募フォーム・お問い合わせフォームの実送信 — Contact Form 7 REST(feedback)接続済み。お問い合わせ=form ID 176 / 求人応募=177。フロントは `lib/wp/submit-cf7.ts` 経由で送信(`_wpcf7_unit_tag` 等の制御フィールド付与が必須)。curl で両フォーム `mail_sent` 確認済み。実ブラウザでの手動送信テストは吉岡さん側で最終確認
-  - [ ] WordPress更新のISRまたはOn-demand Revalidation
+  - [x] WordPress更新のISRまたはOn-demand Revalidation — タグ方式で実装。WP実データfetchに `next: { tags: ['wp'], revalidate: 3600 }` を付与(`lib/wp/client.ts`)。`app/api/revalidate` がシークレット照合後に `revalidateTag('wp','max')` + 任意 `revalidatePath(path,'page')`。WP側 `inc/revalidate-hook.php` が対象4CPTの `transition_post_status` で `wp_remote_post`(非同期)。エンドポイント/シークレットはテーマ非保持で mu-plugin(`wp-content/mu-plugins/rishi-revalidate-config.php`・リポジトリ外)から定数注入。curlで401/200を確認済み。実WP保存→再検証の疎通は吉岡さん側で最終確認
 - [ ] **Phase 7: モバイル最適化** — レイアウト調整は進行済み、性能最適化は未着手
   - [ ] モバイル用軽量GLB切替
   - [ ] DPR制限・影/ポストエフェクト制御
   - [ ] iOS Safari / Android Chrome実機確認
-- [ ] **Phase 8: テスト・デプロイ** — 未着手
+- [ ] **Phase 8: テスト・デプロイ** — 一部着手
   - [ ] 応募・問い合わせのスパム対策とサーバー側検証
-  - [ ] metadata / OGP / sitemap / robots / 構造化データ
+  - [x] metadata / OGP / sitemap / robots / 構造化データ — `lib/seo.ts`(SITE_URL/buildMetadata/ogImageFromField)を基点に整備。`app/layout.tsx` に metadataBase + title template + デフォルトOG/Twitter + robots(index)。`app/robots.ts`・`app/sitemap.ts`(静的+4CPT動的)追加。全一覧/静的/詳細ページに canonical+OG付与(contactは"use client"のため `app/contact/layout.tsx` で対応)。詳細ページにJSON-LD構造化データ(求人=JobPosting[datePosted用に `date` をクエリ追加]/イベント=Event/観光地=TouristAttraction、移住者の声はArticle系OGのみ)。ドメインは `NEXT_PUBLIC_SITE_URL`(既定 https://rishirecruit.com)。**dev+WP実データで全項目ライブ確認済み: robots.txt/動的sitemap(全CPT実slug)/title template/canonical/OG(画像付きページはog:image出力)/求人JobPosting・観光地TouristAttraction・イベントEventのJSON-LD・移住者の声のog:type=article。`tsc`/`eslint`/`npm run build` 通過。残TODO: デフォルトOG画像(1200x630ラスタ)未整備 → デザイン側**
   - [ ] GA4・主要KPI計測
   - [ ] Vitest / Playwright・アクセシビリティ・Lighthouse
   - [ ] 本番ホスティング・環境変数・監視
@@ -339,9 +339,9 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 ### 次に進める順序
 
 1. 公開中のテスト投稿を非公開化または削除する
-2. 応募・お問い合わせフォームの実送信を実装する
-3. WordPress更新の再検証方式を実装する
-4. SEO・計測・テスト・モバイル性能最適化へ進む
+2. SEO・計測・テスト・モバイル性能最適化へ進む
+
+> 応募・お問い合わせフォームの実送信、WordPress更新の再検証方式(On-demand Revalidation)は実装済み。
 
 > `CLAUDE.md` はClaude Code固有ルールの入口として使用し、共通仕様・規約・進捗の更新は同ファイルの指示どおり `AGENTS.md` に集約する。
 

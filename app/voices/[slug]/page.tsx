@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { buildMetadata, ogImageFromField } from "@/lib/seo";
 import { galleryFromField, imageFromField, selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import {
@@ -49,12 +50,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!voice) return {};
 
-  return {
+  return buildMetadata({
     title: `${voice.title}｜移住者の声`,
     description:
       voice.testimonialFields?.leadText ??
       "利尻富士町へ移住し、島で働く人のインタビューです。",
-  };
+    path: `/voices/${slug}`,
+    image: ogImageFromField(
+      voice.testimonialFields?.photo,
+      `${voice.title}の写真`,
+    ),
+    article: true,
+  });
 }
 
 export default async function VoiceDetailPage({ params }: PageProps) {

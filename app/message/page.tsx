@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "利尻富士町で働くということ",
   description:
     "北海道・利尻富士町で仕事を探す方へ。島で働く意味、暮らしの特徴、応募前に確かめたいことをお伝えします。",
-};
+  path: "/message",
+});
 
 const STORIES = [
   {

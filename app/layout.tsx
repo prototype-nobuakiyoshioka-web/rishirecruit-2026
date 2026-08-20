@@ -2,12 +2,37 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
+const HOME_TITLE = `${SITE_NAME}｜利尻島の求人・移住・観光`;
+
 export const metadata: Metadata = {
-  title: "Rishiri Recruit 2026",
-  description:
-    "利尻島の求人・イベント・観光・コラムを3Dマップから探せるインタラクティブサイト。",
+  // OGP/canonical の相対URLを絶対URLへ解決する基準。これが無いとOG画像が壊れる。
+  metadataBase: new URL(SITE_URL),
+  // 各ページの title は template により "…｜Rishiri Recruit 2026" に整形される。
+  title: {
+    default: HOME_TITLE,
+    template: `%s｜${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  alternates: { canonical: "/" },
+  // Next.js 側の公開サイトはインデックスさせる(WP側は inc/headless-config.php で noindex)。
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "ja_JP",
+    url: SITE_URL,
+    title: HOME_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary",
+    title: HOME_TITLE,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

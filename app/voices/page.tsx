@@ -3,14 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { imageFromField } from "@/lib/wp/format";
 import { Button } from "@/components/ui/Button";
+import { buildMetadata } from "@/lib/seo";
 import { getTestimonials } from "@/lib/wp/queries/voices";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "移住者の声",
   description:
     "利尻富士町へ移住し、島で働く人たちの声。移住前の暮らし、仕事、冬の生活、人とのつながりを本人の言葉で紹介します。",
-};
+  path: "/voices",
+});
 
 export default async function VoicesPage() {
   const voices = await getTestimonials();

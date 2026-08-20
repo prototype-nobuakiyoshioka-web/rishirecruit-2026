@@ -29,6 +29,7 @@ export interface JobPosting {
   id: string;
   slug: string;
   title: string;
+  date: string | null;
   areas: { nodes: AreaTerm[] } | null;
   jobPostingFields: {
     employmentType: string[] | null;

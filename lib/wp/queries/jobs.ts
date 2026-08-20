@@ -52,6 +52,7 @@ const GET_JOB_POSTING_BY_SLUG = gql`
       id
       slug
       title
+      date
       areas {
         nodes {
           id

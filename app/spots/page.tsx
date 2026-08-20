@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
+import { buildMetadata } from "@/lib/seo";
 import { imageFromField, selectFirst } from "@/lib/wp/format";
 import { SPOT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getTouristspots } from "@/lib/wp/queries/spots";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
 
-export const metadata: Metadata = { title: "利尻島の観光地", description: "利尻島の観光地と、島で暮らす人の身近な風景を紹介します。" };
+export const metadata: Metadata = buildMetadata({ title: "利尻島の観光地", description: "利尻島の観光地と、島で暮らす人の身近な風景を紹介します。", path: "/spots" });
 
 export default async function SpotsPage() {
   const spots = await getTouristspots();

@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { FooterOfficeInfo } from "@/components/layout/FooterInfo";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildMetadata({
+  title: "プライバシーポリシー",
+  description: "当サイトにおける個人情報の取り扱いについて。",
+  path: "/privacy",
+});
 
 const PRIVACY_SECTIONS = [
   {

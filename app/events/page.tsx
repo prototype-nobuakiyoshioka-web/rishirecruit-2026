@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
+import { buildMetadata } from "@/lib/seo";
 import { formatEventPeriod } from "@/lib/utils/format-date";
 import { eventStatus, imageFromField, selectFirst } from "@/lib/wp/format";
 import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getEvents } from "@/lib/wp/queries/events";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
 
-export const metadata: Metadata = { title: "利尻富士町のイベント", description: "利尻富士町で開催中・開催予定のイベント情報。日時、会場、参加方法を確認できます。" };
+export const metadata: Metadata = buildMetadata({ title: "利尻富士町のイベント", description: "利尻富士町で開催中・開催予定のイベント情報。日時、会場、参加方法を確認できます。", path: "/events" });
 
 export default async function EventsPage() {
   const events = await getEvents();

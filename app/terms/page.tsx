@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { FooterOfficeInfo } from "@/components/layout/FooterInfo";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildMetadata({
+  title: "利用規約",
+  description: "当サイトの利用規約について。",
+  path: "/terms",
+});
 
 const TERMS_SECTIONS = [
   {
