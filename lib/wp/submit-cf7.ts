@@ -47,3 +47,22 @@ export async function submitCf7(
 export function isCf7Success(result: Cf7Response): boolean {
   return result.status === "mail_sent";
 }
+
+/**
+ * フォームを Next.js の API ルート（/api/form）経由で送信する。
+ * サーバー側で Turnstile 検証とバリデーションを通してから CF7 へ中継されるため、
+ * クライアントからは CF7 を直接叩かない（ボット対策・secret秘匿）。
+ */
+export async function submitForm(
+  formId: string,
+  fields: Record<string, string>,
+  turnstileToken: string,
+  honeypot = "",
+): Promise<Cf7Response> {
+  const res = await fetch("/api/form", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ formId, fields, turnstileToken, honeypot }),
+  });
+  return (await res.json()) as Cf7Response;
+}

@@ -3,8 +3,10 @@
 import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
-import { submitCf7, isCf7Success } from "@/lib/wp/submit-cf7";
+import { submitForm, isCf7Success } from "@/lib/wp/submit-cf7";
+import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
+import { Turnstile } from "@/components/ui/Turnstile";
 
 // CF7 求人応募フォームの数値ID（管理画面の post=ID）
 const CF7_APPLY_ID = process.env.NEXT_PUBLIC_CF7_APPLY_ID ?? "177";
@@ -176,6 +178,9 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
   const [submitError, setSubmitError] = useState("");
   const [isZipLoading, setIsZipLoading] = useState(false);
   const [zipLookupError, setZipLookupError] = useState("");
+  // Turnstile トークン（未取得なら送信不可）とハニーポット（人間は空のまま）。
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [honeypot, setHoneypot] = useState("");
 
   const validationErrors = validateForm(form);
   const isReadyToSubmit = Object.keys(validationErrors).length === 0;
@@ -246,23 +251,36 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
+    // Turnstile 未完了なら送信しない。
+    if (!turnstileToken) {
+      setSubmitError("認証を完了してください。");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError("");
     try {
-      const result = await submitCf7(CF7_APPLY_ID, {
-        full_name: form.fullName,
-        full_name_kana: form.fullNameKana,
-        gender: form.gender,
-        birth_date: form.birthDate,
-        phone: form.phone,
-        email: form.email,
-        zip_code: form.zipCode,
-        prefecture: form.prefecture,
-        address_line: form.addressLine,
-        job_slug: jobSlug,
-        privacy: form.privacy ? "1" : "",
-      });
+      const result = await submitForm(
+        CF7_APPLY_ID,
+        {
+          full_name: form.fullName,
+          full_name_kana: form.fullNameKana,
+          gender: form.gender,
+          birth_date: form.birthDate,
+          phone: form.phone,
+          email: form.email,
+          zip_code: form.zipCode,
+          prefecture: form.prefecture,
+          address_line: form.addressLine,
+          job_slug: jobSlug,
+          privacy: form.privacy ? "1" : "",
+        },
+        turnstileToken,
+        honeypot,
+      );
       if (isCf7Success(result)) {
+        // 応募完了をGA4へ送信(主要コンバージョン)。
+        trackEvent("apply_submit", { job_slug: jobSlug, job_title: jobTitle });
         setIsSubmitted(true);
       } else {
         setSubmitError(result.message || SUBMIT_ERROR_MESSAGE);
@@ -280,7 +298,6 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
         id="apply-form"
         className="scroll-mt-[calc(var(--space-6)*6)] rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] p-[var(--space-6)] shadow-[var(--shadow-md)]"
       >
-        {/* TODO: GA計測イベント発火ポイント */}
         <p className="text-2xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
           届きました。3営業日以内にお返事します。
         </p>
@@ -524,6 +541,20 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
           <FieldError message={errors.privacy} />
         </div>
 
+        {/* ハニーポット: 画面外に隠し、人間は入力しない。ボットが埋めると送信を無効化する。 */}
+        <input
+          type="text"
+          name="company_website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          value={honeypot}
+          onChange={(event) => setHoneypot(event.target.value)}
+          className="absolute left-[-9999px] h-0 w-0 opacity-0"
+        />
+
+        <Turnstile onToken={setTurnstileToken} />
+
         {submitError && (
           <p role="alert" className="text-sm font-bold text-[color:var(--c-pin-job)]">
             {submitError}
@@ -533,7 +564,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
         <Button
           type="submit"
           disabled={isSubmitting}
-          aria-disabled={!isReadyToSubmit || isSubmitting}
+          aria-disabled={!isReadyToSubmit || !turnstileToken || isSubmitting}
         >
           {isSubmitting
             ? "送信中..."

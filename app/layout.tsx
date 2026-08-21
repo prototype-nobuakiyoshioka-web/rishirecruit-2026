@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { GA_ID } from "@/lib/analytics";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -47,6 +49,8 @@ export default function RootLayout({
         <PageTransition />
         {children}
         <Footer />
+        {/* GA_ID 設定時のみ GA4 を読み込む(未設定の環境では一切読み込まない)。 */}
+        {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
       </body>
     </html>
   );

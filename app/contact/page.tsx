@@ -4,8 +4,10 @@ import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
-import { submitCf7, isCf7Success } from "@/lib/wp/submit-cf7";
+import { submitForm, isCf7Success } from "@/lib/wp/submit-cf7";
+import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
+import { Turnstile } from "@/components/ui/Turnstile";
 
 // CF7 お問い合わせフォームの数値ID（管理画面の post=ID）
 const CF7_CONTACT_ID = process.env.NEXT_PUBLIC_CF7_CONTACT_ID ?? "176";
@@ -88,6 +90,9 @@ export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  // Turnstile トークン（未取得なら送信不可）とハニーポット（人間は空のまま）。
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const isReadyToSubmit = Object.keys(validateForm(form)).length === 0;
 
   function updateField(field: FieldName, value: string | boolean) {
@@ -112,19 +117,32 @@ export default function ContactPage() {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
+    // Turnstile 未完了なら送信しない。
+    if (!turnstileToken) {
+      setSubmitError("認証を完了してください。");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError("");
     try {
-      const result = await submitCf7(CF7_CONTACT_ID, {
-        inquiry_type: form.inquiryType,
-        name: form.name,
-        furigana: form.furigana,
-        email: form.email,
-        phone: form.phone,
-        message: form.message,
-        privacy: form.privacy ? "1" : "",
-      });
+      const result = await submitForm(
+        CF7_CONTACT_ID,
+        {
+          inquiry_type: form.inquiryType,
+          name: form.name,
+          furigana: form.furigana,
+          email: form.email,
+          phone: form.phone,
+          message: form.message,
+          privacy: form.privacy ? "1" : "",
+        },
+        turnstileToken,
+        honeypot,
+      );
       if (isCf7Success(result)) {
+        // 問い合わせ完了をGA4へ送信。
+        trackEvent("contact_submit", { inquiry_type: form.inquiryType });
         setIsSubmitted(true);
       } else {
         setSubmitError(result.message || SUBMIT_ERROR_MESSAGE);
@@ -217,13 +235,27 @@ export default function ContactPage() {
                 <FieldError message={errors.privacy} />
               </div>
 
+              {/* ハニーポット: 画面外に隠し、人間は入力しない。ボットが埋めると送信を無効化する。 */}
+              <input
+                type="text"
+                name="company_website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={honeypot}
+                onChange={(event) => setHoneypot(event.target.value)}
+                className="absolute left-[-9999px] h-0 w-0 opacity-0"
+              />
+
+              <Turnstile onToken={setTurnstileToken} />
+
               {submitError && (
                 <p role="alert" className="text-sm font-bold text-[color:var(--c-pin-job)]">
                   {submitError}
                 </p>
               )}
 
-              <Button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting} aria-disabled={!turnstileToken || isSubmitting}>
                 {isSubmitting ? "送信中..." : isReadyToSubmit ? "送信する" : "必須項目を入力してください"}
               </Button>
             </form>

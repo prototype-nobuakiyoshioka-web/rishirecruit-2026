@@ -1,9 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { trackEvent } from "@/lib/analytics";
 
 export function StickyApplyCta() {
   function handleClick() {
+    // 応募CTAのクリックをGA4へ送信(応募フォーム到達の先行指標)。
+    trackEvent("apply_cta_click", { location: "sticky" });
     document.getElementById("apply-form")?.scrollIntoView({
       behavior: "smooth",
       block: "start",

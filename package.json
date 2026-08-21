@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@next/third-parties": "16.2.6",
     "@react-three/drei": "10.3.0",
     "@react-three/fiber": "9.1.2",
     "graphql": "16.10.0",

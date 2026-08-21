@@ -330,9 +330,9 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [ ] DPR制限・影/ポストエフェクト制御
   - [ ] iOS Safari / Android Chrome実機確認
 - [ ] **Phase 8: テスト・デプロイ** — 一部着手
-  - [ ] 応募・問い合わせのスパム対策とサーバー側検証
+  - [x] 応募・問い合わせのスパム対策とサーバー側検証 — Cloudflare Turnstile + Next.js APIプロキシで実装。フォームはCF7直POSTをやめ `/api/form`(`app/api/form/route.ts`)経由に変更。ルートで ①Turnstileサーバー検証(`lib/turnstile.ts` siteverify)②formId許可リスト(176/177)③ハニーポット(`company_website`空チェック)④メール形式のサーバー側検証 → CF7中継。フロントは `components/ui/Turnstile.tsx`(explicit render)+ `submitForm()`(`lib/wp/submit-cf7.ts`)。キーは env(`NEXT_PUBLIC_TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY`、既定は公式テストキー)。curlで mail_sent/spam/validation_failed/formId弾き/ハニーポット破棄を確認、`npm run build` 通過。**本番前に実Turnstileキー発行が必要。ブラウザ実操作テストは吉岡さん側で最終確認**
   - [x] metadata / OGP / sitemap / robots / 構造化データ — `lib/seo.ts`(SITE_URL/buildMetadata/ogImageFromField)を基点に整備。`app/layout.tsx` に metadataBase + title template + デフォルトOG/Twitter + robots(index)。`app/robots.ts`・`app/sitemap.ts`(静的+4CPT動的)追加。全一覧/静的/詳細ページに canonical+OG付与(contactは"use client"のため `app/contact/layout.tsx` で対応)。詳細ページにJSON-LD構造化データ(求人=JobPosting[datePosted用に `date` をクエリ追加]/イベント=Event/観光地=TouristAttraction、移住者の声はArticle系OGのみ)。ドメインは `NEXT_PUBLIC_SITE_URL`(既定 https://rishirecruit.com)。**dev+WP実データで全項目ライブ確認済み: robots.txt/動的sitemap(全CPT実slug)/title template/canonical/OG(画像付きページはog:image出力)/求人JobPosting・観光地TouristAttraction・イベントEventのJSON-LD・移住者の声のog:type=article。`tsc`/`eslint`/`npm run build` 通過。残TODO: デフォルトOG画像(1200x630ラスタ)未整備 → デザイン側**
-  - [ ] GA4・主要KPI計測
+  - [x] GA4・主要KPI計測 — `@next/third-parties`(16.2.6 pin)の `GoogleAnalytics` を `app/layout.tsx` に設置(`NEXT_PUBLIC_GA_ID` 設定時のみ読み込み、page_viewはenhanced measurementで自動)。カスタムイベントは `lib/analytics.ts` の `trackEvent()`(GA未設定時no-op)経由: 応募完了=`apply_submit`(job_slug/job_title)、問い合わせ完了=`contact_submit`(inquiry_type)、応募CTAクリック=`apply_cta_click`(StickyApplyCta)。GA_ID空→gtag読込0、GA_ID設定→gtag.js読込をdevで確認、`npm run build` 通過。**本番前に実GA4測定ID(G-XXXX)を `NEXT_PUBLIC_GA_ID` に設定が必要。GA4管理画面でのコンバージョン設定・実イベント着弾確認は吉岡さん側**
   - [ ] Vitest / Playwright・アクセシビリティ・Lighthouse
   - [ ] 本番ホスティング・環境変数・監視
 
