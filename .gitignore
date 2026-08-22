@@ -100,3 +100,8 @@ next-env.d.ts
 
 # Vercel
 .vercel
+
+# Test artifacts (Playwright / Vitest)
+/test-results/
+/playwright-report/
+/playwright/.cache/
