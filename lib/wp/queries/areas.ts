@@ -87,6 +87,7 @@ const GET_AREA_WITH_POSTS = gql`
             dateDisplayType
             periodMonth
             periodRange
+            venueName
             thumbnailImage {
               node {
                 sourceUrl

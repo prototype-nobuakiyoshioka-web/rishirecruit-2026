@@ -13,9 +13,18 @@ interface AreaPinProps {
   isActive: boolean;
 }
 
+// 活性/非活性ピンのリング寸法（world unit）
+const PIN_ACTIVE_INNER = 0.07;
+const PIN_ACTIVE_OUTER = 0.11;
+const PIN_INACTIVE_INNER = 0.045;
+const PIN_INACTIVE_OUTER = 0.07;
+
 // useFrame 内でのアロケーション回避（AGENTS.md 規約）
 const worldPos = new THREE.Vector3();
-const ndcPos = new THREE.Vector3();
+const edgeWorldPos = new THREE.Vector3();
+const ndcCenter = new THREE.Vector3();
+const ndcEdge = new THREE.Vector3();
+const cameraUp = new THREE.Vector3();
 
 export function Pin({ areaSlug, areaName, position, isActive }: AreaPinProps) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -25,19 +34,36 @@ export function Pin({ areaSlug, areaName, position, isActive }: AreaPinProps) {
   useFrame(() => {
     if (!isActive || !meshRef.current) return;
 
-    // メッシュのワールド座標を取得し、カメラで NDC 空間へ投影
+    // 中心のワールド座標
     meshRef.current.getWorldPosition(worldPos);
-    ndcPos.copy(worldPos).project(camera);
 
-    // NDC(-1..1) → CSS pixel。canvas 実サイズ(size)を使うため DPR は気にしない
-    const screenX = (ndcPos.x * 0.5 + 0.5) * size.width;
-    const screenY = (-ndcPos.y * 0.5 + 0.5) * size.height;
-    // ndcPos.z が -1..1 の範囲外なら画面外(視錐台外)
-    const inFrustum = ndcPos.z > -1 && ndcPos.z < 1;
+    // Billboard は常にカメラに正対するので、外周点は camera.up 方向へ外接半径ぶん進めた点。
+    // camera の world up ベクトルを取得（camera.up は local なので matrixWorld から）
+    cameraUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
+    edgeWorldPos.copy(worldPos).addScaledVector(cameraUp, PIN_ACTIVE_OUTER);
+
+    // 両点を NDC へ投影
+    ndcCenter.copy(worldPos).project(camera);
+    ndcEdge.copy(edgeWorldPos).project(camera);
+
+    // NDC(-1..1) → CSS pixel。
+    const screenCenterX = (ndcCenter.x * 0.5 + 0.5) * size.width;
+    const screenCenterY = (-ndcCenter.y * 0.5 + 0.5) * size.height;
+    const screenEdgeX = (ndcEdge.x * 0.5 + 0.5) * size.width;
+    const screenEdgeY = (-ndcEdge.y * 0.5 + 0.5) * size.height;
+
+    // 中心と外周の pixel 距離 = 画面上の半径
+    const radius = Math.hypot(
+      screenEdgeX - screenCenterX,
+      screenEdgeY - screenCenterY,
+    );
+
+    const inFrustum = ndcCenter.z > -1 && ndcCenter.z < 1;
 
     useActivePinPositionStore.getState().setPosition({
-      x: screenX,
-      y: screenY,
+      x: screenCenterX,
+      y: screenCenterY,
+      radius,
       visible: inFrustum,
     });
   });
@@ -45,7 +71,13 @@ export function Pin({ areaSlug, areaName, position, isActive }: AreaPinProps) {
   return (
     <Billboard position={position} follow userData={{ areaSlug, areaName }}>
       <mesh ref={meshRef}>
-        <ringGeometry args={isActive ? [0.07, 0.11, 32] : [0.045, 0.07, 32]} />
+        <ringGeometry
+          args={
+            isActive
+              ? [PIN_ACTIVE_INNER, PIN_ACTIVE_OUTER, 32]
+              : [PIN_INACTIVE_INNER, PIN_INACTIVE_OUTER, 32]
+          }
+        />
         <meshBasicMaterial
           color="#FFFFFF"
           transparent

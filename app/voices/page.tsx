@@ -104,9 +104,6 @@ export default async function VoicesPage() {
               <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
                 Video interviews
               </p>
-              <h3 className="mt-3 text-balance text-2xl font-black leading-tight tracking-[-0.02em] text-[color:var(--c-deep-ocean)] md:text-4xl md:leading-tight">
-                言葉より、空気で伝わる島の話。
-              </h3>
             </div>
             <div className="flex flex-col items-center gap-16 md:gap-20">
               {videoItems.map((video) => (

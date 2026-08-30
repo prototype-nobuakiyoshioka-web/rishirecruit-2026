@@ -11,6 +11,8 @@ import { create } from "zustand";
 export interface ActivePinScreenPosition {
   x: number;
   y: number;
+  /** ピン(円)の外接半径(CSS pixel)。線をピン外側から引くために使う。 */
+  radius: number;
   visible: boolean;
 }
 
@@ -20,6 +22,6 @@ interface ActivePinPositionState {
 }
 
 export const useActivePinPositionStore = create<ActivePinPositionState>((set) => ({
-  position: { x: 0, y: 0, visible: false },
+  position: { x: 0, y: 0, radius: 0, visible: false },
   setPosition: (position) => set({ position }),
 }));

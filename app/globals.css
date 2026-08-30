@@ -180,6 +180,60 @@ body {
   animation: area-panel-fade-in 400ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
+/* Job/Event/Spot タブ切替時のコンテンツ内アニメーション。
+   activeTab を key に指定した div が remount される想定。
+   タブは横並びなので、水平方向にわずかにスライド＋フェードで切替感を演出。 */
+.tab-content-enter {
+  animation: tab-content-fade-in 280ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes tab-content-fade-in {
+  from {
+    opacity: 0;
+    transform: translate3d(6px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* タブカード内スライド（前/次ページャー）の方向別切替アニメーション。
+   一般的なスライドショーのように、旧スライドが片側に抜けつつ新スライドが
+   反対側から入ってくる連動移動を実現するため、幅 200% のトラック（旧＋新の
+   2 枚が横並び）を translateX する方式。フェードは無し、純粋な水平移動のみ。
+   親要素側に overflow: hidden を必ず付ける。 */
+.slide-track-next {
+  animation: slide-track-next 360ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.slide-track-prev {
+  animation: slide-track-prev 360ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* トラック内子順: [prev, current] → 左半分から右半分へスクロール */
+@keyframes slide-track-next {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* トラック内子順: [current, prev] → 右半分から左半分へスクロール */
+@keyframes slide-track-prev {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @keyframes area-panel-fade-in {
   from {
     opacity: 0;
@@ -193,12 +247,24 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .area-panel-enter {
-    animation-duration: 80ms;
-    animation-timing-function: linear;
+  .area-panel-enter,
+  .tab-content-enter,
+  .slide-track-next,
+  .slide-track-prev {
+    animation-duration: 1ms;
   }
 
   @keyframes area-panel-fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes tab-content-fade-in {
     from {
       opacity: 0;
     }
