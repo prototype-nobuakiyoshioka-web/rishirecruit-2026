@@ -284,6 +284,53 @@ function AreaPostSliderContent({
               {slideInfo.catchCopy}
             </p>
           )}
+          {(() => {
+            // タイトル・キャッチと詳細リンクの間に極小 chip でメタ情報を差し込む。
+            // SP の card 幅は狭いので、chip は最大 2 個までを想定し、はみ出しは省略する。
+            const chips: string[] = [];
+            if (slideInfo.jobMeta) {
+              if (slideInfo.jobMeta.employmentType) chips.push(slideInfo.jobMeta.employmentType);
+              if (slideInfo.jobMeta.salary) chips.push(slideInfo.jobMeta.salary);
+            }
+            if (slideInfo.eventMeta) {
+              if (slideInfo.eventMeta.period) chips.push(slideInfo.eventMeta.period);
+              if (slideInfo.eventMeta.venueName) chips.push(slideInfo.eventMeta.venueName);
+            }
+            if (chips.length === 0) return null;
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "nowrap",
+                  gap: "0.35rem",
+                  marginBottom: "var(--space-1)",
+                  overflow: "hidden",
+                }}
+              >
+                {chips.slice(0, 2).map((chip) => (
+                  <span
+                    key={chip}
+                    style={{
+                      display: "inline-block",
+                      padding: "0.15rem 0.55rem",
+                      borderRadius: "9999px",
+                      background: "rgba(10, 46, 78, 0.08)",
+                      color: "var(--c-deep-ocean)",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      lineHeight: 1.4,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: "48%",
+                    }}
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            );
+          })()}
           <Link
             href={slideInfo.href}
             style={{
