@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import type { WPImageNode } from "./wp/types";
 
-// 本番ドメイン。next.config の remotePatterns と一致(https://rishirecruit.com)。
+// 本番ドメイン。https://www.rishirecruit.com（www あり継続）。
 // 環境ごとに NEXT_PUBLIC_SITE_URL で上書きできる。末尾スラッシュは正規化する。
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://rishirecruit.com"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.rishirecruit.com"
 ).replace(/\/+$/, "");
 
 export const SITE_NAME = "Rishiri Recruit 2026";
