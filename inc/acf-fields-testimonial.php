@@ -2,7 +2,15 @@
 /**
  * testimonial CPT 用 ACF フィールドグループ登録。
  *
- * 移住者の声の編集フィールドを2タブ構成で定義し、WPGraphQLにも公開します。
+ * 既存サイト rishirecruit.com のトップ移住者スライダー ".slide_txt" の
+ * DOM 構造に忠実に合わせた最小構成:
+ *   - .slide_name .name         → post_title（ACFフィールドは不要）
+ *   - .slide_date .age          → age (text)
+ *   - .slide_coppy-headeing     → catch_copy (textarea, <br>保持)
+ *   - .slide_img (親li)          → photo (image)
+ *   - dl > dt.question/dd.answer → qa_list (repeater: question + answer)
+ *
+ * WPGraphQL にも公開する（graphql_field_name: testimonialFields）。
  */
 
 if (!defined('ABSPATH')) {
@@ -19,118 +27,75 @@ add_action('acf/init', function (): void {
         'title' => '移住者の声',
         'fields' => [
             [
-                'key' => 'field_tm_tab_profile',
-                'label' => 'プロフィール',
-                'type' => 'tab',
-                'instructions' => '一覧表示とプロフィール情報、関連求人を設定します。',
-                'placement' => 'top',
+                // 経過年ラベル。単独人物「移住6年目」、複数人「移住10年目・18年目」の両方に対応するため text で扱う。
+                'key' => 'field_tm_age',
+                'label' => '経過年',
+                'name' => 'age',
+                'type' => 'text',
+                'instructions' => '移住からの経過年を「移住N年目」形式で入力してください。例: 移住6年目 / 移住10年目・18年目（複数人の場合は中黒で連結）',
+                'required' => 1,
                 'show_in_graphql' => 1,
             ],
             [
+                // キャッチコピー。改行を <br> に変換して保持するため textarea + new_lines: 'br'。
                 'key' => 'field_tm_catch_copy',
                 'label' => 'キャッチコピー',
                 'name' => 'catch_copy',
-                'type' => 'text',
-                'instructions' => '一覧ページの見出し文を入力してください。例: 子育てしながら、海の近くで働く',
-                'required' => 1,
-                'show_in_graphql' => 1,
-            ],
-            [
-                'key' => 'field_tm_photo',
-                'label' => 'メイン写真',
-                'name' => 'photo',
-                'type' => 'image',
-                'instructions' => '顔写真または暮らしの様子の写真を選択してください。',
-                'required' => 1,
-                'return_format' => 'array',
-                'preview_size' => 'medium',
-                'library' => 'all',
-                'show_in_graphql' => 1,
-            ],
-            [
-                'key' => 'field_tm_profile_before',
-                'label' => '移住前の暮らし',
-                'name' => 'profile_before',
-                'type' => 'text',
-                'instructions' => '移住前の居住地や仕事を入力してください。例: 東京都・会社員',
-                'required' => 0,
-                'show_in_graphql' => 1,
-            ],
-            [
-                'key' => 'field_tm_profile_after',
-                'label' => '現在の暮らし',
-                'name' => 'profile_after',
-                'type' => 'text',
-                'instructions' => '現在の居住地や仕事を入力してください。例: 利尻富士町・役場勤務',
-                'required' => 0,
-                'show_in_graphql' => 1,
-            ],
-            [
-                'key' => 'field_tm_migration_year',
-                'label' => '移住年',
-                'name' => 'migration_year',
-                'type' => 'text',
-                'instructions' => '移住した年を入力してください。例: 2023年',
-                'required' => 0,
-                'show_in_graphql' => 1,
-            ],
-            [
-                'key' => 'field_tm_related_job',
-                'label' => '関連求人',
-                'name' => 'related_job',
-                'type' => 'post_object',
-                'instructions' => 'この移住者が応募した求人があれば選択してください。任意項目です。',
-                'required' => 0,
-                'post_type' => ['job_posting'],
-                'return_format' => 'id',
-                'multiple' => 0,
-                'allow_null' => 1,
-                'ui' => 1,
-                'show_in_graphql' => 1,
-            ],
-            [
-                'key' => 'field_tm_tab_interview',
-                'label' => 'インタビュー本文',
-                'type' => 'tab',
-                'instructions' => '導入文、本文、暮らしの写真を設定します。',
-                'placement' => 'top',
-                'show_in_graphql' => 1,
-            ],
-            [
-                'key' => 'field_tm_lead_text',
-                'label' => 'リード文',
-                'name' => 'lead_text',
                 'type' => 'textarea',
-                'instructions' => '編集側が書く導入の要約文を2-3文程度で入力してください。',
+                'instructions' => "スライドの見出しコピー。改行位置は表示にそのまま反映されます。\n例:\n「また来たい」じゃなく、\n「ここで生きたい」と思えた島",
                 'required' => 1,
-                'rows' => 4,
+                'rows' => 3,
                 'new_lines' => 'br',
                 'show_in_graphql' => 1,
             ],
             [
-                'key' => 'field_tm_interview_body',
-                'label' => 'インタビュー本文',
-                'name' => 'interview_body',
-                'type' => 'wysiwyg',
-                'instructions' => 'インタビュー本文を入力してください。写真を文中に挿入することも可能です。',
+                // スライドで表示する顔写真・暮らしの写真。既存キー field_tm_photo を継続使用。
+                'key' => 'field_tm_photo',
+                'label' => 'メイン写真',
+                'name' => 'photo',
+                'type' => 'image',
+                'instructions' => 'スライドで表示するメイン写真（顔写真または暮らしの様子）を選択してください。',
                 'required' => 1,
-                'tabs' => 'all',
-                'toolbar' => 'full',
-                'media_upload' => 1,
+                'return_format' => 'array',
+                'preview_size' => 'medium',
+                'library' => 'all',
                 'show_in_graphql' => 1,
             ],
             [
-                'key' => 'field_tm_gallery_images',
-                'label' => '暮らしの写真',
-                'name' => 'gallery_images',
-                'type' => 'gallery',
-                'instructions' => '暮らしの様子の写真を選択してください。複数枚登録できます。',
-                'required' => 0,
-                'return_format' => 'array',
-                'preview_size' => 'medium',
-                'insert' => 'append',
-                'library' => 'all',
+                // 質問と回答のペア。人により5〜6組程度で可変。
+                'key' => 'field_tm_qa_list',
+                'label' => 'Q&A リスト',
+                'name' => 'qa_list',
+                'type' => 'repeater',
+                'instructions' => '質問と回答のペアを追加してください。人によって5〜6組程度が目安です。',
+                'required' => 1,
+                'min' => 1,
+                'max' => 0,
+                'layout' => 'block',
+                'button_label' => 'Q&A を追加',
                 'show_in_graphql' => 1,
+                'sub_fields' => [
+                    [
+                        'key' => 'field_tm_qa_question',
+                        'label' => '質問',
+                        'name' => 'question',
+                        'type' => 'text',
+                        'instructions' => '「Q.」から始まる質問文を入力してください。例: Q.お仕事は何をされていますか？',
+                        'required' => 1,
+                        'show_in_graphql' => 1,
+                    ],
+                    [
+                        'key' => 'field_tm_qa_answer',
+                        'label' => '回答',
+                        'name' => 'answer',
+                        'type' => 'textarea',
+                        'instructions' => '回答本文を入力してください。改行位置は表示にそのまま反映されます。',
+                        'required' => 1,
+                        'rows' => 6,
+                        'new_lines' => 'br',
+                        'show_in_graphql' => 1,
+                    ],
+                ],
             ],
         ],
         'location' => [

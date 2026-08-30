@@ -26,6 +26,8 @@ function rishi_revalidate_paths_for(string $post_type, string $slug): array {
         'touristspot' => 'spots',
         'event'       => 'events',
         'testimonial' => 'voices',
+        // 動画は詳細ページを持たず /voices 内に埋め込み表示するため voices セグメントに紐付け。
+        'voice_video' => 'voices',
     );
 
     if (!isset($segments[$post_type])) {

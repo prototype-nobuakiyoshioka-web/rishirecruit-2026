@@ -1,6 +1,7 @@
 import { IslandCanvas } from "@/components/scene/IslandCanvas";
 import { ColumnBoard } from "@/components/scene/ColumnBoard";
 import { AreaSidePanels } from "@/components/scene/AreaSidePanels";
+import { PinConnectorOverlay } from "@/components/scene/PinConnectorOverlay";
 import { getAreaWithPosts } from "@/lib/wp/queries/areas";
 
 export default async function Home() {
@@ -27,6 +28,7 @@ export default async function Home() {
       </main>
       <ColumnBoard />
       <AreaSidePanels areaData={areaData} />
+      <PinConnectorOverlay />
     </>
   );
 }

@@ -172,3 +172,39 @@ body {
     display: none;
   }
 }
+
+/* エリアパネル切替アニメーション。
+   activeAreaSlug 変更時にコンテンツ内容が unmount → 再mount されるので、
+   マウント直後にフェード＋わずかなリフトアップで自然に切り替える。 */
+.area-panel-enter {
+  animation: area-panel-fade-in 400ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes area-panel-fade-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .area-panel-enter {
+    animation-duration: 80ms;
+    animation-timing-function: linear;
+  }
+
+  @keyframes area-panel-fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+}

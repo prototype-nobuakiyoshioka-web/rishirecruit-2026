@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { imageFromField } from "@/lib/wp/format";
+import { Fragment } from "react";
+import { imageFromField, splitByBr } from "@/lib/wp/format";
 import { Button } from "@/components/ui/Button";
+import { VoiceVideoPlayer } from "@/components/ui/VoiceVideoPlayer";
 import { buildMetadata } from "@/lib/seo";
 import { getTestimonials } from "@/lib/wp/queries/voices";
+import { getVoiceVideos } from "@/lib/wp/queries/voice-videos";
+import { extractYouTubeVideoId, fetchYouTubeOEmbed } from "@/lib/utils/youtube";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
 
 export const metadata: Metadata = buildMetadata({
@@ -15,7 +19,25 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function VoicesPage() {
-  const voices = await getTestimonials();
+  const [voices, videos] = await Promise.all([
+    getTestimonials(),
+    getVoiceVideos(),
+  ]);
+
+  // 動画メタ(表示用タイトル)を YouTube oEmbed から並列取得。
+  // post_title には YouTube URL がそのまま入っている前提。
+  const videoItems = await Promise.all(
+    videos.map(async (video) => {
+      const videoId = extractYouTubeVideoId(video.title);
+      if (!videoId) return null;
+      const oembed = await fetchYouTubeOEmbed(video.title);
+      return {
+        id: video.id,
+        videoId,
+        title: oembed?.title ?? video.title,
+      };
+    }),
+  ).then((items) => items.filter((v): v is NonNullable<typeof v> => v !== null));
 
   return (
     <main className="overflow-hidden bg-[#1a8fa8]">
@@ -76,6 +98,37 @@ export default async function VoicesPage() {
           </div>
         </header>
 
+        {videoItems.length > 0 ? (
+          <section className="relative mx-auto max-w-[960px] px-[var(--space-6)] pb-24 md:pb-32">
+            <div className="mb-10 text-center md:mb-14">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+                Video interviews
+              </p>
+              <h3 className="mt-3 text-balance text-2xl font-black leading-tight tracking-[-0.02em] text-[color:var(--c-deep-ocean)] md:text-4xl md:leading-tight">
+                言葉より、空気で伝わる島の話。
+              </h3>
+            </div>
+            <div className="flex flex-col items-center gap-16 md:gap-20">
+              {videoItems.map((video) => (
+                <article
+                  key={video.id}
+                  className="flex w-full flex-col items-center gap-5"
+                >
+                  <h4 className="w-full text-balance text-center text-xl font-black leading-snug text-[color:var(--c-deep-ocean)] md:text-2xl">
+                    {video.title}
+                  </h4>
+                  <div className="w-full">
+                    <VoiceVideoPlayer
+                      videoId={video.videoId}
+                      title={video.title}
+                    />
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
           {voices.length > 0 ? (
             <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-12">
@@ -108,23 +161,21 @@ export default async function VoicesPage() {
                         Voice {String(index + 1).padStart(2, "0")}
                       </p>
                       <p className="mt-3 text-sm font-bold text-[color:var(--c-text-secondary)]">
-                        {fields?.migrationYear
-                          ? `${fields.migrationYear} 移住`
-                          : "移住者インタビュー"}
+                        {fields?.age ?? "移住者インタビュー"}
                       </p>
                       <h2 className="mt-3 text-balance text-2xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-3xl">
-                        {fields?.catchCopy ?? voice.title}
+                        {fields?.catchCopy
+                          ? splitByBr(fields.catchCopy).map((seg, i, arr) => (
+                              <Fragment key={i}>
+                                {seg}
+                                {i < arr.length - 1 ? <br /> : null}
+                              </Fragment>
+                            ))
+                          : voice.title}
                       </h2>
                       <p className="mt-3 text-base font-bold text-[color:var(--c-text-primary)]">
                         {voice.title}
                       </p>
-                      {fields?.profileBefore || fields?.profileAfter ? (
-                        <p className="mt-3 text-sm leading-7 text-[color:var(--c-text-secondary)]">
-                          {[fields.profileBefore, fields.profileAfter]
-                            .filter(Boolean)
-                            .join("  →  ")}
-                        </p>
-                      ) : null}
                       <Link
                         href={`/voices/${voice.slug}`}
                         className="mt-5 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 text-base font-black text-[color:var(--c-deep-ocean)] transition-opacity hover:opacity-65"

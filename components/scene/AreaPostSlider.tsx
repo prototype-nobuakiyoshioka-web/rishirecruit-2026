@@ -160,9 +160,11 @@ function AreaPostSliderContent({
   if (isMobile) {
     return (
       <div
+        className="area-panel-enter"
         style={{
           width: "100vw",
           height: "100%",
+          willChange: "transform, opacity",
         }}
       >
         <div
@@ -436,8 +438,10 @@ function AreaPostSliderContent({
 
   return (
     <div
+      className="area-panel-enter"
       style={{
         width: isMobile ? "92vw" : "100%",
+        willChange: "transform, opacity",
       }}
     >
       <div

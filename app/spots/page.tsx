@@ -35,9 +35,11 @@ export default async function SpotsPage() {
                     <Image src={image.sourceUrl} alt={image.altText || `${spot.title}の風景`} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-500 hover:scale-[1.02]" />
                   </div>
                 </Link>
-                <div className="mt-6 grid gap-4 md:grid-cols-[1fr_auto] md:items-start">
-                  <div><p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">{category ? SPOT_CATEGORY_LABELS[category] ?? category : "Spot"}</p><h2 className="mt-3 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">{spot.title}</h2>{fields?.catchCopy ? <p className="mt-3 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}</div>
-                  <Link href={`/spots/${spot.slug}`} className="inline-flex min-h-11 items-center font-black text-[color:var(--c-deep-ocean)] hover:underline">この場所を知る →</Link>
+                <div className="mt-6">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">{category ? SPOT_CATEGORY_LABELS[category] ?? category : "Spot"}</p>
+                  <h2 className="mt-3 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">{spot.title}</h2>
+                  {fields?.catchCopy ? <p className="mt-3 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
+                  <Link href={`/spots/${spot.slug}`} className="mt-5 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">この場所を知る →</Link>
                 </div>
               </article>
             );

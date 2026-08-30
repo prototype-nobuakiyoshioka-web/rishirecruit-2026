@@ -8,10 +8,8 @@ const TESTIMONIAL_CARD_FIELDS = gql`
     slug
     title
     testimonialFields {
+      age
       catchCopy
-      migrationYear
-      profileBefore
-      profileAfter
       photo {
         node {
           sourceUrl
@@ -44,6 +42,7 @@ const GET_TESTIMONIAL_BY_SLUG = gql`
       slug
       title
       testimonialFields {
+        age
         catchCopy
         photo {
           node {
@@ -55,34 +54,9 @@ const GET_TESTIMONIAL_BY_SLUG = gql`
             }
           }
         }
-        profileBefore
-        profileAfter
-        migrationYear
-        leadText
-        interviewBody
-        galleryImages {
-          nodes {
-            sourceUrl
-            altText
-            mediaDetails {
-              width
-              height
-            }
-          }
-        }
-        relatedJob {
-          nodes {
-            ... on JobPosting {
-              __typename
-              id
-              slug
-              title
-              jobPostingFields {
-                employmentType
-                catchCopy
-              }
-            }
-          }
+        qaList {
+          question
+          answer
         }
       }
     }

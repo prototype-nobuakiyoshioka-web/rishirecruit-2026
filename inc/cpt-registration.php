@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * 求人・観光地・イベント・移住者の声のCPTを登録します。
+ * 求人・観光地・イベント・移住者の声・移住者インタビュー動画のCPTを登録します。
  */
 function rishirecruit2026_register_custom_post_types(): void
 {
@@ -121,6 +121,36 @@ function rishirecruit2026_register_custom_post_types(): void
             'graphql_plural_name' => 'testimonials',
             'supports'            => ['title', 'editor', 'thumbnail'],
             'menu_icon'           => 'dashicons-format-quote',
+        ]
+    );
+
+    // 動画CPT: 「タイトル欄にYouTubeリンクを貼付するだけで投稿完了」できる最小構成。
+    // 本文・アイキャッチ等の追加入力は要求されていないため supports は title のみ。
+    register_post_type(
+        'voice_video',
+        [
+            'labels' => [
+                'name'               => __('移住者インタビュー動画', 'rishirecruit2026'),
+                'singular_name'      => __('動画', 'rishirecruit2026'),
+                'menu_name'          => __('インタビュー動画', 'rishirecruit2026'),
+                'name_admin_bar'     => __('動画', 'rishirecruit2026'),
+                'add_new'            => __('新規追加', 'rishirecruit2026'),
+                'add_new_item'       => __('YouTubeリンクを追加', 'rishirecruit2026'),
+                'new_item'           => __('新しい動画', 'rishirecruit2026'),
+                'edit_item'          => __('動画を編集', 'rishirecruit2026'),
+                'view_item'          => __('動画を表示', 'rishirecruit2026'),
+                'all_items'          => __('動画一覧', 'rishirecruit2026'),
+                'search_items'       => __('動画を検索', 'rishirecruit2026'),
+                'not_found'          => __('動画が見つかりませんでした。', 'rishirecruit2026'),
+                'not_found_in_trash' => __('ゴミ箱に動画はありません。', 'rishirecruit2026'),
+            ],
+            'public'              => true,
+            'show_in_rest'        => true,
+            'show_in_graphql'     => true,
+            'graphql_single_name' => 'voiceVideo',
+            'graphql_plural_name' => 'voiceVideos',
+            'supports'            => ['title'],
+            'menu_icon'           => 'dashicons-video-alt3',
         ]
     );
 }

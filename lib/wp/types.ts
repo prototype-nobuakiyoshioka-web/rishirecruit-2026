@@ -109,30 +109,29 @@ export interface WPEvent {
   } | null;
 }
 
+export interface TestimonialQA {
+  question: string | null;
+  answer: string | null;
+}
+
 export interface Testimonial {
   id: string;
   slug: string;
   title: string;
   testimonialFields: {
+    age: string | null;
     catchCopy: string | null;
     photo: WPImageNode | null;
-    profileBefore: string | null;
-    profileAfter: string | null;
-    migrationYear: string | null;
-    leadText: string | null;
-    interviewBody: string | null;
-    galleryImages: WPGalleryNodes | null;
-    relatedJob: {
-      nodes: Array<{
-        __typename: "JobPosting";
-        id: string;
-        slug: string;
-        title: string;
-        jobPostingFields?: {
-          employmentType: string[] | null;
-          catchCopy: string | null;
-        } | null;
-      }>;
-    } | null;
+    qaList: TestimonialQA[] | null;
   } | null;
+}
+
+/**
+ * 移住者インタビュー動画 CPT。
+ * post_title に YouTube URL を貼付する運用（ACFフィールドは持たない）。
+ */
+export interface VoiceVideo {
+  id: string;
+  slug: string;
+  title: string;
 }
