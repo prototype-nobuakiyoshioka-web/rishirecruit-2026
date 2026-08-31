@@ -18,6 +18,8 @@ export function PinLayer({ activeAreaSlug }: PinLayerProps) {
       {AREAS.map((area) => {
         const pos = AREA_POSITIONS[area.slug];
         if (!pos) return null;
+        // フォーカス中エリアのピンのみ表示（相手側は非表示）
+        if (area.slug !== activeAreaSlug) return null;
 
         return (
           <Pin
@@ -25,7 +27,7 @@ export function PinLayer({ activeAreaSlug }: PinLayerProps) {
             areaSlug={area.slug}
             areaName={area.name}
             position={[pos.x, pos.y, pos.z]}
-            isActive={area.slug === activeAreaSlug}
+            isActive
           />
         );
       })}

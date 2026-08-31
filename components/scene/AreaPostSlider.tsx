@@ -562,7 +562,8 @@ function AreaPostSliderContent({
             padding: "0 0 0 4vw",
             boxSizing: "border-box",
             scrollSnapType: "x mandatory",
-            scrollPaddingInline: "4vw 0",
+            // 右端に 8px の余白を確保（スナップ位置を 8px 内側に寄せる）
+            scrollPaddingInline: "4vw 8px",
             overscrollBehaviorX: "contain",
             WebkitOverflowScrolling: "touch",
             scrollbarWidth: "none",
@@ -596,7 +597,8 @@ function AreaPostSliderContent({
               style={{
                 display: "flex",
                 gap: "var(--space-1)",
-                height: "44px",
+                // タブ高を詰めてコンテンツ領域を広げる
+                height: "32px",
                 flexShrink: 0,
               }}
             >
@@ -606,8 +608,8 @@ function AreaPostSliderContent({
                   type="button"
                   onClick={() => handleTabChange(tab.key)}
                   style={{
-                    minHeight: "44px",
-                    padding: "0.35rem clamp(1rem, 5vw, 1.25rem)",
+                    minHeight: "32px",
+                    padding: "0.1rem clamp(1rem, 5vw, 1.25rem)",
                     borderRadius: "var(--radius-md) var(--radius-md) 0 0",
                     background:
                       activeTab === tab.key

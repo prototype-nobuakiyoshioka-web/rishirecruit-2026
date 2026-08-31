@@ -19,13 +19,15 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
       data-pin-connector-target="area-info"
       style={{
         width: isMobile ? "82vw" : "100%",
+        // SP はタブカードと高さを揃えるため 100%。内容がはみ出す場合はカード内スクロール。
         height: isMobile ? "100%" : undefined,
+        overflowY: isMobile ? "auto" : undefined,
         boxSizing: isMobile ? "border-box" : undefined,
         background: "rgba(255, 255, 255, 0.92)",
         backdropFilter: "blur(8px)",
         borderRadius: "var(--radius-lg)",
         padding: isMobile
-          ? "var(--space-3)"
+          ? "var(--space-2)"
           : "clamp(var(--space-4), 2.5dvh, var(--space-6))",
         boxShadow: "var(--shadow-md)",
         willChange: "transform, opacity",
@@ -33,15 +35,14 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
     >
       <p
         style={{
-          fontSize: isMobile
-            ? "clamp(0.875rem, 2dvh, 0.95rem)"
-            : "0.75rem",
+          fontSize: isMobile ? "0.7rem" : "0.75rem",
           fontWeight: 700,
           color: "var(--c-pin-spot)",
           letterSpacing: "0.05em",
           marginBottom: isMobile
-            ? "var(--space-1)"
+            ? "2px"
             : "clamp(var(--space-1), 1dvh, var(--space-2))",
+          lineHeight: isMobile ? 1.1 : undefined,
         }}
       >
         Area
@@ -50,19 +51,20 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
       <h2
         style={{
           fontSize: isMobile
-            ? "clamp(1.25rem, 3.2dvh, 1.5rem)"
+            ? "1.1rem"
             : "clamp(1.35rem, 3.2dvh, 1.75rem)",
           fontWeight: 700,
           color: "var(--c-deep-ocean)",
           marginBottom: isMobile
-            ? "var(--space-1)"
+            ? "4px"
             : "clamp(var(--space-2), 2dvh, var(--space-4))",
+          lineHeight: isMobile ? 1.2 : undefined,
         }}
       >
         {info.name}
         <span
           style={{
-            fontSize: isMobile ? "0.875rem" : "1rem",
+            fontSize: isMobile ? "0.75rem" : "1rem",
             marginLeft: "var(--space-2)",
             fontWeight: 600,
           }}
@@ -72,21 +74,21 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
       </h2>
 
       {isMobile ? (
-        <p
-          style={{
-            marginBottom: "var(--space-1)",
-            fontSize: "0.875rem",
-            fontWeight: 700,
-            color: "var(--c-deep-ocean)",
-            lineHeight: 1.35,
-            display: "-webkit-box",
-            WebkitBoxOrient: "vertical",
-            WebkitLineClamp: 1,
-            overflow: "hidden",
-          }}
-        >
-          {info.catchCopy.join(" ")}
-        </p>
+        <div style={{ marginBottom: "6px" }}>
+          {info.catchCopy.map((line) => (
+            <p
+              key={line}
+              style={{
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                color: "var(--c-deep-ocean)",
+                lineHeight: 1.35,
+              }}
+            >
+              {line}
+            </p>
+          ))}
+        </div>
       ) : (
         <div
           style={{
@@ -110,19 +112,20 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
       )}
 
       {isMobile ? (
-        <p
-          style={{
-            fontSize: "0.875rem",
-            color: "var(--c-text-secondary)",
-            lineHeight: 1.35,
-            display: "-webkit-box",
-            WebkitBoxOrient: "vertical",
-            WebkitLineClamp: 1,
-            overflow: "hidden",
-          }}
-        >
-          {info.description.join(" ")}
-        </p>
+        <div>
+          {info.description.map((line) => (
+            <p
+              key={line}
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--c-text-secondary)",
+                lineHeight: 1.35,
+              }}
+            >
+              {line}
+            </p>
+          ))}
+        </div>
       ) : (
         <div>
           {info.description.map((line) => (

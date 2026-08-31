@@ -13,7 +13,8 @@ const MODEL_PATH = "/models/rishiri-prototype3.glb?v=1";
 const MODEL_BASE_SCALE_DESKTOP = 0.04;
 const MODEL_BASE_SCALE_MOBILE = 1;
 // SP 時にカメラの注視点を下にずらすことで、島を画面上方向へ寄せる。
-// 値を大きくするほど島が画面上に上がる。
+// 値を大きくするほど島が上・水平線も上に上がる。
+// 下げる（島も水平線も下がる）と空の面積が減る。
 const MOBILE_LOOKAT_Y_OFFSET = 50;
 const MAX_ROTATION = Math.PI / 4;
 const DAMP_SPEED = 4;
