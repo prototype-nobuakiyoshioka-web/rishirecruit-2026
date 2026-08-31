@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useState } from "react";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 import { Background } from "./Background";
+import { Boat } from "./Boat";
 import { IslandModel } from "./IslandModel";
 import { PinLayer } from "./PinLayer";
 
@@ -37,10 +38,12 @@ export function IslandCanvas() {
       <Background />
       <ambientLight intensity={0.6} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
-      <ScrollControls pages={6} damping={0}>
+      {/* SP はスクロール量を減らして早く鬼脇まで届くように */}
+      <ScrollControls pages={isMobile ? 3 : 6} damping={0}>
         <Suspense fallback={null}>
           <IslandModel isMobile={isMobile}>
             {SHOW_PINS && <PinLayer activeAreaSlug={activeAreaSlug} />}
+            <Boat />
           </IslandModel>
         </Suspense>
       </ScrollControls>

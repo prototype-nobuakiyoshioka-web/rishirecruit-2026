@@ -3,6 +3,10 @@
 import { useEffect, useRef } from "react";
 import { useActivePinPositionStore } from "@/store/active-pin-position-store";
 
+// ピン外周からさらに離す余白（円と点線の間に空ける隙間、px）
+// 値を小さくすると dot がピンに近づき、大きくすると離れる
+const PIN_EDGE_GAP = 12;
+
 /**
  * 3D 側の活性ピンと DOM 側のエリア情報パネルを、点線（stroke-dasharray でドット）で
  * 視覚的に接続するオーバーレイ。
@@ -21,9 +25,6 @@ export function PinConnectorOverlay() {
     let lastX = -1;
     let lastY = -1;
     let lastVisible = false;
-
-    // ピン外周からさらに離す余白（円と点線の間に空ける隙間、px）
-    const PIN_EDGE_GAP = 48;
 
     const tick = () => {
       const svg = svgRef.current;
@@ -61,9 +62,12 @@ export function PinConnectorOverlay() {
       lastVisible = true;
 
       const rect = target.getBoundingClientRect();
-      // パネル左辺の縦中央を終点に。
-      const targetX = rect.left;
-      const targetY = rect.top + rect.height / 2;
+      // ピンから見てパネルのどの辺が最も近いかで終点を決める。
+      // 画面幅が狭い（SP）とパネルは下にあるため上辺中央、
+      // 広い（PC）とパネルは右にあるため左辺中央に終点を置く。
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      const targetX = isMobile ? rect.left + rect.width / 2 : rect.left;
+      const targetY = isMobile ? rect.top : rect.top + rect.height / 2;
 
       // ピン中心 → パネルへの単位ベクトル
       const dx = targetX - pinX;
@@ -95,7 +99,7 @@ export function PinConnectorOverlay() {
     <svg
       ref={svgRef}
       aria-hidden="true"
-      className="pin-connector-overlay hidden md:block"
+      className="pin-connector-overlay"
       style={{
         position: "fixed",
         inset: 0,
@@ -116,7 +120,7 @@ export function PinConnectorOverlay() {
         stroke="#FFFFFF"
         strokeWidth={4}
         strokeLinecap="round"
-        strokeDasharray="0 20"
+        strokeDasharray="0 8"
         opacity={0.95}
       />
     </svg>

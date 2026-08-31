@@ -4,11 +4,17 @@ import { useGLTF, useScroll } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import * as THREE from "three";
-import type { Group, Mesh } from "three";
-import type { GLTF } from "three-stdlib";
+import type { Group } from "three";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
 const MODEL_PATH = "/models/rishiri-prototype3.glb?v=1";
+// 新モデルの世界単位が旧モデルと違うため、全体を縮小する倍率。
+// PC / SP で見え方が異なるため個別に持つ。値を下げると小さく、上げると大きくなる。
+const MODEL_BASE_SCALE_DESKTOP = 0.04;
+const MODEL_BASE_SCALE_MOBILE = 1;
+// SP 時にカメラの注視点を下にずらすことで、島を画面上方向へ寄せる。
+// 値を大きくするほど島が画面上に上がる。
+const MOBILE_LOOKAT_Y_OFFSET = 50;
 const MAX_ROTATION = Math.PI / 4;
 const DAMP_SPEED = 4;
 const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;
@@ -18,8 +24,12 @@ const MOBILE_HORIZONTAL_MARGIN = 16;
 const ADAPTIVE_FIT_MAX_WIDTH = 768;
 const DESKTOP_CAMERA_POSITION = new THREE.Vector3(-6, 5, 12);
 
-type RishiriGLTF = GLTF & {
-  nodes: Record<string, THREE.Object3D>;
+// GLB 内のオブジェクト名に対応する色（Blender の Collection 名と揃える）。
+// null / undefined を指定するとそのパーツは元の色のまま。
+const ISLAND_PART_COLORS: Record<string, string | null> = {
+  fumoto: "#3FA85C",   // 麓（緑）
+  mid: "#2E7D45",      // 中腹（濃緑）
+  sanchou: "#F5F7FA",  // 山頂（雪をかぶった白）
 };
 
 interface IslandModelProps {
@@ -28,23 +38,47 @@ interface IslandModelProps {
 }
 
 export function IslandModel({ children, isMobile = false }: IslandModelProps) {
-  const { nodes, scene } = useGLTF(MODEL_PATH) as unknown as RishiriGLTF & {
-    scene: THREE.Group;
-  };
-  // メッシュ名（旧: "平面"）に依存しないよう、GLB内の最初のMeshを取得する。
-  // 明示的に "平面" があればそれを優先し、なければ scene を traverse して見つける。
-  const islandMesh = useMemo<Mesh | undefined>(() => {
-    const named = nodes["平面"] as Mesh | undefined;
-    if (named && (named as THREE.Object3D).type === "Mesh") return named;
+  const { scene } = useGLTF(MODEL_PATH) as unknown as { scene: THREE.Group };
+  // 新モデルは fumoto / mid / sanchou の複数オブジェクト構成のため、
+  // シーン全体をそのまま表示する（単一メッシュ抽出では山頂・中腹が欠落する）。
+  const islandObject = scene;
 
-    let firstMesh: Mesh | undefined;
+  // GLB 内のメッシュ / オブジェクト名にマッチする色を適用する。
+  // マテリアルは他インスタンスと共有される可能性があるため clone してから書き換える。
+  useEffect(() => {
     scene.traverse((child) => {
-      if (!firstMesh && (child as THREE.Object3D).type === "Mesh") {
-        firstMesh = child as Mesh;
+      const mesh = child as THREE.Mesh;
+      if (!(mesh.isMesh)) return;
+
+      // 自身の名前 or 親オブジェクト名を辿って一致するキーを探す
+      let target: THREE.Object3D | null = mesh;
+      let colorHex: string | null | undefined;
+      while (target) {
+        const key = target.name;
+        if (key && key in ISLAND_PART_COLORS) {
+          colorHex = ISLAND_PART_COLORS[key];
+          break;
+        }
+        target = target.parent;
       }
+      if (!colorHex) return;
+
+      const original = mesh.material as THREE.Material | THREE.Material[];
+      const applyColor = (_mat: THREE.Material) => {
+        // Blender の PBR マテリアル（metalness/roughness、頂点色、テクスチャ）を継承すると
+        // 環境マップ無しでは暗く出るため、フラットな MeshStandardMaterial に置き換える。
+        return new THREE.MeshStandardMaterial({
+          color: new THREE.Color(colorHex!),
+          roughness: 0.9,
+          metalness: 0,
+          flatShading: true,
+        });
+      };
+      mesh.material = Array.isArray(original)
+        ? original.map(applyColor)
+        : applyColor(original);
     });
-    return firstMesh;
-  }, [nodes, scene]);
+  }, [scene]);
   const { camera, size: viewportSize } = useThree();
   const viewportHeight = viewportSize.height;
   const shouldAutoFit = isMobile || viewportSize.width <= ADAPTIVE_FIT_MAX_WIDTH;
@@ -58,11 +92,11 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
       ? -0.45
       : -0.34;
   const islandSize = useMemo(() => {
-    if (!islandMesh) return null;
+    if (!islandObject) return null;
 
-    const box = new THREE.Box3().setFromObject(islandMesh);
+    const box = new THREE.Box3().setFromObject(islandObject);
     return box.getSize(new THREE.Vector3());
-  }, [islandMesh]);
+  }, [islandObject]);
   const mobileCameraDistance = useMemo(() => {
     if (!shouldAutoFit || !islandSize) return null;
 
@@ -123,10 +157,12 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
       camera.position
         .copy(MOBILE_CAMERA_DIRECTION)
         .multiplyScalar(mobileCameraDistance);
+      // SP のみ注視点を下に下げると、島が画面上方向へ寄って見える
+      camera.lookAt(0, -MOBILE_LOOKAT_Y_OFFSET, 0);
     } else {
       camera.position.copy(DESKTOP_CAMERA_POSITION);
+      camera.lookAt(0, 0, 0);
     }
-    camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
   }, [camera, mobileCameraDistance, shouldAutoFit]);
 
@@ -149,6 +185,8 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
         mobilePositionX + 0.6,
         scroll.offset
       );
+      // SP のみ毎フレーム lookAt を強制（HMR で定数変更が即反映されるようにする）
+      camera.lookAt(0, -MOBILE_LOOKAT_Y_OFFSET, 0);
     }
     setRotationAngle(groupRef.current.rotation.y);
 
@@ -165,13 +203,20 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
     }
   });
 
+  const finalMobileScale = mobileScale * MODEL_BASE_SCALE_MOBILE;
+  const finalDesktopScale = 3 * MODEL_BASE_SCALE_DESKTOP;
+
   return (
     <group
       ref={groupRef}
       position={shouldAutoFit ? [mobilePositionX, 2.68, 0] : [-4, 1, 0]}
-      scale={shouldAutoFit ? [mobileScale, mobileScale, mobileScale] : [3, 3, 3]}
+      scale={
+        shouldAutoFit
+          ? [finalMobileScale, finalMobileScale, finalMobileScale]
+          : [finalDesktopScale, finalDesktopScale, finalDesktopScale]
+      }
     >
-      {islandMesh && <primitive object={islandMesh} />}
+      <primitive object={islandObject} />
       {children}
     </group>
   );

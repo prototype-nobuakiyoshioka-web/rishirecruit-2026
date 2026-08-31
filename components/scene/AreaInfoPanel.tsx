@@ -16,7 +16,7 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
     <div
       key={areaSlug}
       className="area-panel-enter"
-      data-pin-connector-target={isMobile ? undefined : "area-info"}
+      data-pin-connector-target="area-info"
       style={{
         width: isMobile ? "82vw" : "100%",
         height: isMobile ? "100%" : undefined,

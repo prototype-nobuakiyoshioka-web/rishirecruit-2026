@@ -13,11 +13,12 @@ interface AreaPinProps {
   isActive: boolean;
 }
 
-// 活性/非活性ピンのリング寸法（world unit）
-const PIN_ACTIVE_INNER = 0.07;
-const PIN_ACTIVE_OUTER = 0.11;
-const PIN_INACTIVE_INNER = 0.045;
-const PIN_INACTIVE_OUTER = 0.07;
+// 活性/非活性ピンのリング寸法（Island group ローカル単位）。
+// 新モデル (rishiri-prototype3.glb) は旧の約 30 倍サイズのため、寸法もスケール。
+const PIN_ACTIVE_INNER = 1.2;
+const PIN_ACTIVE_OUTER = 1.9;
+const PIN_INACTIVE_INNER = 0.75;
+const PIN_INACTIVE_OUTER = 1.2;
 
 // useFrame 内でのアロケーション回避（AGENTS.md 規約）
 const worldPos = new THREE.Vector3();
@@ -25,6 +26,7 @@ const edgeWorldPos = new THREE.Vector3();
 const ndcCenter = new THREE.Vector3();
 const ndcEdge = new THREE.Vector3();
 const cameraUp = new THREE.Vector3();
+const worldScale = new THREE.Vector3();
 
 export function Pin({ areaSlug, areaName, position, isActive }: AreaPinProps) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -36,11 +38,14 @@ export function Pin({ areaSlug, areaName, position, isActive }: AreaPinProps) {
 
     // 中心のワールド座標
     meshRef.current.getWorldPosition(worldPos);
+    // 親グループの scale を反映した実効半径（親スケール変更に強い）
+    meshRef.current.getWorldScale(worldScale);
+    const effectiveRadius = PIN_ACTIVE_OUTER * worldScale.x;
 
     // Billboard は常にカメラに正対するので、外周点は camera.up 方向へ外接半径ぶん進めた点。
     // camera の world up ベクトルを取得（camera.up は local なので matrixWorld から）
     cameraUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
-    edgeWorldPos.copy(worldPos).addScaledVector(cameraUp, PIN_ACTIVE_OUTER);
+    edgeWorldPos.copy(worldPos).addScaledVector(cameraUp, effectiveRadius);
 
     // 両点を NDC へ投影
     ndcCenter.copy(worldPos).project(camera);

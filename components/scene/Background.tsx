@@ -36,8 +36,10 @@ export function Background() {
         uColorDark: { value: new THREE.Color("#2BA8C4") },
         uSkyColor: { value: new THREE.Color("#4FA8D5") },
         uFoamColor: { value: new THREE.Color("#FFFFFF") },
-        uFadeStart: { value: 80.0 },
-        uFadeEnd: { value: 250.0 },
+        // SP はカメラ距離が大きく、80-250 のままだと波が空色にブレンドされて消える。
+        // 距離を広げ、遠景でも波が見えるようにする。
+        uFadeStart: { value: 200.0 },
+        uFadeEnd: { value: 500.0 },
       },
       vertexShader: `
         attribute float aRandom;
@@ -100,7 +102,7 @@ export function Background() {
           float dist = length(vWorldPosition - cameraPosition);
 
           float nearFactor = 1.0 - smoothstep(0.0, 60.0, dist);
-          float farFactor = smoothstep(80.0, 250.0, dist);
+          float farFactor = smoothstep(uFadeStart, uFadeEnd, dist);
 
           vec3 color = baseColor;
           color = mix(color, uColorNear, nearFactor * 0.5);
