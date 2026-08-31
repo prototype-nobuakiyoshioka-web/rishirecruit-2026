@@ -69,8 +69,9 @@ export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
         gap: "clamp(var(--space-4), 3dvh, calc(var(--space-6) + var(--space-2)))",
         justifyContent: "flex-start",
         minHeight: 0,
-        overflowY: "auto",
-        overscrollBehavior: "contain",
+        // overflowY: auto はホイールイベントを吸収して 3D シーンのスクロール回転を
+        // 阻害するため使わない。パネル全体が viewport に収まる想定。
+        overflow: "visible",
         pointerEvents: "none",
       }}
     >
