@@ -8,7 +8,7 @@ import type { Group, Mesh } from "three";
 import type { GLTF } from "three-stdlib";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
-const MODEL_PATH = "/models/rshiri-prototype02.glb?v=terrain-height";
+const MODEL_PATH = "/models/rishiri-prototype3.glb?v=1";
 const MAX_ROTATION = Math.PI / 4;
 const DAMP_SPEED = 4;
 const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;
@@ -28,8 +28,23 @@ interface IslandModelProps {
 }
 
 export function IslandModel({ children, isMobile = false }: IslandModelProps) {
-  const { nodes } = useGLTF(MODEL_PATH) as unknown as RishiriGLTF;
-  const islandMesh = nodes["平面"] as Mesh | undefined;
+  const { nodes, scene } = useGLTF(MODEL_PATH) as unknown as RishiriGLTF & {
+    scene: THREE.Group;
+  };
+  // メッシュ名（旧: "平面"）に依存しないよう、GLB内の最初のMeshを取得する。
+  // 明示的に "平面" があればそれを優先し、なければ scene を traverse して見つける。
+  const islandMesh = useMemo<Mesh | undefined>(() => {
+    const named = nodes["平面"] as Mesh | undefined;
+    if (named && (named as THREE.Object3D).type === "Mesh") return named;
+
+    let firstMesh: Mesh | undefined;
+    scene.traverse((child) => {
+      if (!firstMesh && (child as THREE.Object3D).type === "Mesh") {
+        firstMesh = child as Mesh;
+      }
+    });
+    return firstMesh;
+  }, [nodes, scene]);
   const { camera, size: viewportSize } = useThree();
   const viewportHeight = viewportSize.height;
   const shouldAutoFit = isMobile || viewportSize.width <= ADAPTIVE_FIT_MAX_WIDTH;
