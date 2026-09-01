@@ -39,18 +39,6 @@ export default function ComingSoonPage() {
           gap: "clamp(1.25rem, 3.5dvh, 2.25rem)",
         }}
       >
-        {/* アイコン */}
-        <div
-          aria-hidden="true"
-          style={{
-            fontSize: "clamp(4rem, 14vw, 6rem)",
-            lineHeight: 1,
-            filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.2))",
-          }}
-        >
-          🏝️
-        </div>
-
         {/* サイト名 */}
         <p
           style={{
