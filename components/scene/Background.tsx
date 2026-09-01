@@ -9,7 +9,10 @@ export function Background() {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   const seaGeometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(400, 400, 140, 140);
+    // SP はカメラ距離が大きくなり、400x400 だと海の端が視野内に見えてしまう。
+    // 十分遠くまで水平線に見せかけるため 1400x1400 に拡張。
+    // 分割数も比例して増やし、波の頂点密度を維持（PC 近景でのっぺりを防ぐ）。
+    const geo = new THREE.PlaneGeometry(1400, 1400, 320, 320);
     const pos = geo.attributes.position;
     const randoms = new Float32Array(pos.count);
 
@@ -36,10 +39,10 @@ export function Background() {
         uColorDark: { value: new THREE.Color("#2BA8C4") },
         uSkyColor: { value: new THREE.Color("#4FA8D5") },
         uFoamColor: { value: new THREE.Color("#FFFFFF") },
-        // SP はカメラ距離が大きく、80-250 のままだと波が空色にブレンドされて消える。
-        // 距離を広げ、遠景でも波が見えるようにする。
-        uFadeStart: { value: 200.0 },
-        uFadeEnd: { value: 500.0 },
+        // SP のカメラ距離が大きく、fade を広げないと海の端が視野内に見えてしまう。
+        // 十分遠くまで海面がある印象を与えるため fade を大きく広げる。
+        uFadeStart: { value: 400.0 },
+        uFadeEnd: { value: 1200.0 },
       },
       vertexShader: `
         attribute float aRandom;
@@ -110,13 +113,21 @@ export function Background() {
 
           float fade = 1.0 - smoothstep(uFadeStart, uFadeEnd, dist);
 
-          float foamThreshold = 0.55;
+          // 波頭の白い泡（強化版）:
+          // 1) 波の高い部分に多く出るクレスト泡（heightFactor × randomFactor）
+          // 2) ランダムに散らばる小さな飛沫（randomFactor 単独 × 弱いheightFactor）
+          // 3) 光の当たっているところをより白く（lighting）
+          float foamThreshold = 0.4;
           float foamNoise = vRandom;
-          float heightFactor = smoothstep(foamThreshold, foamThreshold + 0.3, vHeight);
-          float randomFactor = step(0.82, foamNoise);
+          float heightFactor = smoothstep(foamThreshold, foamThreshold + 0.35, vHeight);
+          float randomFactor = step(0.72, foamNoise);
+          float crestFoam = heightFactor * randomFactor;
 
-          float foam = heightFactor * randomFactor;
-          color = mix(color, uFoamColor, foam * 0.6);
+          float sprayFactor = step(0.9, foamNoise) * smoothstep(0.2, 0.55, vHeight);
+          float highlightFoam = smoothstep(0.55, 0.9, vHeight) * lighting * 0.4;
+
+          float foam = clamp(crestFoam + sprayFactor * 0.7 + highlightFoam, 0.0, 1.0);
+          color = mix(color, uFoamColor, foam);
 
           gl_FragColor = vec4(color, fade * 0.7);
         }

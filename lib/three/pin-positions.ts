@@ -3,5 +3,5 @@
 // Y は海岸沿いの街なので低めに設定。値は微調整可能。
 export const AREA_POSITIONS: Record<string, { x: number; y: number; z: number }> = {
   oshidomari: { x: 18, y: 6, z: 22 },
-  oniwaki: { x: -20, y: 6, z: -18 },
+  oniwaki: { x: -25, y: 7, z: -5 },
 };

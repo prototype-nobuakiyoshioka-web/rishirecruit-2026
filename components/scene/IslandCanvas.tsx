@@ -6,7 +6,10 @@ import { Suspense, useEffect, useState } from "react";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 import { Airplane } from "./Airplane";
 import { Background } from "./Background";
+import { Birds } from "./Birds";
 import { Boat } from "./Boat";
+import { Clouds } from "./Clouds";
+import { FishingBoats } from "./FishingBoats";
 import { IslandModel } from "./IslandModel";
 import { PinLayer } from "./PinLayer";
 
@@ -46,6 +49,9 @@ export function IslandCanvas() {
             {SHOW_PINS && <PinLayer activeAreaSlug={activeAreaSlug} />}
             <Boat />
             <Airplane />
+            <FishingBoats />
+            <Clouds />
+            <Birds />
           </IslandModel>
         </Suspense>
       </ScrollControls>

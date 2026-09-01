@@ -175,27 +175,27 @@ body {
 
 /* エリアパネル切替アニメーション。
    activeAreaSlug 変更時にコンテンツ内容が unmount → 再mount されるので、
-   マウント直後にフェード＋わずかなリフトアップで自然に切り替える。 */
+   マウント直後に "ふわっ・ぷるっ" と現れる、少し弾む出現に強化。 */
 .area-panel-enter {
-  animation: area-panel-fade-in 400ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: area-panel-pop-in 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* Job/Event/Spot タブ切替時のコンテンツ内アニメーション。
    activeTab を key に指定した div が remount される想定。
-   タブは横並びなので、水平方向にわずかにスライド＋フェードで切替感を演出。 */
+   横スライド＋わずかにスケールで動きに勢いをつける。 */
 .tab-content-enter {
-  animation: tab-content-fade-in 280ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: tab-content-pop-in 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-@keyframes tab-content-fade-in {
+@keyframes tab-content-pop-in {
   from {
     opacity: 0;
-    transform: translate3d(6px, 0, 0);
+    transform: translate3d(10px, 0, 0) scale(0.97);
   }
 
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -234,15 +234,20 @@ body {
   }
 }
 
-@keyframes area-panel-fade-in {
-  from {
+@keyframes area-panel-pop-in {
+  0% {
     opacity: 0;
-    transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 16px, 0) scale(0.94);
   }
 
-  to {
+  60% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, -3px, 0) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 

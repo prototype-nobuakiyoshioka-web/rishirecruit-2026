@@ -13,13 +13,14 @@ const MODEL_PATH = "/models/rishiri-prototype3.glb?v=1";
 const MODEL_BASE_SCALE_DESKTOP = 0.04;
 const MODEL_BASE_SCALE_MOBILE = 1;
 // SP 時にカメラの注視点を下にずらすことで、島を画面上方向へ寄せる。
-// 値を大きくするほど島が上・水平線も上に上がる。
-// 下げる（島も水平線も下がる）と空の面積が減る。
-const MOBILE_LOOKAT_Y_OFFSET = 50;
+// カメラを寝かせた（DIRECTION Y=6）ので、LOOKAT も控えめに。
+const MOBILE_LOOKAT_Y_OFFSET = 15;
 const MAX_ROTATION = Math.PI / 4;
 const DAMP_SPEED = 4;
 const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;
-const MOBILE_CAMERA_DIRECTION = new THREE.Vector3(-6, 14, 18).normalize();
+// Y を下げると カメラが低く（水平寄り）になり、水平線が下がって自然な位置に見える。
+// 14 → 6 で PC (Y:5) に近い自然な俯瞰角度に。
+const MOBILE_CAMERA_DIRECTION = new THREE.Vector3(-6, 6, 18).normalize();
 const MOBILE_CAMERA_FOV = 60;
 const MOBILE_HORIZONTAL_MARGIN = 16;
 const ADAPTIVE_FIT_MAX_WIDTH = 768;
