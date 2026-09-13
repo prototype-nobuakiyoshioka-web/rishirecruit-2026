@@ -1,0 +1,18 @@
+{
+  "Buildings": {
+    "faces": 18615,
+    "outside_town_face_centers": 0
+  },
+  "Roads": {
+    "faces": 4112,
+    "outside_town_face_centers": 0
+  },
+  "groups": [
+    "Terrain",
+    "Buildings",
+    "Roads",
+    "Vegetation",
+    "Water"
+  ],
+  "textures": 0
+}

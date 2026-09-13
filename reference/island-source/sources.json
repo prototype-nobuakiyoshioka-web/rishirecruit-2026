@@ -1,0 +1,10 @@
+{
+  "gsi": "https://maps.gsi.go.jp/development/ichiran.html",
+  "dem_template": "https://cyberjapandata.gsi.go.jp/xyz/dem/12/{x}/{y}.txt",
+  "elevation_zoom": 12,
+  "osm_api": "https://api.openstreetmap.org/api/0.6/",
+  "municipality_relation": 4088083,
+  "retrieved": "2026-09-14",
+  "license": "GSI content terms; © OpenStreetMap contributors, ODbL 1.0",
+  "google_reference": "https://www.google.com/maps/@45.180,141.242,12z/data=!5m1!1e4"
+}

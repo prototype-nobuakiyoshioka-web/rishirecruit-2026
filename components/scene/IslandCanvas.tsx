@@ -4,19 +4,14 @@ import { ScrollControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useState } from "react";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
-import { Airplane } from "./Airplane";
 import { Background } from "./Background";
-import { Birds } from "./Birds";
-import { Boat } from "./Boat";
-import { Clouds } from "./Clouds";
-import { FishingBoats } from "./FishingBoats";
 import { IslandModel } from "./IslandModel";
 import { PinLayer } from "./PinLayer";
 
 const SHOW_PINS = true;
 
 export function IslandCanvas() {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const activeAreaSlug = useScrollProgressStore(
     (state) => state.activeAreaSlug
   );
@@ -31,8 +26,11 @@ export function IslandCanvas() {
     return () => mediaQuery.removeEventListener("change", updateMatches);
   }, []);
 
+  if (isMobile === null) return null;
+
   return (
     <Canvas
+      dpr={isMobile ? [1, 1.5] : [1, 2]}
       camera={
         isMobile
           ? { position: [-6, 14, 18], fov: 60 }
@@ -40,18 +38,14 @@ export function IslandCanvas() {
       }
     >
       <Background />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[10, 10, 5]} intensity={1} />
+      <ambientLight intensity={0.75} />
+      <hemisphereLight args={["#fff7e7", "#a9c5b6", 0.5]} />
+      <directionalLight position={[10, 10, 5]} intensity={1.6} />
       {/* SP はスクロール量を減らして早く鬼脇まで届くように */}
       <ScrollControls pages={isMobile ? 3 : 6} damping={0}>
         <Suspense fallback={null}>
           <IslandModel isMobile={isMobile}>
             {SHOW_PINS && <PinLayer activeAreaSlug={activeAreaSlug} />}
-            <Boat />
-            <Airplane />
-            <FishingBoats />
-            <Clouds />
-            <Birds />
           </IslandModel>
         </Suspense>
       </ScrollControls>

@@ -286,7 +286,9 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 
 <!-- 作業を進めるたびにここを更新する -->
 - [x] **Phase 1: 要件定義・設計** — 完了(`docs/` 配下 5 ファイル + `reference/` の HTML)
-- [ ] **Phase 2: 3Dアセット制作** — ロードマップあり、Blender 作業中(`reference/blender-roadmap.html`)
+- [ ] **Phase 2: 3Dアセット制作** — パステル調ミニチュア版を作成・組み込み済み（2026-09-14）。実機性能・最終デザイン確認は継続
+  - [x] Googleマップの地形表示を参照し、国土地理院DEM + OSM海岸線・町境・道路・建物からGLBを生成。建物83棟・樹木330本、人物/動物なし、構造物は利尻富士町内。PC=96,498三角形/890,572 bytes、SP=69,362三角形/814,132 bytes。5グループ・22材質・テクスチャ0・Draco圧縮
+  - [x] 編集用 `reference/island-source/rishiri-miniature.blend`、再生成/検証 `scripts/models/`、制作仕様・出典・精度上の限界 `docs/07-island-miniature.md`。既存の回転・エリア切替を維持し、ピン座標を新モデルに対応
 - [x] **Phase 3: WordPress 構築** — **完了**
   - [x] Task 01: テーマ基盤 + 4CPT 登録(job_posting/touristspot/event/testimonial)
   - [x] Task 02: WPGraphQL + CORS + ヘッドレス強化
@@ -326,8 +328,8 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [x] 応募フォーム・お問い合わせフォームの実送信 — Contact Form 7 REST(feedback)接続済み。お問い合わせ=form ID 176 / 求人応募=177。フロントは `lib/wp/submit-cf7.ts` 経由で送信(`_wpcf7_unit_tag` 等の制御フィールド付与が必須)。curl で両フォーム `mail_sent` 確認済み。実ブラウザでの手動送信テストは吉岡さん側で最終確認
   - [x] WordPress更新のISRまたはOn-demand Revalidation — タグ方式で実装。WP実データfetchに `next: { tags: ['wp'], revalidate: 3600 }` を付与(`lib/wp/client.ts`)。`app/api/revalidate` がシークレット照合後に `revalidateTag('wp','max')` + 任意 `revalidatePath(path,'page')`。WP側 `inc/revalidate-hook.php` が対象4CPTの `transition_post_status` で `wp_remote_post`(非同期)。エンドポイント/シークレットはテーマ非保持で mu-plugin(`wp-content/mu-plugins/rishi-revalidate-config.php`・リポジトリ外)から定数注入。curlで401/200を確認済み。実WP保存→再検証の疎通は吉岡さん側で最終確認
 - [ ] **Phase 7: モバイル最適化** — レイアウト調整は進行済み、性能最適化は未着手
-  - [ ] モバイル用軽量GLB切替
-  - [ ] DPR制限・影/ポストエフェクト制御
+  - [x] モバイル用軽量GLB切替 — `rishiri-miniature-mobile.glb`。判定後に必要なモデルのみ取得
+  - [x] DPR制限・影/ポストエフェクト制御 — SPのDPR上限1.5、影・ポストエフェクトなし、海面メッシュを160分割へ削減
   - [ ] iOS Safari / Android Chrome実機確認
 - [ ] **Phase 8: テスト・デプロイ** — 一部着手
   - [x] 応募・問い合わせのスパム対策とサーバー側検証 — Cloudflare Turnstile + Next.js APIプロキシで実装。フォームはCF7直POSTをやめ `/api/form`(`app/api/form/route.ts`)経由に変更。ルートで ①Turnstileサーバー検証(`lib/turnstile.ts` siteverify)②formId許可リスト(176/177)③ハニーポット(`company_website`空チェック)④メール形式のサーバー側検証 → CF7中継。フロントは `components/ui/Turnstile.tsx`(explicit render)+ `submitForm()`(`lib/wp/submit-cf7.ts`)。キーは env(`NEXT_PUBLIC_TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY`、既定は公式テストキー)。curlで mail_sent/spam/validation_failed/formId弾き/ハニーポット破棄を確認、`npm run build` 通過。**本番前に実Turnstileキー発行が必要。ブラウザ実操作テストは吉岡さん側で最終確認**

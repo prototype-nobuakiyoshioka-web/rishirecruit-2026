@@ -14,7 +14,7 @@ interface AreaPinProps {
 }
 
 // 活性/非活性ピンのリング寸法（Island group ローカル単位）。
-// 新モデル (rishiri-prototype3.glb) は旧の約 30 倍サイズのため、寸法もスケール。
+// 島と同じ 1km=5単位の座標系で、画面上の視認性を保つ。
 const PIN_ACTIVE_INNER = 1.2;
 const PIN_ACTIVE_OUTER = 1.9;
 const PIN_INACTIVE_INNER = 0.75;

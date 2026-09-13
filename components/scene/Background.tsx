@@ -5,14 +5,14 @@ import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
 export function Background() {
-  const skyColor = useMemo(() => new THREE.Color("#4FA8D5"), []);
+  const skyColor = useMemo(() => new THREE.Color("#D8E9DB"), []);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   const seaGeometry = useMemo(() => {
     // SP はカメラ距離が大きくなり、400x400 だと海の端が視野内に見えてしまう。
     // 十分遠くまで水平線に見せかけるため 1400x1400 に拡張。
-    // 分割数も比例して増やし、波の頂点密度を維持（PC 近景でのっぺりを防ぐ）。
-    const geo = new THREE.PlaneGeometry(1400, 1400, 320, 320);
+    // 160 分割で波の起伏を保ち、海だけで約20万三角形になることを避ける。
+    const geo = new THREE.PlaneGeometry(1400, 1400, 160, 160);
     const pos = geo.attributes.position;
     const randoms = new Float32Array(pos.count);
 
@@ -32,12 +32,12 @@ export function Background() {
       depthWrite: false,
       uniforms: {
         uTime: { value: 0 },
-        uWaveHeight: { value: 0.5 },
+        uWaveHeight: { value: 0.18 },
         uWaveSpeed: { value: 0.5 },
-        uColorNear: { value: new THREE.Color("#1A8FA8") },
-        uColorLight: { value: new THREE.Color("#7FE3E8") },
-        uColorDark: { value: new THREE.Color("#2BA8C4") },
-        uSkyColor: { value: new THREE.Color("#4FA8D5") },
+        uColorNear: { value: new THREE.Color("#62C5B8") },
+        uColorLight: { value: new THREE.Color("#AFE4D8") },
+        uColorDark: { value: new THREE.Color("#75CDBD") },
+        uSkyColor: { value: new THREE.Color("#D8E9DB") },
         uFoamColor: { value: new THREE.Color("#FFFFFF") },
         // SP のカメラ距離が大きく、fade を広げないと海の端が視野内に見えてしまう。
         // 十分遠くまで海面がある印象を与えるため fade を大きく広げる。
@@ -127,7 +127,8 @@ export function Background() {
           float highlightFoam = smoothstep(0.55, 0.9, vHeight) * lighting * 0.4;
 
           float foam = clamp(crestFoam + sprayFactor * 0.7 + highlightFoam, 0.0, 1.0);
-          color = mix(color, uFoamColor, foam);
+          // 淡いミニチュアの海なので、遠景の大きな白い三角形を抑える。
+          color = mix(color, uFoamColor, foam * 0.12);
 
           gl_FragColor = vec4(color, fade * 0.7);
         }
@@ -146,7 +147,7 @@ export function Background() {
   return (
     <>
       <primitive attach="background" object={skyColor} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.7, 0]}>
         <primitive object={seaGeometry} attach="geometry" />
         <primitive object={seaMaterial} ref={materialRef} attach="material" />
       </mesh>

@@ -1,7 +1,5 @@
-// 新モデル (rishiri-prototype3.glb) 基準の座標。
-// GLB world size: x=94.11, y=21.85, z=89.77 / center: (-1.54, 10.92, 0.85)
-// Y は海岸沿いの街なので低めに設定。値は微調整可能。
+// scripts/models/build-miniature.py の緯度経度から生成。GLB: X=北、Y=上、Z=東。
 export const AREA_POSITIONS: Record<string, { x: number; y: number; z: number }> = {
-  oshidomari: { x: 18, y: 6, z: 22 },
-  oniwaki: { x: -25, y: 7, z: -5 },
+  oshidomari: { x: 34.342, y: 3.756, z: -0.196 },
+  oniwaki: { x: -22.598, y: 3.602, z: 33.152 },
 };

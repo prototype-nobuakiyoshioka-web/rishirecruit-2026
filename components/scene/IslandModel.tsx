@@ -7,8 +7,9 @@ import * as THREE from "three";
 import type { Group } from "three";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
-const MODEL_PATH = "/models/rishiri-prototype3.glb?v=1";
-// 新モデルの世界単位が旧モデルと違うため、全体を縮小する倍率。
+const MODEL_PATH = "/models/rishiri-miniature.glb";
+const MOBILE_MODEL_PATH = "/models/rishiri-miniature-mobile.glb";
+// 1km=5単位の GLB を既存の画面レイアウトに合わせる倍率。
 // PC / SP で見え方が異なるため個別に持つ。値を下げると小さく、上げると大きくなる。
 const MODEL_BASE_SCALE_DESKTOP = 0.04;
 const MODEL_BASE_SCALE_MOBILE = 1;
@@ -26,61 +27,18 @@ const MOBILE_HORIZONTAL_MARGIN = 16;
 const ADAPTIVE_FIT_MAX_WIDTH = 768;
 const DESKTOP_CAMERA_POSITION = new THREE.Vector3(-6, 5, 12);
 
-// GLB 内のオブジェクト名に対応する色（Blender の Collection 名と揃える）。
-// null / undefined を指定するとそのパーツは元の色のまま。
-const ISLAND_PART_COLORS: Record<string, string | null> = {
-  fumoto: "#3FA85C",   // 麓（緑）
-  mid: "#2E7D45",      // 中腹（濃緑）
-  sanchou: "#F5F7FA",  // 山頂（雪をかぶった白）
-};
-
 interface IslandModelProps {
   children?: ReactNode;
   isMobile?: boolean;
 }
 
 export function IslandModel({ children, isMobile = false }: IslandModelProps) {
-  const { scene } = useGLTF(MODEL_PATH) as unknown as { scene: THREE.Group };
-  // 新モデルは fumoto / mid / sanchou の複数オブジェクト構成のため、
-  // シーン全体をそのまま表示する（単一メッシュ抽出では山頂・中腹が欠落する）。
+  const { scene } = useGLTF(isMobile ? MOBILE_MODEL_PATH : MODEL_PATH, "/draco/") as unknown as {
+    scene: THREE.Group;
+  };
+  // GLB のパステル色とベベル法線をそのまま使用する。
   const islandObject = scene;
 
-  // GLB 内のメッシュ / オブジェクト名にマッチする色を適用する。
-  // マテリアルは他インスタンスと共有される可能性があるため clone してから書き換える。
-  useEffect(() => {
-    scene.traverse((child) => {
-      const mesh = child as THREE.Mesh;
-      if (!(mesh.isMesh)) return;
-
-      // 自身の名前 or 親オブジェクト名を辿って一致するキーを探す
-      let target: THREE.Object3D | null = mesh;
-      let colorHex: string | null | undefined;
-      while (target) {
-        const key = target.name;
-        if (key && key in ISLAND_PART_COLORS) {
-          colorHex = ISLAND_PART_COLORS[key];
-          break;
-        }
-        target = target.parent;
-      }
-      if (!colorHex) return;
-
-      const original = mesh.material as THREE.Material | THREE.Material[];
-      const applyColor = (_mat: THREE.Material) => {
-        // Blender の PBR マテリアル（metalness/roughness、頂点色、テクスチャ）を継承すると
-        // 環境マップ無しでは暗く出るため、フラットな MeshStandardMaterial に置き換える。
-        return new THREE.MeshStandardMaterial({
-          color: new THREE.Color(colorHex!),
-          roughness: 0.9,
-          metalness: 0,
-          flatShading: true,
-        });
-      };
-      mesh.material = Array.isArray(original)
-        ? original.map(applyColor)
-        : applyColor(original);
-    });
-  }, [scene]);
   const { camera, size: viewportSize } = useThree();
   const viewportHeight = viewportSize.height;
   const shouldAutoFit = isMobile || viewportSize.width <= ADAPTIVE_FIT_MAX_WIDTH;
@@ -223,5 +181,3 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
     </group>
   );
 }
-
-useGLTF.preload(MODEL_PATH);

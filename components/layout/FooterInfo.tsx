@@ -29,6 +29,9 @@ export function FooterCopyright({ className = "" }: { className?: string }) {
   return (
     <p className={["tracking-normal", className].join(" ")}>
       © 2026 rishirecruit ・ 利尻富士町
+      <span className="mt-2 block text-[10px] leading-relaxed">
+        3D地形：<a href="https://maps.gsi.go.jp/development/ichiran.html" className="underline">国土地理院</a>の標高タイルを加工 ／ 地図データ：© <a href="https://www.openstreetmap.org/copyright" className="underline">OpenStreetMap contributors</a>
+      </span>
     </p>
   );
 }
