@@ -33,6 +33,8 @@ export interface JobPosting {
   areas: { nodes: AreaTerm[] } | null;
   jobPostingFields: {
     employmentType: string[] | null;
+    jobCategory: string | null;
+    recruitmentCount: string | null;
     catchCopy: string | null;
     salary: string | null;
     salaryDetail: string | null;
@@ -49,7 +51,6 @@ export interface JobPosting {
     workAddressDetail: string | null;
     pinLocation: string[] | null;
     description: string | null;
-    desiredPerson: string | null;
     requiredQualifications: string | null;
     applicationFlow: string | null;
     thumbnailImage: WPImageNode | null;

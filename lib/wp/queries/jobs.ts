@@ -16,6 +16,8 @@ const JOB_POSTING_CARD_FIELDS = gql`
     }
     jobPostingFields {
       employmentType
+      jobCategory
+      recruitmentCount
       catchCopy
       salary
       workHours
@@ -62,6 +64,8 @@ const GET_JOB_POSTING_BY_SLUG = gql`
       }
       jobPostingFields {
         employmentType
+        jobCategory
+        recruitmentCount
         catchCopy
         salary
         salaryDetail
@@ -78,7 +82,6 @@ const GET_JOB_POSTING_BY_SLUG = gql`
         workAddressDetail
         pinLocation
         description
-        desiredPerson
         requiredQualifications
         applicationFlow
         thumbnailImage {
