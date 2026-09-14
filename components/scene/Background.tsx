@@ -5,7 +5,7 @@ import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
 export function Background() {
-  const skyColor = useMemo(() => new THREE.Color("#D8E9DB"), []);
+  const skyColor = useMemo(() => new THREE.Color("#4FA8D5"), []);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   const seaGeometry = useMemo(() => {
@@ -34,10 +34,10 @@ export function Background() {
         uTime: { value: 0 },
         uWaveHeight: { value: 0.18 },
         uWaveSpeed: { value: 0.5 },
-        uColorNear: { value: new THREE.Color("#62C5B8") },
-        uColorLight: { value: new THREE.Color("#AFE4D8") },
-        uColorDark: { value: new THREE.Color("#75CDBD") },
-        uSkyColor: { value: new THREE.Color("#D8E9DB") },
+        uColorNear: { value: new THREE.Color("#1A8FA8") },
+        uColorLight: { value: new THREE.Color("#7FE3E8") },
+        uColorDark: { value: new THREE.Color("#2BA8C4") },
+        uSkyColor: { value: new THREE.Color("#4FA8D5") },
         uFoamColor: { value: new THREE.Color("#FFFFFF") },
         // SP のカメラ距離が大きく、fade を広げないと海の端が視野内に見えてしまう。
         // 十分遠くまで海面がある印象を与えるため fade を大きく広げる。

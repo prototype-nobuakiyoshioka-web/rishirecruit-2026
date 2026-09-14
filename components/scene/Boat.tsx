@@ -6,30 +6,29 @@ import * as THREE from "three";
 import type { Group } from "three";
 
 /**
- * 鴛泊港沖を往復するローポリ船。IslandModel group の子として配置され、
- * 島の回転・スケールに追従する。
+ * 鴛泊港と沖を往復するチビ・ジオラマ調の連絡船。
+ * IslandModel group の子として配置され、島の回転・スケールに追従する。
  *
- * 座標系は Island local。Y=0 が地形ベース（≒ 海面付近）に相当。
+ * 座標系は新 GLB の Island local（1km=5単位、Y=0が海面付近）。
  */
 
-// 往復の 2 点（鴛泊港近くの Island local 座標）
-const ANCHOR_A = new THREE.Vector3(33, 0.5, 38); // 港側
-const ANCHOR_B = new THREE.Vector3(70, 0.5, 70); // 沖合
+// 港側 A / 沖合 B（Island local 座標）
+const ANCHOR_A = new THREE.Vector3(40, 0.4, 4);
+const ANCHOR_B = new THREE.Vector3(58, 0.4, 18);
 
-// 片道にかける秒数
-const TRAVEL_SECONDS = 12;
-// 港（A）と沖（B）で停泊する秒数
+// 片道時間と停泊時間
+const TRAVEL_SECONDS = 14;
 const PORT_PAUSE_SECONDS = 4;
 const OFFSHORE_PAUSE_SECONDS = 2;
 
-// 上下の揺れ振幅・周期
-const BOB_AMPLITUDE = 0.15;
-const BOB_PERIOD = 1.6;
+// 上下のゆれ
+const BOB_AMPLITUDE = 0.1;
+const BOB_PERIOD = 1.8;
 
-// 船体サイズ（Island local 単位）
-const HULL_LENGTH = 7.5;
-const HULL_WIDTH = 3;
-const HULL_HEIGHT = 1.2;
+// ジオラマなので寸法は小さめ
+const HULL_LENGTH = 3.8;
+const HULL_WIDTH = 1.4;
+const HULL_HEIGHT = 0.6;
 
 const dir = new THREE.Vector3();
 
@@ -39,7 +38,6 @@ export function Boat() {
   useFrame((state) => {
     if (!groupRef.current) return;
 
-    // 1 サイクル = 港停泊 → A→B 移動 → 沖停泊 → B→A 移動
     const cycle =
       PORT_PAUSE_SECONDS +
       TRAVEL_SECONDS +
@@ -50,36 +48,29 @@ export function Boat() {
     let progress: number;
     let heading: 1 | -1 | 0;
     if (s < PORT_PAUSE_SECONDS) {
-      // 港で停泊
       progress = 0;
       heading = 0;
     } else if (s < PORT_PAUSE_SECONDS + TRAVEL_SECONDS) {
-      // A → B
       progress = (s - PORT_PAUSE_SECONDS) / TRAVEL_SECONDS;
       heading = 1;
     } else if (
       s <
       PORT_PAUSE_SECONDS + TRAVEL_SECONDS + OFFSHORE_PAUSE_SECONDS
     ) {
-      // 沖で停泊
       progress = 1;
       heading = 0;
     } else {
-      // B → A
       const traveled =
         s - PORT_PAUSE_SECONDS - TRAVEL_SECONDS - OFFSHORE_PAUSE_SECONDS;
       progress = 1 - traveled / TRAVEL_SECONDS;
       heading = -1;
     }
 
-    // 位置
     groupRef.current.position.lerpVectors(ANCHOR_A, ANCHOR_B, progress);
-    // 揺れ（Y だけ小さく上下）
     groupRef.current.position.y +=
       Math.sin(state.clock.elapsedTime * ((Math.PI * 2) / BOB_PERIOD)) *
       BOB_AMPLITUDE;
 
-    // 進行方向を向く。停泊中は直前の向きを維持したいので heading==0 なら更新しない
     if (heading !== 0) {
       dir.subVectors(ANCHOR_B, ANCHOR_A);
       if (heading === -1) dir.negate();
@@ -89,30 +80,35 @@ export function Boat() {
 
   return (
     <group ref={groupRef}>
-      {/* 船体下部（白） */}
+      {/* 船体下部（コーラルレッド） */}
       <mesh position={[0, HULL_HEIGHT / 2, 0]}>
         <boxGeometry args={[HULL_WIDTH, HULL_HEIGHT, HULL_LENGTH]} />
-        <meshStandardMaterial color="#F5F7F5" roughness={0.9} />
+        <meshStandardMaterial color="#BC5643" roughness={0.9} flatShading />
       </mesh>
-      {/* 喫水線ライン（濃紺・細帯） */}
-      <mesh position={[0, 0.1, 0]}>
-        <boxGeometry args={[HULL_WIDTH + 0.02, 0.15, HULL_LENGTH + 0.02]} />
-        <meshStandardMaterial color="#1F3A5F" roughness={0.9} />
+      {/* 喫水線（濃紺の細帯） */}
+      <mesh position={[0, 0.08, 0]}>
+        <boxGeometry args={[HULL_WIDTH + 0.03, 0.08, HULL_LENGTH + 0.03]} />
+        <meshStandardMaterial color="#22454B" roughness={0.9} flatShading />
       </mesh>
-      {/* 上部構造（白） */}
-      <mesh position={[0, HULL_HEIGHT + 0.9, -0.3]}>
-        <boxGeometry args={[HULL_WIDTH * 0.85, 1.8, HULL_LENGTH * 0.55]} />
-        <meshStandardMaterial color="#FFFFFF" roughness={0.9} />
+      {/* デッキ（クリーム） */}
+      <mesh position={[0, HULL_HEIGHT + 0.05, 0]}>
+        <boxGeometry args={[HULL_WIDTH * 0.9, 0.1, HULL_LENGTH * 0.9]} />
+        <meshStandardMaterial color="#FFE6BD" roughness={0.95} flatShading />
       </mesh>
-      {/* ブリッジ（さらに一段上、白） */}
-      <mesh position={[0, HULL_HEIGHT + 2.2, -0.6]}>
-        <boxGeometry args={[HULL_WIDTH * 0.55, 0.9, HULL_LENGTH * 0.28]} />
-        <meshStandardMaterial color="#FFFFFF" roughness={0.9} />
+      {/* キャビン（白） */}
+      <mesh position={[0, HULL_HEIGHT + 0.5, -0.15]}>
+        <boxGeometry args={[HULL_WIDTH * 0.75, 0.8, HULL_LENGTH * 0.5]} />
+        <meshStandardMaterial color="#F0EDE4" roughness={0.9} flatShading />
       </mesh>
-      {/* 煙突（黄アクセント） */}
-      <mesh position={[0, HULL_HEIGHT + 2.9, -0.6]}>
-        <boxGeometry args={[HULL_WIDTH * 0.28, 0.55, HULL_LENGTH * 0.14]} />
-        <meshStandardMaterial color="#F2C94C" roughness={0.9} />
+      {/* ブリッジ（もう一段） */}
+      <mesh position={[0, HULL_HEIGHT + 1.1, -0.3]}>
+        <boxGeometry args={[HULL_WIDTH * 0.5, 0.4, HULL_LENGTH * 0.25]} />
+        <meshStandardMaterial color="#F0EDE4" roughness={0.9} flatShading />
+      </mesh>
+      {/* 煙突（マスタード） */}
+      <mesh position={[0, HULL_HEIGHT + 1.55, -0.3]}>
+        <cylinderGeometry args={[0.15, 0.15, 0.35, 8]} />
+        <meshStandardMaterial color="#E8CE73" roughness={0.9} flatShading />
       </mesh>
     </group>
   );

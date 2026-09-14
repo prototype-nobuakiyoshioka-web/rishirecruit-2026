@@ -4,7 +4,12 @@ import { ScrollControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useState } from "react";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
+import { Airplane } from "./Airplane";
 import { Background } from "./Background";
+import { Birds } from "./Birds";
+import { Boat } from "./Boat";
+import { Clouds } from "./Clouds";
+import { FishingBoats } from "./FishingBoats";
 import { IslandModel } from "./IslandModel";
 import { PinLayer } from "./PinLayer";
 
@@ -46,6 +51,11 @@ export function IslandCanvas() {
         <Suspense fallback={null}>
           <IslandModel isMobile={isMobile}>
             {SHOW_PINS && <PinLayer activeAreaSlug={activeAreaSlug} />}
+            <Airplane />
+            <Boat />
+            <FishingBoats />
+            <Birds />
+            <Clouds />
           </IslandModel>
         </Suspense>
       </ScrollControls>

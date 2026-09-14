@@ -7,12 +7,12 @@ import * as THREE from "three";
 import type { Group } from "three";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
-const MODEL_PATH = "/models/rishiri-miniature.glb";
-const MOBILE_MODEL_PATH = "/models/rishiri-miniature-mobile.glb";
+const MODEL_PATH = "/models/rishiri-miniature.glb?v=otatomari-1";
+const MOBILE_MODEL_PATH = "/models/rishiri-miniature-mobile.glb?v=otatomari-1";
 // 1km=5単位の GLB を既存の画面レイアウトに合わせる倍率。
 // PC / SP で見え方が異なるため個別に持つ。値を下げると小さく、上げると大きくなる。
-const MODEL_BASE_SCALE_DESKTOP = 0.04;
-const MODEL_BASE_SCALE_MOBILE = 1;
+const MODEL_BASE_SCALE_DESKTOP = 0.048;
+const MODEL_BASE_SCALE_MOBILE = 1.15;
 // SP 時にカメラの注視点を下にずらすことで、島を画面上方向へ寄せる。
 // カメラを寝かせた（DIRECTION Y=6）ので、LOOKAT も控えめに。
 const MOBILE_LOOKAT_Y_OFFSET = 15;
@@ -32,12 +32,26 @@ interface IslandModelProps {
   isMobile?: boolean;
 }
 
+// 表示から除外する GLB ノード名（親グループを丸ごと非表示にする）。
+// - Vegetation: 木（Leaves + Trunk）
+// - Terrain_Cliff: 島の土台の縁（厚みのあるベージュのプラットフォーム）
+const HIDDEN_NODE_NAMES = ["Vegetation", "Terrain_Cliff"];
+
 export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   const { scene } = useGLTF(isMobile ? MOBILE_MODEL_PATH : MODEL_PATH, "/draco/") as unknown as {
     scene: THREE.Group;
   };
   // GLB のパステル色とベベル法線をそのまま使用する。
   const islandObject = scene;
+
+  // 指定ノード（木＝Vegetation）を非表示にする。GLB からは消さず visible = false のみ。
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (HIDDEN_NODE_NAMES.includes(child.name)) {
+        child.visible = false;
+      }
+    });
+  }, [scene]);
 
   const { camera, size: viewportSize } = useThree();
   const viewportHeight = viewportSize.height;

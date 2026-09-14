@@ -1,0 +1,5 @@
+{
+  "minimum": 0.0036333799362182617,
+  "intersecting_frames": [],
+  "method": "301 samples along the route, aircraft mesh vertices at scale 0.8 vs highest desktop terrain/building/landmark surface. Static propeller orientation. Not a continuous collision proof."
+}

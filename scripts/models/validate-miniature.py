@@ -16,7 +16,7 @@ r=next(e for e in data if e['type']=='relation' and e['id']==4088083)
 rings=namespace['join_lines']([namespace['geom'](m['geometry']) for m in r['members'] if m.get('role')=='outer' and m.get('geometry')])
 inside=namespace['inside']
 report={}
-for name in ['Buildings','Roads']:
+for name in ['Buildings','Roads','Landmarks']:
     count=0;bad=0
     for obj in bpy.data.collections[name].objects:
         if obj.type!='MESH':continue
@@ -25,8 +25,10 @@ for name in ['Buildings','Roads']:
             count+=1
             if not any(inside((center.x,center.y),ring[:-1]) for ring in rings):bad+=1
     report[name]={'faces':count,'outside_town_face_centers':bad}
-report['groups']=[c for c in ['Terrain','Buildings','Roads','Vegetation','Water'] if bpy.data.collections.get(c)]
+report['groups']=[c for c in ['Terrain','Buildings','Roads','Vegetation','Water','Landmarks'] if bpy.data.collections.get(c)]
+report['landmark_names']=[o.name for o in bpy.data.objects['Landmarks'].children]
+assert set(report['landmark_names'])=={p['id'] for p in json.loads((SOURCE/'landmarks.json').read_text())}
 report['textures']=len(bpy.data.images)-len([i for i in bpy.data.images if i.name in ['Render Result','Viewer Node']])
 (SOURCE/'validation.json').write_text(json.dumps(report,indent=2))
 print('GEOGRAPHY_VALIDATION',json.dumps(report))
-assert all(report[n]['outside_town_face_centers']==0 for n in ['Buildings','Roads'])
+assert all(report[n]['outside_town_face_centers']==0 for n in ['Buildings','Roads','Landmarks'])

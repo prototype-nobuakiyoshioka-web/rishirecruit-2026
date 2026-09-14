@@ -287,8 +287,9 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 <!-- 作業を進めるたびにここを更新する -->
 - [x] **Phase 1: 要件定義・設計** — 完了(`docs/` 配下 5 ファイル + `reference/` の HTML)
 - [ ] **Phase 2: 3Dアセット制作** — パステル調ミニチュア版を作成・組み込み済み（2026-09-14）。実機性能・最終デザイン確認は継続
-  - [x] Googleマップの地形表示を参照し、国土地理院DEM + OSM海岸線・町境・道路・建物からGLBを生成。建物83棟・樹木330本、人物/動物なし、構造物は利尻富士町内。PC=96,498三角形/890,572 bytes、SP=69,362三角形/814,132 bytes。5グループ・22材質・テクスチャ0・Draco圧縮
+  - [x] Googleマップの地形表示を参照し、国土地理院DEM + OSM海岸線・町境・道路・建物からGLBを生成。一般建物68棟・一般樹木330本、GLB内は人物/動物なし、構造物は利尻富士町内。PC=99,789三角形/1,060,024 bytes、SP=77,457三角形/946,596 bytes。6グループ・29材質・テクスチャ0・Draco圧縮
   - [x] 編集用 `reference/island-source/rishiri-miniature.blend`、再生成/検証 `scripts/models/`、制作仕様・出典・精度上の限界 `docs/07-island-miniature.md`。既存の回転・エリア切替を維持し、ピン座標を新モデルに対応
+  - [x] ペシ岬・利尻空港・鴛泊フェリーターミナル・役場・役場前公園・姫沼・沼浦展望台を名前付き `Landmarks` グループで強調（PC/SP）。参照と配置補正は `docs/08-island-landmarks.md`。現行のスクロール・表示倍率を維持。PC/SP幅の読み込み・回転とエリア切替、型チェック、対象ESLint、町境とメッシュ面中心の照合を確認済み
 - [x] **Phase 3: WordPress 構築** — **完了**
   - [x] Task 01: テーマ基盤 + 4CPT 登録(job_posting/touristspot/event/testimonial)
   - [x] Task 02: WPGraphQL + CORS + ヘッドレス強化
@@ -311,6 +312,7 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [x] Task 13: WPGraphQL クライアントセットアップ + 一覧ページ実データ接続
   - [x] Task 14: 詳細ページ実データ接続 + `generateStaticParams`
 - [ ] **Phase 5: 3Dシーン実装** — 進行中
+  - [x] パステル調の小型双発機を空港から離陸させる演出（2026-09-14）。`rishiri-airplane.glb` は168,328 bytes・4,044三角形・6材質・テクスチャ0。滑走路の地形座標に接地し、3秒待機→約30秒の離陸・上空への飛行を反復。既存スクロールに追従。再生成・仕様は `docs/09-airport-flight.md`
   - [x] 鴛泊・鬼脇のエリアピン + Billboard表示
   - [x] スクロール量によるエリア自動切替
   - [x] エリア情報パネル + WordPress実データ投稿スライダー

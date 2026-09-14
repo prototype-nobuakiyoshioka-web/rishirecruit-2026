@@ -3,7 +3,7 @@
 Reproducible, texture-free diorama. Geographic source coordinates stay in the
 JSON; Blender Z-up becomes glTF Y-up. Buildings are deliberately exaggerated.
 """
-import bpy, json, math, pathlib, random
+import bpy, json, math, pathlib, random, sys
 from mathutils import Vector
 from mathutils.geometry import delaunay_2d_cdt
 from mathutils.bvhtree import BVHTree
@@ -12,13 +12,16 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'reference/island-source'
 OUTPUT = ROOT / 'public/models'
 ART = ROOT / 'artifacts/island-miniature'
+sys.dont_write_bytecode=True
+sys.path.insert(0,str(ROOT/'scripts/models'))
+from landmark_geometry import create_landmarks
 random.seed(914)
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):
     if c.name != 'Collection': bpy.data.collections.remove(c)
 COLS={}
-for name in ['Terrain','Buildings','Roads','Vegetation','Water','Presentation']:
+for name in ['Terrain','Buildings','Roads','Vegetation','Water','Landmarks','Presentation']:
     c=bpy.data.collections.new(name); bpy.context.scene.collection.children.link(c); COLS[name]=c
 
 def move(obj, category):
@@ -72,6 +75,10 @@ SX=111.32*5; SY=111.32*math.cos(math.radians(LAT0))*5
 
 def xy(lon,lat): return ((lat-LAT0)*SX,-(lon-LON0)*SY)
 def lonlat(x,y): return (LON0-y/SY,LAT0+x/SX)
+landmarks=json.loads((SOURCE/'landmarks.json').read_text())
+landmark_reserves=[(*xy(item['lon'],item['lat']),*item['offset'],item['clearance']) for item in landmarks]
+def reserved_for_landmark(x,y):
+    return any(math.hypot(x-a-dx,y-b-dy)<r for a,b,dx,dy,r in landmark_reserves)
 TILES={}
 for path in SOURCE.glob('dem-*.txt'):
     _,z,x,y=path.stem.split('-')
@@ -87,7 +94,22 @@ def dem(lon,lat):
     return (get(a,b)*(1-u)+get(a+1,b)*u)*(1-v)+(get(a,b+1)*(1-u)+get(a+1,b+1)*u)*v
 
 def height(x,y):
-    return .7+dem(*lonlat(x,y))*.0125
+    h=.7+dem(*lonlat(x,y))*.0125
+    # Flatten only the exaggerated Hime Pond basin; blend back to the DEM.
+    px,py=xy(141.24565748,45.22662358)
+    radius=math.hypot((x-px)/3.25,(y-py)/2.65)
+    if radius<1.4:
+        pond=.7+dem(141.24565748,45.22662358)*.0125
+        t=max(0,min(1,(radius-1)/.4));t=t*t*(3-2*t)
+        h=pond*(1-t)+h*t
+    # The enlarged Otatomari shoreline needs a level basin beside Numaura hill.
+    px,py=xy(141.28506738620695,45.12043761379311);px+=1.6;py+=.4
+    radius=math.hypot((x-px)/2.3,(y-py)/2.05)
+    if radius<1.35:
+        pond=.7+dem(*lonlat(px,py))*.0125
+        t=max(0,min(1,(radius-1)/.35));t=t*t*(3-2*t)
+        h=pond*(1-t)+h*t
+    return h
 
 def geom(points):return [xy(p['lon'],p['lat']) for p in points]
 def inside(p,poly):
@@ -214,7 +236,7 @@ for way in buildings:
     poly=geom(way['geometry'])[:-1]
     if len(poly)<3:continue
     p=(sum(x for x,y in poly)/len(poly),sum(y for x,y in poly)/len(poly))
-    if not in_town(p) or not inside(p,outline):continue
+    if not in_town(p) or not inside(p,outline) or reserved_for_landmark(*p):continue
     source_p=p
     # Toy houses are wider than their mapped footprint: nudge inland away from
     # the nearest road, never outside the municipality or the coastline.
@@ -251,7 +273,7 @@ for way in ways:
 
 lakes=[]
 for way in ways:
-    if way.get('tags',{}).get('natural')!='water':continue
+    if way.get('tags',{}).get('natural')!='water' or way['id'] in [442979645,416887304]:continue
     poly=geom(way['geometry'])
     if len(poly)<4 or not all(in_town(p) for p in poly):continue
     lake=mesh('Lake_'+str(way['id']),[(x,y,surface(x,y)+.09) for x,y in poly[:-1]],[list(range(len(poly)-1))],'Lagoon','Water')
@@ -261,7 +283,7 @@ for way in ways:
 trees=[]
 for _ in range(3500):
     x,y=random.uniform(-43,44),random.uniform(-43,40)
-    if not in_town((x,y)) or not inside((x,y),outline):continue
+    if not in_town((x,y)) or not inside((x,y),outline) or reserved_for_landmark(x,y):continue
     alt=surface(x,y)
     if not 1.3<alt<9.5:continue
     if min((math.dist((x,y),p) for p in occupied),default=100)<1.4:continue
@@ -283,6 +305,8 @@ for i,(x,y) in enumerate(outline):
     bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=random.uniform(.22,.5),location=(x,y,height(x,y)+.07))
     obj=move(bpy.context.object,'Terrain');obj.name='Coastal_pebble';obj.scale.z=.55;obj.data.materials.append(M['Rock']);bevel(obj,.06,1)
 
+create_landmarks(locals())
+
 # Merge by shared material inside each semantic collection to bound draw calls.
 for category in ['Terrain','Buildings','Roads','Vegetation','Water']:
     groups={}
@@ -299,12 +323,18 @@ for category in ['Terrain','Buildings','Roads','Vegetation','Water']:
             bpy.context.view_layer.objects.active=obj
             mod=obj.modifiers.new('Reduce tiny bevel facets','DECIMATE');mod.ratio=.65
             bpy.ops.object.modifier_apply(modifier=mod.name)
+    if category=='Vegetation':
+        for obj in COLS[category].objects:
+            if obj.type!='MESH':continue
+            bpy.context.view_layer.objects.active=obj
+            mod=obj.modifiers.new('Background forest budget','DECIMATE');mod.ratio=.64
+            bpy.ops.object.modifier_apply(modifier=mod.name)
     parent=bpy.data.objects.new(category,None);COLS[category].objects.link(parent)
     for obj in list(COLS[category].objects):
         if obj!=parent:obj.parent=parent
 
 bpy.ops.object.select_all(action='DESELECT')
-for cat in ['Terrain','Buildings','Roads','Vegetation','Water']:
+for cat in ['Terrain','Buildings','Roads','Vegetation','Water','Landmarks']:
     for obj in COLS[cat].objects:obj.select_set(True)
 
 # Khronos Draco preserves the monochrome palette without image textures.
@@ -333,7 +363,7 @@ bpy.ops.wm.save_as_mainfile(filepath=str(SOURCE/'rishiri-miniature.blend'))
 scene.render.filepath=str(ART/'model-preview.png');bpy.ops.render.render(write_still=True)
 
 bpy.ops.object.select_all(action='DESELECT')
-for cat in ['Terrain','Buildings','Roads','Vegetation','Water']:
+for cat in ['Terrain','Buildings','Roads','Vegetation','Water','Landmarks']:
     for obj in COLS[cat].objects:
         obj.select_set(True)
         if obj.type=='MESH' and cat in ['Terrain','Vegetation']:
@@ -342,6 +372,6 @@ for cat in ['Terrain','Buildings','Roads','Vegetation','Water']:
             bpy.ops.object.modifier_apply(modifier=mod.name)
 bpy.ops.export_scene.gltf(filepath=str(OUTPUT/'rishiri-miniature-mobile.glb'),**kwargs)
 mobile_triangles=sum(sum(len(p.vertices)-2 for p in o.data.polygons) for name,c in COLS.items() if name!='Presentation' for o in c.objects if o.type=='MESH')
-manifest={'boundary_relation':boundary['id'],'source_building_count':len(buildings),'representative_buildings':selected_buildings,'tree_count':len(trees),'harbour_segments':ports,'lake_osm_ids':lakes,'desktop_triangles':base_triangles,'mobile_triangles':mobile_triangles,'pins':pins,'coordinate_system':{'origin':[LON0,LAT0],'units_per_km':5,'vertical_exaggeration':2.5,'gltf_axes':'X north, Y up, Z east'},'attribution':'国土地理院の標高タイルを加工して作成 / © OpenStreetMap contributors'}
+manifest={'landmarks':landmarks,'boundary_relation':boundary['id'],'source_building_count':len(buildings),'representative_buildings':selected_buildings,'tree_count':len(trees),'harbour_segments':ports,'lake_osm_ids':lakes,'desktop_triangles':base_triangles,'mobile_triangles':mobile_triangles,'pins':pins,'coordinate_system':{'origin':[LON0,LAT0],'units_per_km':5,'vertical_exaggeration':2.5,'gltf_axes':'X north, Y up, Z east'},'attribution':'国土地理院の標高タイルを加工して作成 / © OpenStreetMap contributors'}
 (SOURCE/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 print('MINIATURE_RESULT',json.dumps({k:v for k,v in manifest.items() if k!='representative_buildings'},ensure_ascii=False))

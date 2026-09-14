@@ -5,51 +5,54 @@ import { useRef } from "react";
 import type { Group } from "three";
 
 /**
- * 島の周辺に浮かぶ小型漁船。IslandModel group の子として配置し、
- * 島と一緒に回転・スケールする。移動はせず、その場でわずかに上下・揺れる。
+ * 島の南岸沖に浮かぶチビ・ジオラマ調の小さな漁船群。
+ * その場で穏やかに上下・左右にゆれる（移動なし）。
  */
 
 type BoatDef = {
   position: [number, number, number];
-  yaw: number;                // 向き（rad）
-  bobPhase: number;           // 上下揺れの位相
-  rollPhase: number;          // 揺れの位相
-  color: string;              // 船体色
+  yaw: number;
+  bobPhase: number;
+  rollPhase: number;
+  color: string;      // 船体色
+  accent: string;     // 屋根アクセント
 };
 
-// Island local 座標
+// Island local 座標（新 GLB スケール、鬼脇側の海岸沖に寄せて配置）
 const FISHING_BOATS: BoatDef[] = [
   {
-    position: [-50, 0.4, -6],
+    position: [-27, 0.3, 35],
     yaw: 0.6,
     bobPhase: 0,
     rollPhase: 0,
-    color: "#D9822B", // オレンジ系
+    color: "#D9822B", // 温かいオレンジ
+    accent: "#F0EDE4",
   },
   {
-    position: [-55, 0.4, -1],
+    position: [-30, 0.3, 38],
     yaw: -0.2,
     bobPhase: 1.4,
     rollPhase: 0.7,
-    color: "#3B7DBF", // 青系
+    color: "#386F67", // ティール
+    accent: "#FFE6BD",
   },
   {
-    position: [-48, 0.4, 3],
+    position: [-24, 0.3, 39],
     yaw: 1.2,
     bobPhase: 2.7,
     rollPhase: 1.3,
-    color: "#C0392B", // 赤系
+    color: "#BC5643", // コーラル
+    accent: "#F0EDE4",
   },
 ];
 
-// 船体寸法（小さめ、Island local 単位）
-const HULL_LENGTH = 3.2;
-const HULL_WIDTH = 1.1;
-const HULL_HEIGHT = 0.55;
+const HULL_LENGTH = 1.6;
+const HULL_WIDTH = 0.65;
+const HULL_HEIGHT = 0.3;
 
-const BOB_AMPLITUDE = 0.12;
+const BOB_AMPLITUDE = 0.06;
 const BOB_PERIOD = 2.4;
-const ROLL_AMPLITUDE = 0.06;
+const ROLL_AMPLITUDE = 0.05;
 const ROLL_PERIOD = 3.1;
 
 export function FishingBoats() {
@@ -83,27 +86,25 @@ function FishingBoat({ def }: { def: BoatDef }) {
       position={def.position}
       rotation={[0, def.yaw, 0]}
     >
-      {/* 船体（色付き） */}
+      {/* 船体（丸みのあるずんぐりバスタブ形状） */}
       <mesh position={[0, HULL_HEIGHT / 2, 0]}>
         <boxGeometry args={[HULL_WIDTH, HULL_HEIGHT, HULL_LENGTH]} />
         <meshStandardMaterial color={def.color} roughness={0.9} flatShading />
       </mesh>
-      {/* デッキ（白木の甲板） */}
+      {/* デッキ（クリーム） */}
       <mesh position={[0, HULL_HEIGHT + 0.02, 0]}>
-        <boxGeometry args={[HULL_WIDTH * 0.9, 0.06, HULL_LENGTH * 0.9]} />
-        <meshStandardMaterial color="#E8DDC1" roughness={0.95} flatShading />
+        <boxGeometry args={[HULL_WIDTH * 0.85, 0.04, HULL_LENGTH * 0.85]} />
+        <meshStandardMaterial color="#EDD9B5" roughness={0.95} flatShading />
       </mesh>
-      {/* 操舵室（小さな箱） */}
-      <mesh position={[0, HULL_HEIGHT + 0.35, -HULL_LENGTH * 0.15]}>
-        <boxGeometry
-          args={[HULL_WIDTH * 0.55, 0.55, HULL_LENGTH * 0.28]}
-        />
-        <meshStandardMaterial color="#F5F5F0" roughness={0.9} flatShading />
+      {/* キャビン */}
+      <mesh position={[0, HULL_HEIGHT + 0.2, -0.15]}>
+        <boxGeometry args={[HULL_WIDTH * 0.5, 0.3, HULL_LENGTH * 0.3]} />
+        <meshStandardMaterial color={def.accent} roughness={0.9} flatShading />
       </mesh>
-      {/* マスト */}
-      <mesh position={[0, HULL_HEIGHT + 0.95, 0]}>
-        <cylinderGeometry args={[0.05, 0.05, 1.2, 6]} />
-        <meshStandardMaterial color="#5C4A2E" roughness={0.9} flatShading />
+      {/* 屋根（アクセント色） */}
+      <mesh position={[0, HULL_HEIGHT + 0.36, -0.15]}>
+        <boxGeometry args={[HULL_WIDTH * 0.55, 0.05, HULL_LENGTH * 0.34]} />
+        <meshStandardMaterial color={def.color} roughness={0.9} flatShading />
       </mesh>
     </group>
   );

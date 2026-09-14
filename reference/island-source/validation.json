@@ -1,10 +1,14 @@
 {
   "Buildings": {
-    "faces": 18615,
+    "faces": 15943,
     "outside_town_face_centers": 0
   },
   "Roads": {
     "faces": 4112,
+    "outside_town_face_centers": 0
+  },
+  "Landmarks": {
+    "faces": 10118,
     "outside_town_face_centers": 0
   },
   "groups": [
@@ -12,7 +16,18 @@
     "Buildings",
     "Roads",
     "Vegetation",
-    "Water"
+    "Water",
+    "Landmarks"
+  ],
+  "landmark_names": [
+    "HimePond",
+    "NumauraViewpoint",
+    "OshidomariFerryTerminal",
+    "OtatomariPond",
+    "PeshiCape",
+    "RishiriAirport",
+    "RishirifujiTownHall",
+    "TownHallPark"
   ],
   "textures": 0
 }

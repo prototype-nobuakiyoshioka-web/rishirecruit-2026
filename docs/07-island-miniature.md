@@ -6,12 +6,12 @@
 
 | 用途 | ファイル | 容量 | 三角形 |
 | --- | --- | ---: | ---: |
-| PC用 | `public/models/rishiri-miniature.glb` | 890,572 bytes | 96,498 |
-| SP用 | `public/models/rishiri-miniature-mobile.glb` | 814,132 bytes | 69,362 |
+| PC用 | `public/models/rishiri-miniature.glb` | 1,060,024 bytes | 99,789 |
+| SP用 | `public/models/rishiri-miniature-mobile.glb` | 946,596 bytes | 77,457 |
 | 編集用 | `reference/island-source/rishiri-miniature.blend` | — | PCモデル |
 | 確認画像 | `artifacts/island-miniature/model-preview.png` | — | Blenderレンダー |
 
-GLBは `Terrain / Buildings / Roads / Vegetation / Water` の5ルートに分類。同一マテリアルのメッシュを各グループ内で結合し、22マテリアル、画像テクスチャ0、Draco圧縮。Three.js付属のDracoデコーダーを `public/draco/` に同梱して外部CDNへの依存を避けた。ライセンスは同ディレクトリ。
+GLBは `Terrain / Buildings / Roads / Vegetation / Water / Landmarks` の6ルートに分類。同一マテリアルのメッシュを各グループ内で結合し、29マテリアル、画像テクスチャ0、Draco圧縮。Three.js付属のDracoデコーダーを `public/draco/` に同梱して外部CDNへの依存を避けた。ライセンスは同ディレクトリ。
 
 Blenderファイルの `Presentation` はプレビュー用カメラ・照明・海面。Web用のGLBには含めない。再エクスポートするときは上記5グループのみを選択して出力する。
 
@@ -22,7 +22,7 @@ Blenderファイルの `Presentation` はプレビュー用カメラ・照明・
 - 海岸線、道路中心線、建物の元位置、港の防波堤、湖沼は[OpenStreetMap](https://www.openstreetmap.org/copyright)。取得日2026-09-14。町域は利尻富士町の行政界relation `4088083`。
 - [参考投稿](https://x.com/ouchi/status/2096060921785503819)の表示画像から、淡い配色、丸い樹冠、玩具のようなエッジを参照。キャラクターは制作対象外。
 - 水平方向は1km=5単位、標高は2.5倍に強調。海岸線は約70m間隔に簡略化。敷地ごとの精密な測量模型ではない。
-- 元の建物5,436件から、町内で道路や他の家と重ならない83棟を代表として配置。住宅の外観・屋根色はデザイン上の創作。実建物の個別形状を再現したものではない。視認性のため建物を拡大し、道路の直近では位置を最大約100m程度ずらす場合がある。元座標と表示座標は `manifest.json` に保存。
+- 元の建物5,436件から、町内で道路や他の家と重ならない68棟を代表として配置。住宅の外観・屋根色はデザイン上の創作。実建物の個別形状を再現したものではない。視認性のため建物を拡大し、道路の直近では位置を最大約100m程度ずらす場合がある。元座標と表示座標は `manifest.json` に保存。
 - 木330本は、町内の低・中標高帯へ景観表現として配置。個々の樹木の実測位置ではない。町域外は島全体のシルエットを構成する地形のみとし、構造物を配置しない。
 - 家屋・岩・防波堤はベベルを適用。建物の微小面とSP版の地形・植物はDecimateで削減。
 
@@ -51,3 +51,5 @@ Blenderファイルの `Presentation` はプレビュー用カメラ・照明・
 - `npm run typecheck` 通過。`npm run lint` はエラー0件、未変更の `Birds.tsx` に既存の未使用import警告1件。
 - `npm run build` 通過（Turbopackの内部ポート生成のため制限環境外で実行）。
 - iOS Safari / Android Chromeの実機での性能測定は未実施。
+
+7ランドマークの強調と配置補正・検証結果は [08-island-landmarks.md](08-island-landmarks.md) を参照。上記の容量・三角形数はランドマーク追加後の値。
