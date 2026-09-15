@@ -10,7 +10,7 @@ import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { getJobPostingBySlug, getJobPostings } from "@/lib/wp/queries/jobs";
 
 // ACFの雇用形態スラッグ → schema.org JobPosting の employmentType 列挙値。
-const SCHEMA_EMPLOYMENT_TYPE: Record<string, string> = { regular: "FULL_TIME", fiscal_year_full: "FULL_TIME", fiscal_year_part: "PART_TIME", entrusted: "CONTRACTOR", fixed_term: "TEMPORARY", temporary: "TEMPORARY" };
+const SCHEMA_EMPLOYMENT_TYPE: Record<string, string> = { seishain: "FULL_TIME", part_time: "PART_TIME", regular: "FULL_TIME", fiscal_year_full: "FULL_TIME", fiscal_year_part: "PART_TIME", entrusted: "CONTRACTOR", fixed_term: "TEMPORARY", temporary: "TEMPORARY" };
 
 type PageProps = { params: Promise<{ slug: string }> };
 export async function generateStaticParams() { return (await getJobPostings()).map((job) => ({ slug: job.slug })); }

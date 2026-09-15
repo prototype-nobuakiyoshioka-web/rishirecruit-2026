@@ -34,6 +34,8 @@ add_action('acf/init', function (): void {
                 'instructions' => '求人の雇用形態を選択してください。',
                 'required' => 1,
                 'choices' => [
+                    'seishain' => '正社員',
+                    'part_time' => 'アルバイト・パート',
                     'regular' => '正規職員',
                     'fiscal_year_full' => '会計年度任用（フル）',
                     'fiscal_year_part' => '会計年度任用（パート）',

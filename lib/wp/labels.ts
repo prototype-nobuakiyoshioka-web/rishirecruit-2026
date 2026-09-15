@@ -1,4 +1,6 @@
 export const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
+  seishain: "正社員",
+  part_time: "アルバイト・パート",
   regular: "正規職員",
   fiscal_year_full: "会計年度任用（フル）",
   fiscal_year_part: "会計年度任用（パート）",
