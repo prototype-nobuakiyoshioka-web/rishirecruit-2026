@@ -1,9 +1,29 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { trackEvent } from "@/lib/analytics";
 
 export function StickyApplyCta() {
+  // 応募フォームが画面内に入ったら sticky CTA を消す（単一 primary 原則）。
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
+  useEffect(() => {
+    const form = document.getElementById("apply-form");
+    if (!form) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsFormVisible(entry.isIntersecting),
+      {
+        // フォーム上端が視野に少し入っただけで CTA を退場させる。
+        rootMargin: "0px 0px -30% 0px",
+        threshold: 0,
+      },
+    );
+    observer.observe(form);
+    return () => observer.disconnect();
+  }, []);
+
   function handleClick() {
     // 応募CTAのクリックをGA4へ送信(応募フォーム到達の先行指標)。
     trackEvent("apply_cta_click", { location: "sticky" });
@@ -15,13 +35,21 @@ export function StickyApplyCta() {
 
   // 位置指定は外側ラッパーに持たせ、Button 側の押し込みアニメ(translate)と競合させない
   return (
-    <div className="fixed inset-x-[var(--space-4)] bottom-[var(--space-4)] z-40 md:inset-x-auto md:bottom-auto md:right-[var(--space-6)] md:top-1/2 md:w-40 md:-translate-y-1/2">
+    <div
+      aria-hidden={isFormVisible}
+      className="fixed inset-x-[var(--space-4)] bottom-[var(--space-4)] z-40 transition-opacity duration-300 md:inset-x-auto md:bottom-auto md:right-[var(--space-6)] md:top-1/2 md:w-40 md:-translate-y-1/2"
+      style={{
+        opacity: isFormVisible ? 0 : 1,
+        pointerEvents: isFormVisible ? "none" : "auto",
+      }}
+    >
       <Button
         type="button"
         onClick={handleClick}
         aria-label="応募フォームへ移動"
         fullWidth
         className="md:min-h-16"
+        tabIndex={isFormVisible ? -1 : 0}
       >
         応募する
       </Button>

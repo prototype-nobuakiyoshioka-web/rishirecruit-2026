@@ -216,8 +216,8 @@ export default async function VoicesPage() {
                 島で働くイメージが少し見えてきたら、現在募集中の仕事を確かめてみてください。
               </p>
             </div>
-            <Button variant="primary" href="/jobs">
-              募集中の仕事を見る →
+            <Button variant="aqua" href="/jobs">
+              求人一覧を見る →
             </Button>
           </div>
         </aside>

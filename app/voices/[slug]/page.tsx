@@ -185,7 +185,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
                 今募集中の仕事から、あなたに合う選択肢を確かめてください。
               </p>
             </div>
-            <Button variant="primary" href="/jobs">
+            <Button variant="aqua" href="/jobs">
               求人一覧を見る →
             </Button>
           </div>

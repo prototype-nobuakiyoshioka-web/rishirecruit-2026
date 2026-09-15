@@ -205,8 +205,8 @@ export default function MessagePage() {
                 気になる求人があるか、仕事内容や条件が自分に合うか。応募するかどうかは、それを確かめてからでかまいません。
               </p>
             </div>
-            <Button variant="primary" href="/jobs">
-              募集中の仕事を見る →
+            <Button variant="aqua" href="/jobs">
+              求人一覧を見る →
             </Button>
           </div>
           <div className="relative mx-auto mt-10 flex max-w-[1080px] flex-wrap gap-x-8 gap-y-4 border-t border-white/15 pt-8 text-sm font-bold text-[color:var(--c-ice)] md:text-base">

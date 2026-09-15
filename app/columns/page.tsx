@@ -60,7 +60,7 @@ export default async function ColumnsPage() {
                     }
                   />
                 </a>
-                <div className="mt-6 grid gap-4 md:grid-cols-[1fr_auto] md:items-start">
+                <div className="mt-6 flex flex-col gap-4">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">
                       Column {String(index + 1).padStart(2, "0")}
