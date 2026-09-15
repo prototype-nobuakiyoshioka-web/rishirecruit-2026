@@ -166,7 +166,7 @@ export default function ContactPage() {
       introEyebrow="Before you contact"
       introLabel="お問い合わせの前に"
       introTitle={<>応募する前でも、<br />聞いて大丈夫です。</>}
-      introBody="住まい、冬の生活、働き方、イベントや観光について。情報を見ても分からないことや、誰に聞けばよいか迷うことをお送りください。正式な求人応募は、各求人詳細ページの応募フォームから受け付けています。"
+      introBody="住まい、冬の生活、働き方、イベントや観光について。情報を見ても分からないことや、誰に聞けばよいか迷うことをお送りください。求人応募は、各求人詳細ページの応募フォームから受け付けています。"
     >
       <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
         {isSubmitted ? (

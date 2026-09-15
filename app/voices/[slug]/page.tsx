@@ -83,15 +83,20 @@ export default async function VoiceDetailPage({ params }: PageProps) {
             ]}
           />
 
-          <div className="mt-12 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-20">
-            <div className="pb-2">
+          {/* lg 以上ではタイトルが画像上に重ねて表示される（不自然な改行防止）。
+              画像は絶対配置で背面に置き、テキストは背景色と同色の text-stroke で視認性を確保する。 */}
+          <div className="relative mt-12">
+            <div className="relative z-10 pb-2 lg:flex lg:min-h-[440px] lg:flex-col lg:justify-end lg:pr-0">
               <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
                 Voice / Interview
               </p>
               <p className="mt-5 text-sm font-bold text-[color:var(--c-deep-ocean)]/70">
                 {fields?.age ?? "移住者インタビュー"}
               </p>
-              <h1 className="mt-5 text-balance text-4xl font-black leading-tight tracking-[-0.03em] text-[color:var(--c-deep-ocean)] md:text-6xl">
+              <h1
+                className="mt-5 text-balance text-4xl font-black leading-tight tracking-[-0.03em] text-[color:var(--c-deep-ocean)] md:text-6xl"
+                style={{ WebkitTextStroke: "6px #2CA0BB", paintOrder: "stroke fill" }}
+              >
                 {fields?.catchCopy
                   ? splitByBr(fields.catchCopy).map((seg, i, arr) => (
                       <Fragment key={i}>
@@ -105,14 +110,16 @@ export default async function VoiceDetailPage({ params }: PageProps) {
                 {voice.title}
               </p>
             </div>
-            <Image
-              src={photo.sourceUrl}
-              alt={photo.altText || `${voice.title}の写真`}
-              width={1200}
-              height={900}
-              priority
-              className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover"
-            />
+            <div className="mt-10 lg:absolute lg:right-0 lg:top-1/2 lg:z-0 lg:mt-0 lg:w-[52%] lg:-translate-y-1/2">
+              <Image
+                src={photo.sourceUrl}
+                alt={photo.altText || `${voice.title}の写真`}
+                width={1200}
+                height={900}
+                priority
+                className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>

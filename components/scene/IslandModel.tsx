@@ -32,10 +32,11 @@ interface IslandModelProps {
   isMobile?: boolean;
 }
 
-// 表示から除外する GLB ノード名（親グループを丸ごと非表示にする）。
+// 表示から除外する GLB ノード名。完全一致 or "*" 接尾でプレフィックス一致。
 // - Vegetation: 木（Leaves + Trunk）
 // - Terrain_Cliff: 島の土台の縁（厚みのあるベージュのプラットフォーム）
-const HIDDEN_NODE_NAMES = ["Vegetation", "Terrain_Cliff"];
+// - HimePond*: 姫沼およびそのランドマーク一式（LandmarkGrass/Water/Wood/LeavesSage/Trunk）
+const HIDDEN_NODE_NAMES = ["Vegetation", "Terrain_Cliff", "HimePond*"];
 
 export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   const { scene } = useGLTF(isMobile ? MOBILE_MODEL_PATH : MODEL_PATH, "/draco/") as unknown as {
@@ -44,12 +45,16 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   // GLB のパステル色とベベル法線をそのまま使用する。
   const islandObject = scene;
 
-  // 指定ノード（木＝Vegetation）を非表示にする。GLB からは消さず visible = false のみ。
+  // 指定ノードを非表示にする。GLB からは消さず visible = false のみ。
+  // 名前末尾が "*" のパターンはプレフィックス一致で複数ノードを一括除外する。
   useEffect(() => {
     scene.traverse((child) => {
-      if (HIDDEN_NODE_NAMES.includes(child.name)) {
-        child.visible = false;
-      }
+      const hidden = HIDDEN_NODE_NAMES.some((pattern) =>
+        pattern.endsWith("*")
+          ? child.name.startsWith(pattern.slice(0, -1))
+          : child.name === pattern,
+      );
+      if (hidden) child.visible = false;
     });
   }, [scene]);
 

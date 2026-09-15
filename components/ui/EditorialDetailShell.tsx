@@ -19,9 +19,21 @@ export function EditorialDetailShell({ breadcrumbs, eyebrow, meta, title, lead, 
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-repeat opacity-[0.14] mix-blend-multiply" style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }} />
         <div className="relative mx-auto max-w-[var(--container-max)] px-[var(--space-6)]">
           <Breadcrumbs items={breadcrumbs} />
-          <div className="mt-12 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-20">
-            <div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">{eyebrow}</p>{meta ? <p className="mt-5 text-sm font-bold text-[color:var(--c-deep-ocean)]/70">{meta}</p> : null}<h1 className="mt-5 text-balance text-4xl font-black leading-tight tracking-[-0.03em] text-[color:var(--c-deep-ocean)] md:text-6xl">{title}</h1>{lead ? <p className="mt-6 max-w-2xl text-base font-bold leading-8 text-[color:var(--c-deep-ocean)]/75 md:text-lg">{lead}</p> : null}</div>
-            <Image src={image.sourceUrl} alt={image.altText || `${title}の写真`} width={1200} height={900} priority className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover" />
+          {/* lg 以上ではタイトルが画像上に重ねて表示される（不自然な改行防止）。
+              画像は絶対配置で背面に置き、テキストは背景色と同色の text-stroke で視認性を確保する。 */}
+          <div className="relative mt-12">
+            <div className="relative z-10 lg:flex lg:min-h-[440px] lg:flex-col lg:justify-end lg:pr-0">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">{eyebrow}</p>
+              {meta ? <p className="mt-5 text-sm font-bold text-[color:var(--c-deep-ocean)]/70">{meta}</p> : null}
+              <h1
+                className="mt-5 text-balance text-4xl font-black leading-tight tracking-[-0.03em] text-[color:var(--c-deep-ocean)] md:text-6xl"
+                style={{ WebkitTextStroke: "6px #2CA0BB", paintOrder: "stroke fill" }}
+              >{title}</h1>
+              {lead ? <p className="mt-6 max-w-2xl text-base font-bold leading-8 text-[color:var(--c-deep-ocean)]/75 md:text-lg">{lead}</p> : null}
+            </div>
+            <div className="mt-10 lg:absolute lg:right-0 lg:top-1/2 lg:z-0 lg:mt-0 lg:w-[52%] lg:-translate-y-1/2">
+              <Image src={image.sourceUrl} alt={image.altText || `${title}の写真`} width={1200} height={900} priority className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover" />
+            </div>
           </div>
         </div>
       </section>
