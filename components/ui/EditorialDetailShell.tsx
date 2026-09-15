@@ -1,6 +1,18 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+
+// 文字列値に含まれる <br /> や \n を実際の改行 (<br />) として描画する。
+// ACF textarea (new_lines: 'br') は保存時 \n → 出力時 <br /> に変換されるため、
+// そのままだと `<br />` が文字列として表示されてしまう問題を吸収する。
+function renderMultiline(value: ReactNode): ReactNode {
+  if (typeof value !== "string") return value;
+  const segments = value.split(/<br\s*\/?>|\n/gi).filter(Boolean);
+  if (segments.length <= 1) return value;
+  return segments.map((seg, i) => (
+    <Fragment key={i}>{i > 0 && <br />}{seg}</Fragment>
+  ));
+}
 
 type EditorialDetailShellProps = {
   breadcrumbs: Array<{ label: string; href?: string }>;
@@ -50,5 +62,5 @@ export function EditorialDetailSection({ eyebrow, label, children }: { eyebrow: 
 }
 
 export function EditorialFieldList({ items }: { items: Array<{ label: string; value: ReactNode }> }) {
-  return <dl className="border-t border-[color:var(--c-deep-ocean)]/15">{items.filter((item)=>item.value !== null && item.value !== undefined && item.value !== "").map((item)=><div key={item.label} className="grid grid-cols-[7rem_1fr] gap-5 border-b border-[color:var(--c-deep-ocean)]/15 py-5 text-sm md:grid-cols-[10rem_1fr] md:text-base"><dt className="font-bold text-[color:var(--c-text-secondary)]">{item.label}</dt><dd className="font-bold leading-7 text-[color:var(--c-text-primary)]">{item.value}</dd></div>)}</dl>;
+  return <dl className="border-t border-[color:var(--c-deep-ocean)]/15">{items.filter((item)=>item.value !== null && item.value !== undefined && item.value !== "").map((item)=><div key={item.label} className="grid grid-cols-[7rem_1fr] gap-5 border-b border-[color:var(--c-deep-ocean)]/15 py-5 text-sm md:grid-cols-[10rem_1fr] md:text-base"><dt className="font-bold text-[color:var(--c-text-secondary)]">{item.label}</dt><dd className="font-bold leading-7 text-[color:var(--c-text-primary)]">{renderMultiline(item.value)}</dd></div>)}</dl>;
 }
