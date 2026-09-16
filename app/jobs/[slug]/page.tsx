@@ -5,7 +5,7 @@ import { ApplyForm } from "@/components/job/ApplyForm";
 import { StickyApplyCta } from "@/components/layout/StickyApplyCta";
 import { EditorialDetailSection, EditorialDetailShell, EditorialFieldList } from "@/components/ui/EditorialDetailShell";
 import { SITE_URL, absoluteUrl, buildMetadata, ogImageFromField } from "@/lib/seo";
-import { htmlToText, imageFromField, selectFirst } from "@/lib/wp/format";
+import { htmlToText, selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { getJobPostingBySlug, getJobPostings } from "@/lib/wp/queries/jobs";
 
@@ -18,12 +18,12 @@ export async function generateMetadata({params}:PageProps):Promise<Metadata>{con
 
 export default async function JobDetailPage({ params }: PageProps) {
   const { slug } = await params; const job = await getJobPostingBySlug(slug); if (!job) notFound();
-  const fields=job.jobPostingFields; const type=selectFirst(fields?.employmentType); const typeLabel=type?(EMPLOYMENT_TYPE_LABELS[type]??type):"求人"; const image=imageFromField(fields?.thumbnailImage,"/placeholders/job.svg");
+  const fields=job.jobPostingFields; const type=selectFirst(fields?.employmentType); const typeLabel=type?(EMPLOYMENT_TYPE_LABELS[type]??type):"求人"; const imageNode=fields?.thumbnailImage?.node; const image=imageNode?.sourceUrl?{sourceUrl:imageNode.sourceUrl,altText:imageNode.altText||`${job.title}の求人写真`}:null;
   // Google for Jobs 向け JobPosting 構造化データ。取得済みフィールドのみで構成する(baseSalary等の未取得項目は省略)。
   const jobLd={"@context":"https://schema.org","@type":"JobPosting",title:job.title,description:htmlToText(fields?.description)||fields?.catchCopy||job.title,datePosted:job.date??undefined,employmentType:type?(SCHEMA_EMPLOYMENT_TYPE[type]??"OTHER"):undefined,hiringOrganization:{"@type":"Organization",name:"利尻富士町",sameAs:SITE_URL},jobLocation:{"@type":"Place",address:{"@type":"PostalAddress",addressRegion:"北海道",addressLocality:"利尻富士町",addressCountry:"JP",streetAddress:fields?.workAddress??undefined}},url:absoluteUrl(`/jobs/${slug}`)};
   return <>
     <JsonLd data={jobLd} />
-    <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"求人",href:"/jobs"},{label:job.title}]} eyebrow="Job / Open position" meta={typeLabel} title={job.title} lead={fields?.catchCopy} image={{...image,altText:image.altText||`${job.title}の求人写真`}}>
+    <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"求人",href:"/jobs"},{label:job.title}]} eyebrow="Job / Open position" meta={typeLabel} title={job.title} lead={fields?.catchCopy} image={image}>
       <EditorialDetailSection eyebrow="Overview" label="仕事について"><div className="grid gap-7 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">{htmlToText(fields?.description).split(/\n+/).filter(Boolean).map(p=><p key={p}>{p}</p>)}</div></EditorialDetailSection>
       <EditorialDetailSection eyebrow="Requirements" label="応募資格"><EditorialFieldList items={[{label:"必要資格・応募条件",value:fields?.requiredQualifications}]} /></EditorialDetailSection>
       <EditorialDetailSection eyebrow="Conditions" label="条件・待遇"><EditorialFieldList items={[{label:"雇用形態",value:typeLabel},{label:"職種カテゴリー",value:fields?.jobCategory},{label:"募集人数",value:fields?.recruitmentCount},{label:"給与",value:fields?.salary},{label:"給与詳細",value:fields?.salaryDetail},{label:"勤務時間",value:fields?.workHours},{label:"勤務時間詳細",value:fields?.workHoursDetail},{label:"休日・休暇",value:fields?.holiday},{label:"社会保険",value:fields?.socialInsurance},{label:"福利厚生",value:fields?.benefits},{label:"住居サポート",value:fields?.housingSupportAvailable?"あり":"なし"},{label:"住居サポート詳細",value:fields?.housingSupportAvailable?fields.housingSupportDetail:null},{label:"受動喫煙対策",value:fields?.smokingPolicy},{label:"試用・研修期間",value:fields?.trialPeriod}]} /></EditorialDetailSection>

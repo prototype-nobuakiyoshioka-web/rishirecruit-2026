@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { buildMetadata } from "@/lib/seo";
-import { imageFromField, selectFirst } from "@/lib/wp/format";
+import { selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { getJobPostings } from "@/lib/wp/queries/jobs";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
@@ -33,14 +33,17 @@ export default async function JobsPage() {
           {jobs.map((job, index) => {
             const fields = job.jobPostingFields;
             const employmentType = selectFirst(fields?.employmentType);
-            const image = imageFromField(fields?.thumbnailImage, "/placeholders/job.svg");
+            const imageUrl = fields?.thumbnailImage?.node?.sourceUrl ?? null;
+            const imageAlt = fields?.thumbnailImage?.node?.altText ?? `${job.title}の求人写真`;
             return (
               <article key={job.id} className={`${gridSpanClass(index)} overflow-hidden rounded-[var(--radius-2xl)] border border-[color:var(--c-deep-ocean)]/10 bg-white/55`}>
-                <Link href={`/jobs/${job.slug}`} aria-label={`${job.title}の求人詳細を見る`}>
-                  <div className="relative aspect-video w-full overflow-hidden bg-[color:var(--c-ice)]">
-                    <Image src={image.sourceUrl} alt={image.altText || `${job.title}の求人写真`} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-contain transition-transform duration-500 hover:scale-[1.02]" />
-                  </div>
-                </Link>
+                {imageUrl ? (
+                  <Link href={`/jobs/${job.slug}`} aria-label={`${job.title}の求人詳細を見る`}>
+                    <div className="relative aspect-video w-full overflow-hidden bg-[color:var(--c-ice)]">
+                      <Image src={imageUrl} alt={imageAlt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-contain transition-transform duration-500 hover:scale-[1.02]" />
+                    </div>
+                  </Link>
+                ) : null}
                 <div className="p-6 md:p-8">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">
                     {employmentType ? EMPLOYMENT_TYPE_LABELS[employmentType] ?? employmentType : "Job"}
