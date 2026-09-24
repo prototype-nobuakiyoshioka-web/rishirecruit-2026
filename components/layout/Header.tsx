@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -9,6 +10,7 @@ import {
   FooterLegalLinks,
   FooterOfficeInfo,
 } from "@/components/layout/FooterInfo";
+import { SITE_NAME } from "@/lib/seo";
 
 const NAV_ITEMS = [
   { label: "メッセージ", href: "/message" },
@@ -61,10 +63,19 @@ export function Header() {
       >
         <Link
           href="/"
-          className="flex min-h-11 items-center text-base font-bold tracking-normal text-[color:var(--c-deep-ocean)] md:text-lg"
+          className="flex min-h-11 items-center gap-[var(--space-2)] text-base font-bold tracking-normal text-[color:var(--c-deep-ocean)] md:text-lg"
+          aria-label={`${SITE_NAME} ホームへ`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          rishirecruit
+          <Image
+            src="/images/logo/site-logo.png"
+            alt=""
+            width={44}
+            height={44}
+            priority
+            className="h-9 w-9 md:h-10 md:w-10"
+          />
+          <span>リシリクルート</span>
         </Link>
 
         <nav className="hidden items-center md:flex" style={DESKTOP_NAV_STYLE}>

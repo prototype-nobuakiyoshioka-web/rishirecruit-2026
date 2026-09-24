@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "サイトリニューアル準備中｜Rishiri Recruit",
@@ -39,6 +40,19 @@ export default function ComingSoonPage() {
           gap: "clamp(1.25rem, 3.5dvh, 2.25rem)",
         }}
       >
+        {/* サイトロゴ */}
+        <Image
+          src="/images/logo/site-logo.png"
+          alt="Rishiri Recruit"
+          width={120}
+          height={120}
+          priority
+          style={{
+            width: "clamp(88px, 18vw, 128px)",
+            height: "auto",
+          }}
+        />
+
         {/* サイト名 */}
         <p
           style={{

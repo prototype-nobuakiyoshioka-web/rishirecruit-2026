@@ -9,6 +9,9 @@ import "./globals.css";
 
 const HOME_TITLE = `${SITE_NAME}｜利尻島の求人・移住・観光`;
 
+// サイトロゴ。サムネイル未設定ページの OGP フォールバック + タブアイコンで共用。
+const SITE_LOGO_PATH = "/images/logo/site-logo.png";
+
 export const metadata: Metadata = {
   // OGP/canonical の相対URLを絶対URLへ解決する基準。これが無いとOG画像が壊れる。
   metadataBase: new URL(SITE_URL),
@@ -20,6 +23,14 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   alternates: { canonical: "/" },
+  // favicon.ico は app/favicon.ico が自動採用される。ここではサイトロゴを補助アイコン
+  // (タブ・iOSホーム画面など)として追加登録する。
+  icons: {
+    icon: [
+      { url: SITE_LOGO_PATH, type: "image/png", sizes: "any" },
+    ],
+    apple: [{ url: SITE_LOGO_PATH, type: "image/png" }],
+  },
   // Next.js 側の公開サイトはインデックスさせる(WP側は inc/headless-config.php で noindex)。
   robots: { index: true, follow: true },
   openGraph: {
@@ -29,11 +40,22 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: HOME_TITLE,
     description: SITE_DESCRIPTION,
+    // 各詳細ページでサムネイル画像を openGraph.images に上書き設定するため、
+    // ここのロゴは"画像が指定されていないページ"のフォールバック扱い。
+    images: [
+      {
+        url: SITE_LOGO_PATH,
+        width: 799,
+        height: 799,
+        alt: SITE_NAME,
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title: HOME_TITLE,
     description: SITE_DESCRIPTION,
+    images: [SITE_LOGO_PATH],
   },
 };
 

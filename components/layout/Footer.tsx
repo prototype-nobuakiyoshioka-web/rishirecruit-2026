@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
 import {
@@ -35,8 +36,33 @@ const STATIC_INNER_STYLE: CSSProperties = {
 };
 
 function FooterContent({ compact = false }: { compact?: boolean }) {
+  const logoSize = compact ? 40 : 56;
   return (
     <div className={compact ? "text-xs leading-5" : "text-sm leading-6"}>
+      <div
+        className={
+          compact
+            ? "mb-[var(--space-3)] flex items-center gap-[var(--space-2)]"
+            : "mb-[var(--space-4)] flex items-center gap-[var(--space-3)]"
+        }
+      >
+        <Image
+          src="/images/logo/site-logo.png"
+          alt=""
+          width={logoSize}
+          height={logoSize}
+          className={compact ? "h-10 w-10" : "h-14 w-14"}
+        />
+        <span
+          className={
+            compact
+              ? "text-sm font-bold tracking-normal text-[color:var(--c-text-inverse)]"
+              : "text-lg font-bold tracking-normal text-[color:var(--c-text-inverse)]"
+          }
+        >
+          リシリクルート
+        </span>
+      </div>
       <FooterOfficeInfo />
       <FooterLegalLinks className="mt-[var(--space-4)] text-[color:var(--c-text-inverse)]/85" />
       <FooterCopyright className="mt-[var(--space-4)] text-[color:var(--c-text-inverse)]/75" />
