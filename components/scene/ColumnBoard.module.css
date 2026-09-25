@@ -72,7 +72,7 @@
 
 @media (width < 768px) {
   .board {
-    z-index: 50;
+    z-index: 49;
     bottom: calc(30dvh + var(--space-2));
     left: 4vw;
     width: 148px;
