@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { buildMetadata } from "@/lib/seo";
 import { formatEventPeriod } from "@/lib/utils/format-date";
-import { eventStatus, imageFromField, selectFirst } from "@/lib/wp/format";
+import { eventStatus, selectFirst } from "@/lib/wp/format";
 import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getEvents } from "@/lib/wp/queries/events";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
@@ -29,15 +29,18 @@ export default async function EventsPage() {
           {events.map((event, index) => {
             const fields = event.eventFields;
             const category = selectFirst(fields?.category);
-            const image = imageFromField(fields?.thumbnailImage, "/placeholders/event.svg");
+            const imageUrl = fields?.thumbnailImage?.node?.sourceUrl ?? null;
+            const imageAlt = fields?.thumbnailImage?.node?.altText ?? `${event.title}の写真`;
             const period = formatEventPeriod(fields?.dateDisplayType?.[0] ?? null, fields?.startDatetime ?? null, fields?.endDatetime ?? null, fields?.periodMonth?.[0] ?? null, fields?.periodRange?.[0] ?? null);
             return (
               <article key={event.id} className={gridSpanClass(index)}>
-                <Link href={`/events/${event.slug}`} aria-label={`${event.title}の詳細を見る`}>
-                  <div className="relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)]">
-                    <Image src={image.sourceUrl} alt={image.altText || `${event.title}の写真`} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-500 hover:scale-[1.02]" />
-                  </div>
-                </Link>
+                {imageUrl ? (
+                  <Link href={`/events/${event.slug}`} aria-label={`${event.title}の詳細を見る`}>
+                    <div className="relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)]">
+                      <Image src={imageUrl} alt={imageAlt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-500 hover:scale-[1.02]" />
+                    </div>
+                  </Link>
+                ) : null}
                 <div className="mt-6">
                   <div className="flex flex-wrap gap-3 text-xs font-black"><span className="text-[color:var(--c-warning)]">{category ? EVENT_CATEGORY_LABELS[category] ?? category : "Event"}</span><span className="text-[color:var(--c-text-secondary)]">{eventStatus(fields?.startDatetime)}</span></div>
                   <p className="mt-3 text-lg font-black text-[color:var(--c-deep-ocean)]">{period || "開催日調整中"}</p>

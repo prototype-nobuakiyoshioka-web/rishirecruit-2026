@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { buildMetadata } from "@/lib/seo";
-import { imageFromField, selectFirst } from "@/lib/wp/format";
+import { selectFirst } from "@/lib/wp/format";
 import { SPOT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getTouristspots } from "@/lib/wp/queries/spots";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
@@ -27,14 +27,17 @@ export default async function SpotsPage() {
           {spots.map((spot, index) => {
             const fields = spot.touristspotFields;
             const category = selectFirst(fields?.category);
-            const image = imageFromField(fields?.thumbnailImage, "/placeholders/spot.svg");
+            const imageUrl = fields?.thumbnailImage?.node?.sourceUrl ?? null;
+            const imageAlt = fields?.thumbnailImage?.node?.altText ?? `${spot.title}の風景`;
             return (
               <article key={spot.id} className={gridSpanClass(index)}>
-                <Link href={`/spots/${spot.slug}`} aria-label={`${spot.title}の詳細を見る`}>
-                  <div className="relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)]">
-                    <Image src={image.sourceUrl} alt={image.altText || `${spot.title}の風景`} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-500 hover:scale-[1.02]" />
-                  </div>
-                </Link>
+                {imageUrl ? (
+                  <Link href={`/spots/${spot.slug}`} aria-label={`${spot.title}の詳細を見る`}>
+                    <div className="relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)]">
+                      <Image src={imageUrl} alt={imageAlt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-500 hover:scale-[1.02]" />
+                    </div>
+                  </Link>
+                ) : null}
                 <div className="mt-6">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">{category ? SPOT_CATEGORY_LABELS[category] ?? category : "Spot"}</p>
                   <h2 className="mt-2 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">{spot.title}</h2>

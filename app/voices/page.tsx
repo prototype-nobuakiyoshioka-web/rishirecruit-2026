@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
-import { imageFromField, splitByBr } from "@/lib/wp/format";
+import { splitByBr } from "@/lib/wp/format";
 import { Button } from "@/components/ui/Button";
 import { VoiceVideoPlayer } from "@/components/ui/VoiceVideoPlayer";
 import { buildMetadata } from "@/lib/seo";
@@ -131,28 +131,27 @@ export default async function VoicesPage() {
             <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-12">
               {voices.map((voice, index) => {
                 const fields = voice.testimonialFields;
-                const photo = imageFromField(
-                  fields?.photo,
-                  "/placeholders/voice.svg",
-                  "移住者の声のプレースホルダー",
-                );
+                const photoUrl = fields?.photo?.node?.sourceUrl ?? null;
+                const photoAlt = fields?.photo?.node?.altText ?? `${voice.title}の写真`;
 
                 return (
                   <article key={voice.id} className={gridSpanClass(index)}>
-                    <Link
-                      href={`/voices/${voice.slug}`}
-                      aria-label={`${voice.title}の話を読む`}
-                    >
-                      <div className="relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)]">
-                        <Image
-                          src={photo.sourceUrl}
-                          alt={photo.altText || `${voice.title}の写真`}
-                          fill
-                          sizes="(min-width: 768px) 50vw, 100vw"
-                          className="object-cover transition-transform duration-500 hover:scale-[1.02]"
-                        />
-                      </div>
-                    </Link>
+                    {photoUrl ? (
+                      <Link
+                        href={`/voices/${voice.slug}`}
+                        aria-label={`${voice.title}の話を読む`}
+                      >
+                        <div className="relative aspect-[3/2] w-full overflow-hidden rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)]">
+                          <Image
+                            src={photoUrl}
+                            alt={photoAlt}
+                            fill
+                            sizes="(min-width: 768px) 50vw, 100vw"
+                            className="object-cover transition-transform duration-500 hover:scale-[1.02]"
+                          />
+                        </div>
+                      </Link>
+                    ) : null}
                     <div className="mt-6">
                       <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
                         Voice {String(index + 1).padStart(2, "0")}

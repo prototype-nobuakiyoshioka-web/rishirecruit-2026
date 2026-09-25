@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { EditorialDetailSection, EditorialDetailShell, EditorialFieldList } from "@/components/ui/EditorialDetailShell";
 import { absoluteUrl, buildMetadata, ogImageFromField } from "@/lib/seo";
 import { formatEventPeriod } from "@/lib/utils/format-date";
-import { eventStatus, galleryFromField, htmlToText, imageFromField, selectFirst } from "@/lib/wp/format";
+import { eventStatus, galleryFromField, htmlToText, selectFirst } from "@/lib/wp/format";
 import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getEventBySlug, getEvents } from "@/lib/wp/queries/events";
 
@@ -15,13 +15,13 @@ export async function generateStaticParams(){return(await getEvents()).map(event
 export async function generateMetadata({params}:PageProps):Promise<Metadata>{const{slug}=await params;const event=await getEventBySlug(slug);if(!event)return{};return buildMetadata({title:event.title,description:event.eventFields?.catchCopy??undefined,path:`/events/${slug}`,image:ogImageFromField(event.eventFields?.thumbnailImage,`${event.title}の写真`)});}
 
 export default async function EventDetailPage({params}:PageProps){
-  const{slug}=await params;const event=await getEventBySlug(slug);if(!event)notFound();const fields=event.eventFields;const category=selectFirst(fields?.category);const categoryLabel=category?(EVENT_CATEGORY_LABELS[category]??category):"Event";const image=imageFromField(fields?.thumbnailImage,"/placeholders/event.svg");const gallery=galleryFromField(fields?.galleryImages);const period=formatEventPeriod(fields?.dateDisplayType?.[0]??null,fields?.startDatetime??null,fields?.endDatetime??null,fields?.periodMonth?.[0]??null,fields?.periodRange?.[0]??null);
+  const{slug}=await params;const event=await getEventBySlug(slug);if(!event)notFound();const fields=event.eventFields;const category=selectFirst(fields?.category);const categoryLabel=category?(EVENT_CATEGORY_LABELS[category]??category):"Event";const imageNode=fields?.thumbnailImage?.node;const image=imageNode?.sourceUrl?{sourceUrl:imageNode.sourceUrl,altText:imageNode.altText||`${event.title}の写真`}:null;const gallery=galleryFromField(fields?.galleryImages);const period=formatEventPeriod(fields?.dateDisplayType?.[0]??null,fields?.startDatetime??null,fields?.endDatetime??null,fields?.periodMonth?.[0]??null,fields?.periodRange?.[0]??null);
   const ogImage=ogImageFromField(fields?.thumbnailImage);
   // イベント構造化データ。日時が取得できる場合のみ startDate を含める。
   const eventLd={"@context":"https://schema.org","@type":"Event",name:event.title,description:htmlToText(fields?.description)||fields?.catchCopy||event.title,startDate:fields?.startDatetime??undefined,endDate:fields?.endDatetime??undefined,eventStatus:"https://schema.org/EventScheduled",location:{"@type":"Place",name:fields?.venueName??"利尻富士町",address:{"@type":"PostalAddress",addressRegion:"北海道",addressLocality:"利尻富士町",addressCountry:"JP",streetAddress:fields?.address??undefined}},image:ogImage?[ogImage.url]:undefined,url:absoluteUrl(`/events/${slug}`)};
   return <>
     <JsonLd data={eventLd} />
-    <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"イベント",href:"/events"},{label:event.title}]} eyebrow="Event / Island calendar" meta={`${categoryLabel} ・ ${eventStatus(fields?.startDatetime)}`} title={event.title} lead={fields?.catchCopy} image={{...image,altText:image.altText||`${event.title}の写真`}}>
+    <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"イベント",href:"/events"},{label:event.title}]} eyebrow="Event / Island calendar" meta={`${categoryLabel} ・ ${eventStatus(fields?.startDatetime)}`} title={event.title} lead={fields?.catchCopy} image={image}>
     <EditorialDetailSection eyebrow="Schedule" label="開催情報"><EditorialFieldList items={[{label:"日程",value:period},{label:"毎年開催",value:fields?.isRecurring?"はい":"いいえ"},{label:"開催パターン",value:fields?.recurrenceNote},{label:"会場",value:fields?.venueName},{label:"住所",value:fields?.address}]} /></EditorialDetailSection>
     <EditorialDetailSection eyebrow="About" label="イベントについて"><div className="grid gap-7 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">{htmlToText(fields?.description).split(/\n+/).filter(Boolean).map(p=><p key={p}>{p}</p>)}</div></EditorialDetailSection>
     {gallery.length?<EditorialDetailSection eyebrow="Scenes" label="会場の風景"><div className="grid gap-5 md:grid-cols-2">{gallery.map((img,index)=><Image key={`${img.sourceUrl}-${index}`} src={img.sourceUrl} alt={img.altText||`${event.title}の写真 ${index+1}`} width={1200} height={900} className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover" />)}</div></EditorialDetailSection>:null}

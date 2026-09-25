@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { buildMetadata, ogImageFromField } from "@/lib/seo";
-import { imageFromField, splitByBr, htmlToText } from "@/lib/wp/format";
+import { splitByBr, htmlToText } from "@/lib/wp/format";
 import {
   getTestimonialBySlug,
   getTestimonials,
@@ -50,11 +50,9 @@ export default async function VoiceDetailPage({ params }: PageProps) {
   if (!voice) notFound();
 
   const fields = voice.testimonialFields;
-  const photo = imageFromField(
-    fields?.photo,
-    "/placeholders/voice.svg",
-    "移住者の声のプレースホルダー",
-  );
+  const photoNode = fields?.photo?.node;
+  const photoUrl = photoNode?.sourceUrl ?? null;
+  const photoAlt = photoNode?.altText || `${voice.title}の写真`;
   const qaList = (fields?.qaList ?? []).filter(
     (qa): qa is { question: string; answer: string } =>
       Boolean(qa?.question && qa?.answer),
@@ -110,16 +108,18 @@ export default async function VoiceDetailPage({ params }: PageProps) {
                 {voice.title}
               </p>
             </div>
-            <div className="mt-10 lg:absolute lg:right-0 lg:top-1/2 lg:z-0 lg:mt-0 lg:w-[52%] lg:-translate-y-1/2">
-              <Image
-                src={photo.sourceUrl}
-                alt={photo.altText || `${voice.title}の写真`}
-                width={1200}
-                height={900}
-                priority
-                className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover"
-              />
-            </div>
+            {photoUrl ? (
+              <div className="mt-10 lg:absolute lg:right-0 lg:top-1/2 lg:z-0 lg:mt-0 lg:w-[52%] lg:-translate-y-1/2">
+                <Image
+                  src={photoUrl}
+                  alt={photoAlt}
+                  width={1200}
+                  height={900}
+                  priority
+                  className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover"
+                />
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
