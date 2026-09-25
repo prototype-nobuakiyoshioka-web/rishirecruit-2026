@@ -20,22 +20,23 @@ const nextConfig: NextConfig = {
       { source: "/event-cat/:slug", destination: "/events", permanent: true },
 
       // 旧サイトの観光地(日本語slug) → 新英語slugへ個別マッピング。
+      // sourceは Next.js が受け取るURLエンコード形式で指定する必要あり(日本語直書きだと match しない)。
       // 未マッピングの旧slugは新サイトで404だが、Googleは掲載終了と判断してくれる。
-      { source: "/spots/甘露泉水", destination: "/spots/kanrosensui", permanent: true },
-      { source: "/spots/南浜湿原", destination: "/spots/minamihama-wetland", permanent: true },
-      { source: "/spots/姫沼", destination: "/spots/himenuma", permanent: true },
-      { source: "/spots/利尻山", destination: "/spots/mount-rishiri", permanent: true },
-      { source: "/spots/利尻山神社", destination: "/spots/rishirizan-shrine", permanent: true },
-      { source: "/spots/泉の袋澗", destination: "/spots/izumi-no-fukuroma", permanent: true },
-      { source: "/spots/ペシ岬展望台", destination: "/spots/peshi-misaki-observatory", permanent: true },
-      { source: "/spots/オタトマリ沼", destination: "/spots/otatomari-numa", permanent: true },
-      { source: "/spots/白い恋人の丘", destination: "/spots/numaura-observatory", permanent: true },
-      { source: "/spots/沼浦展望台", destination: "/spots/numaura-observatory", permanent: true },
-      { source: "/spots/野塚展望台", destination: "/spots/nozuka-observatory", permanent: true },
-      { source: "/spots/富士野園地", destination: "/spots/fujino-garden", permanent: true },
-      { source: "/spots/夕日ヶ丘展望台", destination: "/spots/yuhigaoka-observatory", permanent: true },
-      { source: "/spots/高山植物展示園", destination: "/spots/alpine-plant-garden", permanent: true },
-      { source: "/spots/りしりアート・ビジターセンター", destination: "/spots/rishiri-art-visitor-center", permanent: true },
+      { source: "/spots/%E7%94%98%E9%9C%B2%E6%B3%89%E6%B0%B4", destination: "/spots/kanrosensui", permanent: true },
+      { source: "/spots/%E5%8D%97%E6%B5%9C%E6%B9%BF%E5%8E%9F", destination: "/spots/minamihama-wetland", permanent: true },
+      { source: "/spots/%E5%A7%AB%E6%B2%BC", destination: "/spots/himenuma", permanent: true },
+      { source: "/spots/%E5%88%A9%E5%B0%BB%E5%B1%B1", destination: "/spots/mount-rishiri", permanent: true },
+      { source: "/spots/%E5%88%A9%E5%B0%BB%E5%B1%B1%E7%A5%9E%E7%A4%BE", destination: "/spots/rishirizan-shrine", permanent: true },
+      { source: "/spots/%E6%B3%89%E3%81%AE%E8%A2%8B%E6%BE%97", destination: "/spots/izumi-no-fukuroma", permanent: true },
+      { source: "/spots/%E3%83%9A%E3%82%B7%E5%B2%AC%E5%B1%95%E6%9C%9B%E5%8F%B0", destination: "/spots/peshi-misaki-observatory", permanent: true },
+      { source: "/spots/%E3%82%AA%E3%82%BF%E3%83%88%E3%83%9E%E3%83%AA%E6%B2%BC", destination: "/spots/otatomari-numa", permanent: true },
+      { source: "/spots/%E7%99%BD%E3%81%84%E6%81%8B%E4%BA%BA%E3%81%AE%E4%B8%98", destination: "/spots/numaura-observatory", permanent: true },
+      { source: "/spots/%E6%B2%BC%E6%B5%A6%E5%B1%95%E6%9C%9B%E5%8F%B0", destination: "/spots/numaura-observatory", permanent: true },
+      { source: "/spots/%E9%87%8E%E5%A1%9A%E5%B1%95%E6%9C%9B%E5%8F%B0", destination: "/spots/nozuka-observatory", permanent: true },
+      { source: "/spots/%E5%AF%8C%E5%A3%AB%E9%87%8E%E5%9C%92%E5%9C%B0", destination: "/spots/fujino-garden", permanent: true },
+      { source: "/spots/%E5%A4%95%E6%97%A5%E3%83%B6%E4%B8%98%E5%B1%95%E6%9C%9B%E5%8F%B0", destination: "/spots/yuhigaoka-observatory", permanent: true },
+      { source: "/spots/%E9%AB%98%E5%B1%B1%E6%A4%8D%E7%89%A9%E5%B1%95%E7%A4%BA%E5%9C%92", destination: "/spots/alpine-plant-garden", permanent: true },
+      { source: "/spots/%E3%82%8A%E3%81%97%E3%82%8A%E3%82%A2%E3%83%BC%E3%83%88%E3%83%BB%E3%83%93%E3%82%B8%E3%82%BF%E3%83%BC%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC", destination: "/spots/rishiri-art-visitor-center", permanent: true },
     ];
   },
   images: {
