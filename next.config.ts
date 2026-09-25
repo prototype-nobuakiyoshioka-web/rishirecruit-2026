@@ -1,6 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // 旧サイトの WordPress URL 構造からのリダイレクト (301 永続)。
+  // Googleに残っている旧URLインデックスを新URLへ移し、404を防ぐ。
+  // slug が一致する場合は詳細ページへ、不一致(旧サイト限定投稿)は一覧へフォールバック(new Next.jsが自動で404)。
+  async redirects() {
+    return [
+      { source: "/job_posting", destination: "/jobs", permanent: true },
+      { source: "/job_posting/:slug", destination: "/jobs/:slug", permanent: true },
+      { source: "/touristspot", destination: "/spots", permanent: true },
+      { source: "/touristspot/:slug", destination: "/spots/:slug", permanent: true },
+      { source: "/event", destination: "/events", permanent: true },
+      { source: "/event/:slug", destination: "/events/:slug", permanent: true },
+      { source: "/testimonial", destination: "/voices", permanent: true },
+      { source: "/testimonial/:slug", destination: "/voices/:slug", permanent: true },
+    ];
+  },
   images: {
     // ローカル開発 (Local by Flywheel の .local ドメインなど) からの画像取得を許可
     dangerouslyAllowLocalIP: true,
