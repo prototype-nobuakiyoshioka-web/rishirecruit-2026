@@ -563,6 +563,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
 
         <Button
           type="submit"
+          icon={isSubmitting ? "loading" : "mail"}
+          aria-busy={isSubmitting}
           disabled={isSubmitting}
           aria-disabled={!isReadyToSubmit || !turnstileToken || isSubmitting}
         >

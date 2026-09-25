@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { buildMetadata } from "@/lib/seo";
 import { formatEventPeriod } from "@/lib/utils/format-date";
@@ -39,17 +40,17 @@ export default async function EventsPage() {
                 </Link>
                 <div className="mt-6">
                   <div className="flex flex-wrap gap-3 text-xs font-black"><span className="text-[color:var(--c-warning)]">{category ? EVENT_CATEGORY_LABELS[category] ?? category : "Event"}</span><span className="text-[color:var(--c-text-secondary)]">{eventStatus(fields?.startDatetime)}</span></div>
-                  <p className="mt-4 text-lg font-black text-[color:var(--c-deep-ocean)]">{period || "開催日調整中"}</p>
+                  <p className="mt-3 text-lg font-black text-[color:var(--c-deep-ocean)]">{period || "開催日調整中"}</p>
                   <h2 className="mt-2 text-2xl font-black leading-tight tracking-[-0.02em] text-[color:var(--c-deep-ocean)] md:text-3xl">{event.title}</h2>
-                  {fields?.catchCopy ? <p className="mt-3 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
-                  {fields?.venueName ? <p className="mt-3 text-sm font-bold text-[color:var(--c-text-secondary)]">会場　{fields.venueName}</p> : null}
-                  <Link href={`/events/${event.slug}`} className="mt-5 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">開催情報を見る →</Link>
+                  {fields?.catchCopy ? <p className="mt-2 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
+                  {fields?.venueName ? <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">会場　{fields.venueName}</p> : null}
+                  <Link href={`/events/${event.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">開催情報を見る →</Link>
                 </div>
               </article>
             );
           })}
         </div>
-        <div className="mt-12 border-t border-[color:var(--c-deep-ocean)]/15 pt-10"><Link href="/jobs" className="font-black text-[color:var(--c-deep-ocean)] hover:underline">求人一覧を見る →</Link></div>
+        <div className="mt-12 border-t border-[color:var(--c-deep-ocean)]/15 pt-10"><Button variant="aqua" href="/jobs">求人一覧を見る</Button></div>
       </section>
     </EditorialIndexShell>
   );

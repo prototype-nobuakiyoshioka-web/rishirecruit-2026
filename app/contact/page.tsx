@@ -197,9 +197,9 @@ export default function ContactPage() {
               <div className="mt-6 grid gap-4 text-sm leading-7 text-[color:var(--c-text-secondary)]">
                 <p><span className="font-black text-[color:var(--c-text-primary)]">*</span> は必須項目です。</p>
                 <p>求人への応募は、求人詳細ページの「応募する」からお進みください。</p>
-                <Link href="/jobs" className="font-black text-[color:var(--c-deep-ocean)] hover:underline">
-                  求人一覧を見る →
-                </Link>
+                <Button variant="aqua" size="md" href="/jobs">
+                  求人一覧を見る
+                </Button>
               </div>
             </aside>
 
@@ -255,7 +255,7 @@ export default function ContactPage() {
                 </p>
               )}
 
-              <Button type="submit" disabled={isSubmitting} aria-disabled={!turnstileToken || isSubmitting}>
+              <Button type="submit" icon={isSubmitting ? "loading" : "mail"} aria-busy={isSubmitting} disabled={isSubmitting} aria-disabled={!turnstileToken || isSubmitting}>
                 {isSubmitting ? "送信中..." : isReadyToSubmit ? "送信する" : "必須項目を入力してください"}
               </Button>
             </form>

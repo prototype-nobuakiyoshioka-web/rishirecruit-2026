@@ -7,8 +7,8 @@ import * as THREE from "three";
 import type { Group } from "three";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
-const MODEL_PATH = "/models/rishiri-miniature.glb?v=otatomari-1";
-const MOBILE_MODEL_PATH = "/models/rishiri-miniature-mobile.glb?v=otatomari-1";
+const MODEL_PATH = "/models/rishiri-miniature.glb?v=mountain-hut-removed-1";
+const MOBILE_MODEL_PATH = "/models/rishiri-miniature-mobile.glb?v=mountain-hut-removed-1";
 // 1km=5単位の GLB を既存の画面レイアウトに合わせる倍率。
 // PC / SP で見え方が異なるため個別に持つ。値を下げると小さく、上げると大きくなる。
 const MODEL_BASE_SCALE_DESKTOP = 0.048;

@@ -48,14 +48,14 @@ export default async function JobsPage() {
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">
                     {employmentType ? EMPLOYMENT_TYPE_LABELS[employmentType] ?? employmentType : "Job"}
                   </p>
-                  <h2 className="mt-4 text-2xl font-black tracking-[-0.02em] text-[color:var(--c-deep-ocean)]">{job.title}</h2>
-                  {fields?.catchCopy ? <p className="mt-4 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
+                  <h2 className="mt-2 text-2xl font-black tracking-[-0.02em] text-[color:var(--c-deep-ocean)]">{job.title}</h2>
+                  {fields?.catchCopy ? <p className="mt-2 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
                   <dl className="mt-6 border-t border-[color:var(--c-deep-ocean)]/15 text-sm">
                     {[{label:"給与",value:fields?.salary},{label:"勤務時間",value:fields?.workHours},{label:"住居サポート",value:fields?.housingSupportAvailable ? "あり" : "なし"}].map((item)=>(
                       <div key={item.label} className="grid grid-cols-[6rem_1fr] gap-4 border-b border-[color:var(--c-deep-ocean)]/15 py-3"><dt className="text-[color:var(--c-text-secondary)]">{item.label}</dt><dd className="font-bold text-[color:var(--c-text-primary)]">{item.value || "—"}</dd></div>
                     ))}
                   </dl>
-                  <Link href={`/jobs/${job.slug}`} className="mt-6 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">募集要項を見る →</Link>
+                  <Link href={`/jobs/${job.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">募集要項を見る →</Link>
                 </div>
               </article>
             );

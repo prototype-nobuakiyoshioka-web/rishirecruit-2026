@@ -37,7 +37,7 @@ export function StickyApplyCta() {
   return (
     <div
       aria-hidden={isFormVisible}
-      className="fixed inset-x-[var(--space-4)] bottom-[var(--space-4)] z-40 transition-opacity duration-300 md:inset-x-auto md:bottom-auto md:right-[var(--space-6)] md:top-1/2 md:w-40 md:-translate-y-1/2"
+      className="fixed bottom-[var(--space-4)] right-[var(--space-4)] z-40 w-40 transition-opacity duration-300 md:bottom-[var(--space-6)] md:right-[var(--space-6)]"
       style={{
         opacity: isFormVisible ? 0 : 1,
         pointerEvents: isFormVisible ? "none" : "auto",

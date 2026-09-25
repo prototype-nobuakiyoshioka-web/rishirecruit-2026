@@ -257,6 +257,12 @@ for way in buildings:
     house('OSM_'+str(way['id']),*p,w,d,h,angle,random.choice(['RoofCoral','RoofTeal','RoofButter','RoofSlate']))
     occupied.append(p);selected_buildings.append({'osm_id':way['id'],'source_lon':lonlat(*source_p)[0],'source_lat':lonlat(*source_p)[1],'lon':lonlat(*p)[0],'lat':lonlat(*p)[1]})
 
+# 山腹の利尻岳山小屋は表示対象外。選定後に除き、他の家の配置・乱数順を保つ。
+for obj in list(COLS['Buildings'].objects):
+    if obj.name.startswith('OSM_515743750_'):
+        bpy.data.objects.remove(obj,do_unlink=True)
+selected_buildings=[b for b in selected_buildings if b['osm_id']!=515743750]
+
 print('Buildings',len(selected_buildings),'Road segments',len(road_segments),flush=True)
 
 # Ports retain mapped breakwater and pier centerlines; no moving craft.

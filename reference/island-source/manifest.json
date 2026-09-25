@@ -121,13 +121,6 @@
       "lat": 45.133840789295796
     },
     {
-      "osm_id": 515743750,
-      "source_lon": 141.236086025,
-      "source_lat": 45.1899495,
-      "lon": 141.236086025,
-      "lat": 45.1899495
-    },
-    {
       "osm_id": 442884215,
       "source_lon": 141.15674605,
       "source_lat": 45.22540499,
@@ -600,8 +593,8 @@
     563963898,
     563963899
   ],
-  "desktop_triangles": 101371,
-  "mobile_triangles": 80409,
+  "desktop_triangles": 101109,
+  "mobile_triangles": 80147,
   "pins": {
     "oshidomari": {
       "x": 34.342,

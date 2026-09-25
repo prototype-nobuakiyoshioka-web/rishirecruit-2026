@@ -1,0 +1,115 @@
+.button {
+  --plate-face: #8dcbd7;
+  --plate-side: #5896a4;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border: 0;
+  border-radius: 18px;
+  color: var(--c-deep-ocean);
+  background: var(--plate-face);
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow:
+    inset 0 3px 0 #ffffff85,
+    inset 0 -3px 0 #0a2e4e0d,
+    0 5px 0 var(--plate-side),
+    0 11px 12px -7px #143d423d;
+  transition: background-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #ffffff60;
+  border-radius: 13px;
+  pointer-events: none;
+}
+
+.aqua {
+  --plate-face: #b2dbea;
+  --plate-side: #74a7b7;
+}
+
+.ice {
+  --plate-face: #c9e2f0;
+  --plate-side: #87afc4;
+}
+
+.label {
+  min-width: 0;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 11px;
+  background: #eaf5facf;
+  box-shadow: inset 0 2px 0 #ffffffa6, 0 2px 0 #0a2e4e18;
+  transition: transform 150ms ease-out;
+}
+
+.icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (hover: hover) {
+  .button:not(:disabled):not([aria-disabled="true"]):hover {
+    background: color-mix(in srgb, var(--plate-face), white 9%);
+  }
+
+  .button:not(:disabled):not([aria-disabled="true"]):hover .icon {
+    transform: translateX(2px);
+  }
+}
+
+.button:not(:disabled):not([aria-disabled="true"]):active {
+  transform: translateY(4px);
+  box-shadow: inset 0 2px 0 #ffffff50, 0 1px 0 var(--plate-side), 0 3px 6px -4px #143d423d;
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--c-deep-ocean);
+  outline-offset: 5px;
+  box-shadow: inset 0 3px 0 #ffffff85, 0 5px 0 var(--plate-side), 0 0 0 5px #eaf5fa;
+}
+
+/* aria-disabled の送信前状態でも、既存の入力検証を呼べる挙動は保つ。 */
+.button:disabled,
+.button[aria-disabled="true"] {
+  --plate-face: #c9dce5;
+  --plate-side: #9eb9c5;
+  box-shadow: inset 0 2px 0 #ffffff85, 0 2px 0 var(--plate-side);
+  cursor: default;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #0a2e4e40;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .icon { transition: none; }
+  .spinner { animation: none; }
+  .button:not(:disabled):not([aria-disabled="true"]):hover .icon { transform: none; }
+}

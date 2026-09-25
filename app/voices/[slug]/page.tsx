@@ -186,7 +186,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
               </p>
             </div>
             <Button variant="aqua" href="/jobs">
-              求人一覧を見る →
+              求人一覧を見る
             </Button>
           </div>
           <div className="relative mx-auto mt-10 max-w-[1080px] border-t border-white/15 pt-8">

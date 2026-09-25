@@ -206,7 +206,7 @@ export default function MessagePage() {
               </p>
             </div>
             <Button variant="aqua" href="/jobs">
-              求人一覧を見る →
+              求人一覧を見る
             </Button>
           </div>
           <div className="relative mx-auto mt-10 flex max-w-[1080px] flex-wrap gap-x-8 gap-y-4 border-t border-white/15 pt-8 text-sm font-bold text-[color:var(--c-ice)] md:text-base">

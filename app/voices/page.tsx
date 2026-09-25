@@ -157,10 +157,10 @@ export default async function VoicesPage() {
                       <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
                         Voice {String(index + 1).padStart(2, "0")}
                       </p>
-                      <p className="mt-3 text-sm font-bold text-[color:var(--c-text-secondary)]">
+                      <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
                         {fields?.age ?? "移住者インタビュー"}
                       </p>
-                      <h2 className="mt-3 text-balance text-2xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-3xl">
+                      <h2 className="mt-2 text-balance text-2xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-3xl">
                         {fields?.catchCopy
                           ? splitByBr(fields.catchCopy).map((seg, i, arr) => (
                               <Fragment key={i}>
@@ -170,12 +170,12 @@ export default async function VoicesPage() {
                             ))
                           : voice.title}
                       </h2>
-                      <p className="mt-3 text-base font-bold text-[color:var(--c-text-primary)]">
+                      <p className="mt-2 text-base font-bold text-[color:var(--c-text-primary)]">
                         {voice.title}
                       </p>
                       <Link
                         href={`/voices/${voice.slug}`}
-                        className="mt-5 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 text-base font-black text-[color:var(--c-deep-ocean)] transition-opacity hover:opacity-65"
+                        className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 text-base font-black text-[color:var(--c-deep-ocean)] transition-opacity hover:opacity-65"
                       >
                         この人の話を読む →
                       </Link>
@@ -217,7 +217,7 @@ export default async function VoicesPage() {
               </p>
             </div>
             <Button variant="aqua" href="/jobs">
-              求人一覧を見る →
+              求人一覧を見る
             </Button>
           </div>
         </aside>

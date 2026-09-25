@@ -65,14 +65,14 @@ export default async function ColumnsPage() {
                     <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">
                       Column {String(index + 1).padStart(2, "0")}
                     </p>
-                    <p className="mt-3 text-sm font-bold text-[color:var(--c-text-secondary)]">
+                    <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
                       {formatPublishedAt(article.publishedAt)}
                     </p>
-                    <h2 className="mt-3 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">
+                    <h2 className="mt-2 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">
                       {article.title}
                     </h2>
                     {article.excerpt ? (
-                      <p className="mt-3 leading-7 text-[color:var(--c-text-secondary)]">
+                      <p className="mt-2 leading-7 text-[color:var(--c-text-secondary)]">
                         {article.excerpt}
                       </p>
                     ) : null}
