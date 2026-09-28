@@ -23,6 +23,10 @@ const EVENT_CARD_FIELDS = gql`
       startDatetime
       endDatetime
       venueName
+      scheduleEntries {
+        venue
+        date
+      }
       thumbnailImage {
         node {
           sourceUrl
@@ -72,6 +76,10 @@ const GET_EVENT_BY_SLUG = gql`
         endDatetime
         isRecurring
         recurrenceNote
+        scheduleEntries {
+          venue
+          date
+        }
         description
         venueName
         address

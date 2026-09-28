@@ -34,3 +34,14 @@ export function formatEventPeriod(
 
   return "日程未定";
 }
+
+// 会場×日程エントリを "〇会場 ◯月◯日" 形式の配列にする。
+// 入力があるエントリ(venue+date両方非空)のみ返す。
+export function formatScheduleEntries(
+  entries: Array<{ venue: string | null; date: string | null }> | null | undefined,
+): string[] {
+  if (!entries) return [];
+  return entries
+    .filter((e) => e.venue && e.date)
+    .map((e) => `${e.venue} ${formatEventDate(e.date)}`);
+}

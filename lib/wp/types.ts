@@ -96,6 +96,8 @@ export interface WPEvent {
     endDatetime: string | null;
     isRecurring: boolean | null;
     recurrenceNote: string | null;
+    // 複数会場×複数日開催の場合、会場ごとに1エントリ。入力があれば日程表示より優先。
+    scheduleEntries: Array<{ venue: string | null; date: string | null }> | null;
     description: string | null;
     venueName: string | null;
     address: string | null;

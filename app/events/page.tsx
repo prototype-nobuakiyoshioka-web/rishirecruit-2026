@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { buildMetadata } from "@/lib/seo";
-import { formatEventPeriod } from "@/lib/utils/format-date";
+import { formatEventPeriod, formatScheduleEntries } from "@/lib/utils/format-date";
 import { eventStatus, selectFirst } from "@/lib/wp/format";
 import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getEvents } from "@/lib/wp/queries/events";
@@ -31,6 +31,7 @@ export default async function EventsPage() {
             const category = selectFirst(fields?.category);
             const imageUrl = fields?.thumbnailImage?.node?.sourceUrl ?? null;
             const imageAlt = fields?.thumbnailImage?.node?.altText ?? `${event.title}の写真`;
+            const scheduleEntries = formatScheduleEntries(fields?.scheduleEntries);
             const period = formatEventPeriod(fields?.dateDisplayType?.[0] ?? null, fields?.startDatetime ?? null, fields?.endDatetime ?? null, fields?.periodMonth?.[0] ?? null, fields?.periodRange?.[0] ?? null);
             return (
               <article key={event.id} className={gridSpanClass(index)}>
@@ -43,10 +44,16 @@ export default async function EventsPage() {
                 ) : null}
                 <div className="mt-6">
                   <div className="flex flex-wrap gap-3 text-xs font-black"><span className="text-[color:var(--c-warning)]">{category ? EVENT_CATEGORY_LABELS[category] ?? category : "Event"}</span><span className="text-[color:var(--c-text-secondary)]">{eventStatus(fields?.startDatetime)}</span></div>
-                  <p className="mt-3 text-lg font-black text-[color:var(--c-deep-ocean)]">{period || "開催日調整中"}</p>
+                  {scheduleEntries.length > 0 ? (
+                    <ul className="mt-3 space-y-1 text-lg font-black text-[color:var(--c-deep-ocean)]">
+                      {scheduleEntries.map((entry) => <li key={entry}>{entry}</li>)}
+                    </ul>
+                  ) : (
+                    <p className="mt-3 text-lg font-black text-[color:var(--c-deep-ocean)]">{period || "開催日調整中"}</p>
+                  )}
                   <h2 className="mt-2 text-2xl font-black leading-tight tracking-[-0.02em] text-[color:var(--c-deep-ocean)] md:text-3xl">{event.title}</h2>
                   {fields?.catchCopy ? <p className="mt-2 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
-                  {fields?.venueName ? <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">会場　{fields.venueName.replace(/<br\s*\/?>/gi, " / ").replace(/\s+/g, " ").trim()}</p> : null}
+                  {scheduleEntries.length === 0 && fields?.venueName ? <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">会場　{fields.venueName.replace(/<br\s*\/?>/gi, " / ").replace(/\s+/g, " ").trim()}</p> : null}
                   <Link href={`/events/${event.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">開催情報を見る →</Link>
                 </div>
               </article>
