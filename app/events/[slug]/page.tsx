@@ -15,14 +15,14 @@ export async function generateStaticParams(){return(await getEvents()).map(event
 export async function generateMetadata({params}:PageProps):Promise<Metadata>{const{slug}=await params;const event=await getEventBySlug(slug);if(!event)return{};return buildMetadata({title:event.title,description:event.eventFields?.catchCopy??undefined,path:`/events/${slug}`,image:ogImageFromField(event.eventFields?.thumbnailImage,`${event.title}の写真`)});}
 
 export default async function EventDetailPage({params}:PageProps){
-  const{slug}=await params;const event=await getEventBySlug(slug);if(!event)notFound();const fields=event.eventFields;const category=selectFirst(fields?.category);const categoryLabel=category?(EVENT_CATEGORY_LABELS[category]??category):"Event";const imageNode=fields?.thumbnailImage?.node;const image=imageNode?.sourceUrl?{sourceUrl:imageNode.sourceUrl,altText:imageNode.altText||`${event.title}の写真`}:null;const gallery=galleryFromField(fields?.galleryImages);const period=formatEventPeriod(fields?.dateDisplayType?.[0]??null,fields?.startDatetime??null,fields?.endDatetime??null,fields?.periodMonth?.[0]??null,fields?.periodRange?.[0]??null);
+  const{slug}=await params;const event=await getEventBySlug(slug);if(!event)notFound();const fields=event.eventFields;const category=selectFirst(fields?.category);const categoryLabel=category?(EVENT_CATEGORY_LABELS[category]??category):"Event";const imageNode=fields?.thumbnailImage?.node;const image=imageNode?.sourceUrl?{sourceUrl:imageNode.sourceUrl,altText:imageNode.altText||`${event.title}の写真`}:null;const gallery=galleryFromField(fields?.galleryImages);const period=formatEventPeriod(fields?.dateDisplayType?.[0]??null,fields?.startDatetime??null,fields?.endDatetime??null,fields?.periodMonth?.[0]??null,fields?.periodRange?.[0]??null,fields?.periodNth?.[0]??null,fields?.periodWeekday?.[0]??null);
   const ogImage=ogImageFromField(fields?.thumbnailImage);
   const descriptionText=htmlToText(fields?.description);
   const scheduleEntries=formatScheduleEntries(fields?.scheduleEntries);
   // 掲載イベントは全て毎年開催のため「毎年開催」行は表示ロジックから除外(ACFフィールドは保持)。
-  // scheduleEntries があれば「日程」の代わりに「会場×日程」を並べて表示、会場行も省略。
+  // scheduleEntries があれば「日程」の代わりに「会場と日程」を並べて表示、会場行も省略。
   const scheduleItems=scheduleEntries.length>0
-    ?[{label:"会場×日程",value:<ul className="space-y-1">{scheduleEntries.map(e=><li key={e}>{e}</li>)}</ul>},{label:"開催詳細",value:fields?.recurrenceNote},{label:"住所",value:fields?.address}]
+    ?[{label:"会場と日程",value:<ul className="space-y-1">{scheduleEntries.map(e=><li key={e}>{e}</li>)}</ul>},{label:"開催詳細",value:fields?.recurrenceNote},{label:"住所",value:fields?.address}]
     :[{label:"日程",value:period},{label:"開催詳細",value:fields?.recurrenceNote},{label:"会場",value:fields?.venueName},{label:"住所",value:fields?.address}];
   const joinItems=[{label:"アクセス",value:fields?.accessInfo},{label:"参加費",value:fields?.price},{label:"問い合わせ",value:fields?.contact},{label:"申込",value:fields?.registrationUrl?<a href={fields.registrationUrl} target="_blank" rel="noopener noreferrer" className="underline">申込ページを開く ↗</a>:null}];
   // イベント構造化データ。日時が取得できる場合のみ startDate を含める。

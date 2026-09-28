@@ -32,7 +32,7 @@ export default async function EventsPage() {
             const imageUrl = fields?.thumbnailImage?.node?.sourceUrl ?? null;
             const imageAlt = fields?.thumbnailImage?.node?.altText ?? `${event.title}の写真`;
             const scheduleEntries = formatScheduleEntries(fields?.scheduleEntries);
-            const period = formatEventPeriod(fields?.dateDisplayType?.[0] ?? null, fields?.startDatetime ?? null, fields?.endDatetime ?? null, fields?.periodMonth?.[0] ?? null, fields?.periodRange?.[0] ?? null);
+            const period = formatEventPeriod(fields?.dateDisplayType?.[0] ?? null, fields?.startDatetime ?? null, fields?.endDatetime ?? null, fields?.periodMonth?.[0] ?? null, fields?.periodRange?.[0] ?? null, fields?.periodNth?.[0] ?? null, fields?.periodWeekday?.[0] ?? null);
             return (
               <article key={event.id} className={gridSpanClass(index)}>
                 {imageUrl ? (

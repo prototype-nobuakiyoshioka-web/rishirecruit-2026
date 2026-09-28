@@ -20,12 +20,18 @@ const EVENT_CARD_FIELDS = gql`
       dateDisplayType
       periodMonth
       periodRange
+      periodNth
+      periodWeekday
       startDatetime
       endDatetime
       venueName
       scheduleEntries {
         venue
+        dateType
         date
+        month
+        nth
+        weekday
       }
       thumbnailImage {
         node {
@@ -72,13 +78,19 @@ const GET_EVENT_BY_SLUG = gql`
         dateDisplayType
         periodMonth
         periodRange
+        periodNth
+        periodWeekday
         startDatetime
         endDatetime
         isRecurring
         recurrenceNote
         scheduleEntries {
           venue
+          dateType
           date
+          month
+          nth
+          weekday
         }
         description
         venueName

@@ -92,12 +92,22 @@ export interface WPEvent {
     dateDisplayType: string[] | null;
     periodMonth: string[] | null;
     periodRange: string[] | null;
+    periodNth: string[] | null;
+    periodWeekday: string[] | null;
     startDatetime: string | null;
     endDatetime: string | null;
     isRecurring: boolean | null;
     recurrenceNote: string | null;
     // 複数会場×複数日開催の場合、会場ごとに1エントリ。入力があれば日程表示より優先。
-    scheduleEntries: Array<{ venue: string | null; date: string | null }> | null;
+    // date_type='exact' なら date を使用、'nth_weekday' なら month + nth + weekday を組み合わせる。
+    scheduleEntries: Array<{
+      venue: string | null;
+      dateType: string[] | null;
+      date: string | null;
+      month: string[] | null;
+      nth: string[] | null;
+      weekday: string[] | null;
+    }> | null;
     description: string | null;
     venueName: string | null;
     address: string | null;
