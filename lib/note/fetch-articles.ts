@@ -44,6 +44,28 @@ function extractFirstImage(html: string | undefined): string | null {
   return normalizeHttpUrl(match?.[1]);
 }
 
+// note 記事本体を取得し、og:image (アイキャッチ) を返す。
+// RSS に画像が無い記事のフォールバック用。24時間キャッシュ。
+async function fetchArticleOgImage(articleUrl: string): Promise<string | null> {
+  try {
+    const response = await fetch(articleUrl, {
+      next: { revalidate: 86400 },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; RishiRecruit/1.0)" },
+    });
+    if (!response.ok) return null;
+    const html = await response.text();
+    // <meta property="og:image" content="..."> を抽出
+    const ogMatch = html.match(
+      /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
+    );
+    if (ogMatch?.[1]) return normalizeHttpUrl(ogMatch[1]);
+    // フォールバック: 本文最初の <img>
+    return extractFirstImage(html);
+  } catch {
+    return null;
+  }
+}
+
 function normalizeExcerpt(value: string | undefined): string | null {
   if (!value) return null;
 
@@ -81,12 +103,16 @@ export async function fetchNoteArticles(): Promise<NoteArticle[]> {
 
     const feed = await parser.parseString(await response.text());
 
-    return feed.items.flatMap((item) => {
+    const items = feed.items.flatMap((item) => {
       const link = normalizeHttpUrl(item.link);
       if (!item.title || !link || !item.pubDate) return [];
 
       const contentHtml =
         item.contentEncoded ?? item.content ?? item.descriptionHtml;
+
+      const rssImage =
+        normalizeHttpUrl(item.mediaThumbnail) ??
+        extractFirstImage(contentHtml);
 
       return [
         {
@@ -96,12 +122,18 @@ export async function fetchNoteArticles(): Promise<NoteArticle[]> {
           excerpt: normalizeExcerpt(
             item.contentSnippet ?? item.descriptionHtml ?? item.content,
           ),
-          imageUrl:
-            normalizeHttpUrl(item.mediaThumbnail) ??
-            extractFirstImage(contentHtml),
+          imageUrl: rssImage,
         },
       ];
     });
+
+    // RSS で画像が無い記事は note 記事ページから og:image を取得(並列)
+    return await Promise.all(
+      items.map(async (item) => {
+        if (item.imageUrl) return item;
+        return { ...item, imageUrl: await fetchArticleOgImage(item.link) };
+      }),
+    );
   } catch (error: unknown) {
     console.error("Failed to fetch Note RSS articles.", error);
     return [];

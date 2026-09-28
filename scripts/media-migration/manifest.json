@@ -1,0 +1,1610 @@
+{
+  "posts": [
+    {
+      "cpt": "touristspots",
+      "slug": "yuhigaoka-observatory",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/yuhigaoka9_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/yuhigaoka9_2000px.webp",
+          "2026/07/yuhigaoka5_2000px.webp",
+          "2026/07/yuhigaoka3_2000px.webp",
+          "2026/07/yuhigaoka2_2000px.webp",
+          "2026/07/yuhigaoka1_2000px.webp",
+          "2026/07/yuhigaoka6_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/yuhigaoka9_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/yuhigaoka9_2000px.webp",
+            "2026/07/yuhigaoka5_2000px.webp",
+            "2026/07/yuhigaoka3_2000px.webp",
+            "2026/07/yuhigaoka2_2000px.webp",
+            "2026/07/yuhigaoka1_2000px.webp",
+            "2026/07/yuhigaoka6_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "fujino-garden",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/fujinoenchi1_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/fujinoenchi9_2000px.webp",
+          "2026/07/fujinoenchi4_2000px.webp",
+          "2026/07/fujinoenchi3_2000px.webp",
+          "2026/07/fujinoenchi2_2000px.webp",
+          "2026/07/fujinoenchi1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/fujinoenchi1_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/fujinoenchi9_2000px.webp",
+            "2026/07/fujinoenchi4_2000px.webp",
+            "2026/07/fujinoenchi3_2000px.webp",
+            "2026/07/fujinoenchi2_2000px.webp",
+            "2026/07/fujinoenchi1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "peshi-misaki-observatory",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/peshi-cape3_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/peshi-cape6_2000px.webp",
+          "2026/07/peshi-cape4_2000px.webp",
+          "2026/07/peshi-cape5_2000px.webp",
+          "2026/07/peshi-cape3_2000px.webp",
+          "2026/07/peshi-cape2_2000px.webp",
+          "2026/07/peshi-cape1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/peshi-cape3_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/peshi-cape6_2000px.webp",
+            "2026/07/peshi-cape4_2000px.webp",
+            "2026/07/peshi-cape5_2000px.webp",
+            "2026/07/peshi-cape3_2000px.webp",
+            "2026/07/peshi-cape2_2000px.webp",
+            "2026/07/peshi-cape1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "rishiri-art-visitor-center",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/ripkan1_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/ripkan1_2000px.webp",
+          "2026/07/ripkan4_2000px.webp",
+          "2026/07/ripkan2_2000px.webp",
+          "2026/07/ripkan3_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/ripkan1_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/ripkan1_2000px.webp",
+            "2026/07/ripkan4_2000px.webp",
+            "2026/07/ripkan2_2000px.webp",
+            "2026/07/ripkan3_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "nozuka-observatory",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/nozuka-tenboudai4_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/nozuka-tenboudai2_2000px.webp",
+          "2026/07/nozuka-tenboudai3_2000px.webp",
+          "2026/07/nozuka-tenboudai4_2000px.webp",
+          "2026/07/nozuka-tenboudai1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/nozuka-tenboudai4_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/nozuka-tenboudai2_2000px.webp",
+            "2026/07/nozuka-tenboudai3_2000px.webp",
+            "2026/07/nozuka-tenboudai4_2000px.webp",
+            "2026/07/nozuka-tenboudai1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "otatomari-numa",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/otatomari1_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/otatomari2_2000px.webp",
+          "2026/07/otatomari4_2000px.webp",
+          "2026/07/otatomari5_2000px.webp",
+          "2026/07/otatomari_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/otatomari1_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/otatomari2_2000px.webp",
+            "2026/07/otatomari4_2000px.webp",
+            "2026/07/otatomari5_2000px.webp",
+            "2026/07/otatomari_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "minamihama-wetland",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/minamihama3_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/minamihama7_2000px.webp",
+          "2026/07/minamihama4_2000px.webp",
+          "2026/07/minamihama9_2000px.webp",
+          "2026/07/minamihama3_2000px.webp",
+          "2026/07/minamihama1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/minamihama3_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/minamihama7_2000px.webp",
+            "2026/07/minamihama4_2000px.webp",
+            "2026/07/minamihama9_2000px.webp",
+            "2026/07/minamihama3_2000px.webp",
+            "2026/07/minamihama1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "alpine-plant-garden",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/kozan-shokubutuen3_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/kozan-shokubutuen3_2000px.webp",
+          "2026/07/kozan-shokubutuen2_2000px.webp",
+          "2026/07/kozan-shokubutuen1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/kozan-shokubutuen3_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/kozan-shokubutuen3_2000px.webp",
+            "2026/07/kozan-shokubutuen2_2000px.webp",
+            "2026/07/kozan-shokubutuen1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "kanrosensui",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/kanrosensui3_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/kanrosensui6_2000px.webp",
+          "2026/07/kanrosensui5_2000px.webp",
+          "2026/07/kanrosensui3_2000px.webp",
+          "2026/07/kanrosensui2_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/kanrosensui3_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/kanrosensui6_2000px.webp",
+            "2026/07/kanrosensui5_2000px.webp",
+            "2026/07/kanrosensui3_2000px.webp",
+            "2026/07/kanrosensui2_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "himenuma",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/himenuma9_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/himenuma9_2000px.webp",
+          "2026/07/himenuma5_2000px.webp",
+          "2026/07/himenuma3_2000px.webp",
+          "2026/07/himenuma2_2000px-2.webp",
+          "2026/07/himenuma1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/himenuma9_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/himenuma9_2000px.webp",
+            "2026/07/himenuma5_2000px.webp",
+            "2026/07/himenuma3_2000px.webp",
+            "2026/07/himenuma2_2000px-2.webp",
+            "2026/07/himenuma1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "rishirizan-shrine",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/rishiri-zan-zinja1_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/rishiri-zan-zinja5_2000px.webp",
+          "2026/07/rishiri-zan-zinja4_2000px.webp",
+          "2026/07/rishiri-zan-zinja3_2000px.webp",
+          "2026/07/rishiri-zan-zinja2_2000px.webp",
+          "2026/07/rishiri-zan-zinja1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/rishiri-zan-zinja1_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/rishiri-zan-zinja5_2000px.webp",
+            "2026/07/rishiri-zan-zinja4_2000px.webp",
+            "2026/07/rishiri-zan-zinja3_2000px.webp",
+            "2026/07/rishiri-zan-zinja2_2000px.webp",
+            "2026/07/rishiri-zan-zinja1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "mount-rishiri",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/top-hero-1.webp"
+        ],
+        "galleryImages": [
+          "2026/07/DJI_20250712083100_0047_D-scaled.webp",
+          "2026/07/himenuma2_2000px.webp",
+          "2026/07/senhousi_2000px.webp",
+          "2026/07/himenuma2_2000px-1.webp",
+          "2026/07/fujinoenchi_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/top-hero-1.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/DJI_20250712083100_0047_D-scaled.webp",
+            "2026/07/himenuma2_2000px.webp",
+            "2026/07/senhousi_2000px.webp",
+            "2026/07/himenuma2_2000px-1.webp",
+            "2026/07/fujinoenchi_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "izumi-no-fukuroma",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/izumin-no-fukuroma1_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/izumin-no-fukuroma5_2000px.webp",
+          "2026/07/izumin-no-fukuroma4_2000px.webp",
+          "2026/07/izumin-no-fukuroma3_2000px.webp",
+          "2026/07/izumin-no-fukuroma2_2000px.webp",
+          "2026/07/izumin-no-fukuroma1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/izumin-no-fukuroma1_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/izumin-no-fukuroma5_2000px.webp",
+            "2026/07/izumin-no-fukuroma4_2000px.webp",
+            "2026/07/izumin-no-fukuroma3_2000px.webp",
+            "2026/07/izumin-no-fukuroma2_2000px.webp",
+            "2026/07/izumin-no-fukuroma1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "touristspots",
+      "slug": "numaura-observatory",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/shiroikoibito-no-oka6_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/shiroikoibito-no-oka6_2000px.webp",
+          "2026/07/shiroikoibito-no-oka5_2000px.webp",
+          "2026/07/shiroikoibito-no-oka4_2000px.webp",
+          "2026/07/shiroikoibito-no-oka3_2000px.webp",
+          "2026/07/shiroikoibito-no-oka2_2000px.webp",
+          "2026/07/shiroikoibito-no-oka1_2000px.webp"
+        ]
+      },
+      "post_type": "touristspot",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ts_thumbnail_image",
+          "files": [
+            "2026/07/shiroikoibito-no-oka6_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ts_gallery_images",
+          "files": [
+            "2026/07/shiroikoibito-no-oka6_2000px.webp",
+            "2026/07/shiroikoibito-no-oka5_2000px.webp",
+            "2026/07/shiroikoibito-no-oka4_2000px.webp",
+            "2026/07/shiroikoibito-no-oka3_2000px.webp",
+            "2026/07/shiroikoibito-no-oka2_2000px.webp",
+            "2026/07/shiroikoibito-no-oka1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "events",
+      "slug": "minato-beer-garden",
+      "images": {
+        "thumbnailImage": [
+          "2026/08/minato-beergarden7_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/08/minato-beergarden30_2000px.webp",
+          "2026/08/minato-beergarden7_2000px.webp",
+          "2026/08/minato-beergarden16_2000px.webp",
+          "2026/08/minato-beergarden21_2000px.webp",
+          "2026/08/minato-beergarden13_2000px.webp",
+          "2026/08/minato-beergarden24_2000px.webp"
+        ]
+      },
+      "post_type": "event",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ev_thumbnail_image",
+          "files": [
+            "2026/08/minato-beergarden7_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ev_gallery_images",
+          "files": [
+            "2026/08/minato-beergarden30_2000px.webp",
+            "2026/08/minato-beergarden7_2000px.webp",
+            "2026/08/minato-beergarden16_2000px.webp",
+            "2026/08/minato-beergarden21_2000px.webp",
+            "2026/08/minato-beergarden13_2000px.webp",
+            "2026/08/minato-beergarden24_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "events",
+      "slug": "rishiri-island-yuyu-running",
+      "images": {
+        "thumbnailImage": [
+          "2026/08/yuuyuurunning_6.webp"
+        ],
+        "galleryImages": [
+          "2026/08/yuuyuurunning_18.webp",
+          "2026/08/yuuyuurunning_15.webp",
+          "2026/08/yuuyuurunning_11.webp",
+          "2026/08/yuuyuurunning_6.webp",
+          "2026/08/yuuyuuruning5_2000px.webp"
+        ]
+      },
+      "post_type": "event",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ev_thumbnail_image",
+          "files": [
+            "2026/08/yuuyuurunning_6.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ev_gallery_images",
+          "files": [
+            "2026/08/yuuyuurunning_18.webp",
+            "2026/08/yuuyuurunning_15.webp",
+            "2026/08/yuuyuurunning_11.webp",
+            "2026/08/yuuyuurunning_6.webp",
+            "2026/08/yuuyuuruning5_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "events",
+      "slug": "hokkai-shima-festival",
+      "images": {
+        "thumbnailImage": [
+          "2026/08/shimamatsuri_oshidomari_23.webp"
+        ],
+        "galleryImages": [
+          "2026/08/shimamatsuri_oshidomari_23.webp",
+          "2026/08/shimamatsuri_oshidomari_22.webp",
+          "2026/08/shimamatsuri_oniwaki_17.webp",
+          "2026/08/shimamatsuri_oniwaki_13.webp",
+          "2026/08/hokkaishimamatsuri6_2000px.webp",
+          "2026/08/hokkaishimamatsuri1_2000px.webp"
+        ]
+      },
+      "post_type": "event",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ev_thumbnail_image",
+          "files": [
+            "2026/08/shimamatsuri_oshidomari_23.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ev_gallery_images",
+          "files": [
+            "2026/08/shimamatsuri_oshidomari_23.webp",
+            "2026/08/shimamatsuri_oshidomari_22.webp",
+            "2026/08/shimamatsuri_oniwaki_17.webp",
+            "2026/08/shimamatsuri_oniwaki_13.webp",
+            "2026/08/hokkaishimamatsuri6_2000px.webp",
+            "2026/08/hokkaishimamatsuri1_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "events",
+      "slug": "uni-uni-festival",
+      "images": {
+        "thumbnailImage": [
+          "2026/08/uniunifasR7_13.webp"
+        ],
+        "galleryImages": [
+          "2026/08/uniunifes1_2000px.webp",
+          "2026/08/uniunifasR7_32.webp",
+          "2026/08/uniunifasR7_29.webp",
+          "2026/08/uniunifasR7_25.webp",
+          "2026/08/uniunifasR7_5.webp",
+          "2026/08/uniunifasR7_13.webp"
+        ]
+      },
+      "post_type": "event",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ev_thumbnail_image",
+          "files": [
+            "2026/08/uniunifasR7_13.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ev_gallery_images",
+          "files": [
+            "2026/08/uniunifes1_2000px.webp",
+            "2026/08/uniunifasR7_32.webp",
+            "2026/08/uniunifasR7_29.webp",
+            "2026/08/uniunifasR7_25.webp",
+            "2026/08/uniunifasR7_5.webp",
+            "2026/08/uniunifasR7_13.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "events",
+      "slug": "rishiri-island-cycling",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/fureaicycling_16.webp"
+        ],
+        "galleryImages": [
+          "2026/07/fureaicycling_26.webp",
+          "2026/07/fureaicycling_25.webp",
+          "2026/07/fureaicycling_16.webp",
+          "2026/07/fureaicycling_13.webp",
+          "2026/07/fureaicycling_12.webp"
+        ]
+      },
+      "post_type": "event",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ev_thumbnail_image",
+          "files": [
+            "2026/07/fureaicycling_16.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ev_gallery_images",
+          "files": [
+            "2026/07/fureaicycling_26.webp",
+            "2026/07/fureaicycling_25.webp",
+            "2026/07/fureaicycling_16.webp",
+            "2026/07/fureaicycling_13.webp",
+            "2026/07/fureaicycling_12.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "events",
+      "slug": "rishirizan-shrine-festival",
+      "images": {
+        "thumbnailImage": [
+          "2026/07/rishirizan-zinja-reitaisai2_2000px.webp"
+        ],
+        "galleryImages": [
+          "2026/07/rishirizan-zinja-reitaisai1_2000px.webp",
+          "2026/07/rishirizan-zinja-reitaisai2_2000px.webp",
+          "2026/07/rishirizan-zinja-reitaisai3_2000px.webp",
+          "2026/07/rishirizan-zinja-reitaisai4_2000px.webp",
+          "2026/07/rishirizan-zinja-reitaisai5_2000px.webp",
+          "2026/07/rishirizan-zinja-reitaisai6_2000px.webp",
+          "2026/07/rishirizan-zinja-reitaisai7_2000px.webp"
+        ]
+      },
+      "post_type": "event",
+      "acf_fields": {
+        "thumbnail_image": {
+          "field_key": "field_ev_thumbnail_image",
+          "files": [
+            "2026/07/rishirizan-zinja-reitaisai2_2000px.webp"
+          ],
+          "type": "image"
+        },
+        "gallery_images": {
+          "field_key": "field_ev_gallery_images",
+          "files": [
+            "2026/07/rishirizan-zinja-reitaisai1_2000px.webp",
+            "2026/07/rishirizan-zinja-reitaisai2_2000px.webp",
+            "2026/07/rishirizan-zinja-reitaisai3_2000px.webp",
+            "2026/07/rishirizan-zinja-reitaisai4_2000px.webp",
+            "2026/07/rishirizan-zinja-reitaisai5_2000px.webp",
+            "2026/07/rishirizan-zinja-reitaisai6_2000px.webp",
+            "2026/07/rishirizan-zinja-reitaisai7_2000px.webp"
+          ],
+          "type": "gallery"
+        }
+      }
+    },
+    {
+      "cpt": "testimonials",
+      "slug": "ogawa-kitai",
+      "images": {
+        "photo": [
+          "2026/08/voice-ogawa-kitai.webp"
+        ]
+      },
+      "post_type": "testimonial",
+      "acf_fields": {
+        "photo": {
+          "field_key": "field_tm_photo",
+          "files": [
+            "2026/08/voice-ogawa-kitai.webp"
+          ],
+          "type": "image"
+        }
+      }
+    },
+    {
+      "cpt": "testimonials",
+      "slug": "yamazaki",
+      "images": {
+        "photo": [
+          "2026/08/voice-yamazaki.webp"
+        ]
+      },
+      "post_type": "testimonial",
+      "acf_fields": {
+        "photo": {
+          "field_key": "field_tm_photo",
+          "files": [
+            "2026/08/voice-yamazaki.webp"
+          ],
+          "type": "image"
+        }
+      }
+    },
+    {
+      "cpt": "testimonials",
+      "slug": "shirakawa",
+      "images": {
+        "photo": [
+          "2026/08/voice-shirakawa.webp"
+        ]
+      },
+      "post_type": "testimonial",
+      "acf_fields": {
+        "photo": {
+          "field_key": "field_tm_photo",
+          "files": [
+            "2026/08/voice-shirakawa.webp"
+          ],
+          "type": "image"
+        }
+      }
+    },
+    {
+      "cpt": "testimonials",
+      "slug": "iwagaki-minami",
+      "images": {
+        "photo": [
+          "2026/08/voice-iwagaki-minami.webp"
+        ]
+      },
+      "post_type": "testimonial",
+      "acf_fields": {
+        "photo": {
+          "field_key": "field_tm_photo",
+          "files": [
+            "2026/08/voice-iwagaki-minami.webp"
+          ],
+          "type": "image"
+        }
+      }
+    },
+    {
+      "cpt": "testimonials",
+      "slug": "yamagami-miyuki",
+      "images": {
+        "photo": [
+          "2026/08/voice-yamagami-miyuki.webp"
+        ]
+      },
+      "post_type": "testimonial",
+      "acf_fields": {
+        "photo": {
+          "field_key": "field_tm_photo",
+          "files": [
+            "2026/08/voice-yamagami-miyuki.webp"
+          ],
+          "type": "image"
+        }
+      }
+    }
+  ],
+  "files": [
+    {
+      "relative_path": "2026/07/yuhigaoka9_2000px.webp",
+      "bytes": 35386,
+      "sha256": "1cf0317ff6c8162f07752e270bca7f4fb7712cce1a4714a1d3ffdf8d5799c63b",
+      "title": "yuhigaoka9_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/yuhigaoka5_2000px.webp",
+      "bytes": 234576,
+      "sha256": "5db60a16bb02878bb0cf99a40f0ae68eb2110b4a3aa701d26f9fc94972f1f4a2",
+      "title": "yuhigaoka5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/yuhigaoka3_2000px.webp",
+      "bytes": 454182,
+      "sha256": "b2f0ea3fa27b3b37352313d1480e50e5e53245b6b5b5dfde14eca8dec59b7fec",
+      "title": "yuhigaoka3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/yuhigaoka2_2000px.webp",
+      "bytes": 266244,
+      "sha256": "101d73b7b70df6606fa2197d812cc68bd8048c9fa09f878f0f506d6b545267f8",
+      "title": "yuhigaoka2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/yuhigaoka1_2000px.webp",
+      "bytes": 337480,
+      "sha256": "9d6bbfce9aa1a2d210d8c6b6b780e3329c46d4238b907afa10c386b97905e5d3",
+      "title": "yuhigaoka1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/yuhigaoka6_2000px.webp",
+      "bytes": 171712,
+      "sha256": "07bf0663c60d40a0a1819f6c969130423ad3cd8453a4ab1c7674babebc65c268",
+      "title": "yuhigaoka6_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fujinoenchi1_2000px.webp",
+      "bytes": 356860,
+      "sha256": "83dcd5c5ee7235fc9a78a46171655a1ef963adac5fd05370eec61693a75cd3a6",
+      "title": "fujinoenchi1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fujinoenchi9_2000px.webp",
+      "bytes": 515042,
+      "sha256": "e1859003d5e6ff33218ce596f4238eba3198fdf3a4c8b559111c7fefe1b09027",
+      "title": "fujinoenchi9_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fujinoenchi4_2000px.webp",
+      "bytes": 293646,
+      "sha256": "e769c285dd0c627b76cd0a73423e6d461b188d64ff139cb359c5c261d9b1c229",
+      "title": "fujinoenchi4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fujinoenchi3_2000px.webp",
+      "bytes": 394172,
+      "sha256": "0a7ecda778e171a5ac2a00fcea412ea08bfc712c263cb3ec4a28e7851579936b",
+      "title": "fujinoenchi3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fujinoenchi2_2000px.webp",
+      "bytes": 362098,
+      "sha256": "f88e2808430ca60164fa1fee9743f41fd25b6b86c9dab51f44ecdd61893d2742",
+      "title": "fujinoenchi2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/peshi-cape3_2000px.webp",
+      "bytes": 287498,
+      "sha256": "889fa5cba29e71f966d92c47a530be0c6fbb005b13b13974169b5fc97583b079",
+      "title": "peshi-cape3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/peshi-cape6_2000px.webp",
+      "bytes": 292480,
+      "sha256": "eb28f502e6f5f895a06eedc7433f377785571724eff4c9f47cab4ac7809c8a01",
+      "title": "peshi-cape6_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/peshi-cape4_2000px.webp",
+      "bytes": 324088,
+      "sha256": "18a999c10c6f453b48ea6f9279ec599991461a0136946459377c614d0fce0383",
+      "title": "peshi-cape4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/peshi-cape5_2000px.webp",
+      "bytes": 221914,
+      "sha256": "17dc6d07b40e87dd5636f5633ef92624ed967b1a6c1b7494d54fe960c0b2146e",
+      "title": "peshi-cape5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/peshi-cape2_2000px.webp",
+      "bytes": 243524,
+      "sha256": "eee478f6caeb783505cfba7f7c6754cdf05c2113ff6bb0cacc8a458e19ba83a1",
+      "title": "peshi-cape2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/peshi-cape1_2000px.webp",
+      "bytes": 274710,
+      "sha256": "591ed27cb9dc176e915481f5388c50f8187943293e19a4117f862a5ac5202b1c",
+      "title": "peshi-cape1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/ripkan1_2000px.webp",
+      "bytes": 296250,
+      "sha256": "455e302555d2434b54d9fec831c24380d27946a51a7ede68566af643ef7c7c8e",
+      "title": "ripkan1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/ripkan4_2000px.webp",
+      "bytes": 150454,
+      "sha256": "9c3553375accdaa7e90a71a9ca81224fafdb06f3b79e02b5fe8d8b456534b35f",
+      "title": "ripkan4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/ripkan2_2000px.webp",
+      "bytes": 287102,
+      "sha256": "8ddaabca886d436ed75eed747a33f405d0cd7840861117395d3eae0106fd9083",
+      "title": "ripkan2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/ripkan3_2000px.webp",
+      "bytes": 141548,
+      "sha256": "99be91893f9f858ff72f93db8503280c4270f79d296b4d566d60203160cf0705",
+      "title": "ripkan3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/nozuka-tenboudai4_2000px.webp",
+      "bytes": 400212,
+      "sha256": "897d889fbd7a682fda18bbb798e57cb59b4830aaca422764dbf0a718aa0ee9ef",
+      "title": "nozuka-tenboudai4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/nozuka-tenboudai2_2000px.webp",
+      "bytes": 401166,
+      "sha256": "f0fa478fd4d88d5b418d788a5cf2bf7ce78b5ad6192aa8cf2be3e6f333d903bb",
+      "title": "nozuka-tenboudai2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/nozuka-tenboudai3_2000px.webp",
+      "bytes": 294164,
+      "sha256": "a5d35f71753b288043dd11c68fa39c98b12b710f3d7d406b6dd616483916e6bc",
+      "title": "nozuka-tenboudai3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/nozuka-tenboudai1_2000px.webp",
+      "bytes": 225170,
+      "sha256": "7b45d9e4d939d6773da0e962ddcd51b6669f1f814ec800a338552bff13b8e92e",
+      "title": "nozuka-tenboudai1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/otatomari1_2000px.webp",
+      "bytes": 316312,
+      "sha256": "34c1693b99e3dbae4da66ca0950311718264cd267c7de6941562152d5b3a71b1",
+      "title": "otatomari1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/otatomari2_2000px.webp",
+      "bytes": 396414,
+      "sha256": "b7ff0d489b65b3773317769ba86c64ca12db769d5f071fdc642a9212ccde90ce",
+      "title": "otatomari2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/otatomari4_2000px.webp",
+      "bytes": 248698,
+      "sha256": "212f9e6471e28b23fbc63558388f724b9679985db4db0544b1ecc6d915d3d30b",
+      "title": "otatomari4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/otatomari5_2000px.webp",
+      "bytes": 240706,
+      "sha256": "8ad151997ec127fc658fc02b91aec51f78d2626e4faa366cb2cf38c8d28cd82e",
+      "title": "otatomari5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/otatomari_2000px.webp",
+      "bytes": 376356,
+      "sha256": "ce86d06e26e3963d1f3776f8cfe836c1f983428b73dd52d585c13fb36faa419b",
+      "title": "otatomari_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/minamihama3_2000px.webp",
+      "bytes": 613018,
+      "sha256": "6a7f3047158bfd96b4066d3cc6ca86c6733b500a53b2a291186ee55bd8998e7b",
+      "title": "minamihama3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/minamihama7_2000px.webp",
+      "bytes": 97004,
+      "sha256": "b96d81199b4578ea5b8e4e613d2d29339f0881cd9aee51a1d524d34586ae9894",
+      "title": "minamihama7_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/minamihama4_2000px.webp",
+      "bytes": 234796,
+      "sha256": "ec3a14879671945e1e9e12ee70569736af04b9e2e4946b8ae9a3d1ec19162f1d",
+      "title": "minamihama4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/minamihama9_2000px.webp",
+      "bytes": 265658,
+      "sha256": "5995cc41d4ed84bea866392d7757768eba9d5cdf06e1b9af71a05cfbf932d7f9",
+      "title": "minamihama9_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/minamihama1_2000px.webp",
+      "bytes": 414326,
+      "sha256": "c926475214542593d8138fff2b60dd8e6ec36e41e12fc192fc8ef8b4efdbb25d",
+      "title": "minamihama1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/kozan-shokubutuen3_2000px.webp",
+      "bytes": 354396,
+      "sha256": "1a55585948ff547f7a489b2d78052cb5af5a315b02a2104c049502a2af091eb3",
+      "title": "kozan-shokubutuen3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/kozan-shokubutuen2_2000px.webp",
+      "bytes": 499406,
+      "sha256": "5876adf0fa1dfdfe76d568d1244cee213d58faad31395070dd316cfca262d692",
+      "title": "kozan-shokubutuen2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/kozan-shokubutuen1_2000px.webp",
+      "bytes": 306762,
+      "sha256": "fe79b3910aad1ecfc5b0ea4930bafc14584ed6c0d7e552d3f3d8105fcedefd57",
+      "title": "kozan-shokubutuen1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/kanrosensui3_2000px.webp",
+      "bytes": 430040,
+      "sha256": "8937f41ba95f8fae5bb629d34a8f1759a277698d3b706b9606786e5cf0e7afef",
+      "title": "kanrosensui3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/kanrosensui6_2000px.webp",
+      "bytes": 426732,
+      "sha256": "f2c995d4754bd96843fa40fa3212120f095a3ca8c7aa84c243f823eb10ffa14b",
+      "title": "kanrosensui6_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/kanrosensui5_2000px.webp",
+      "bytes": 760726,
+      "sha256": "6f0627e6e0e6bf4c646fd2001968e0f194e900e528e5a20e9f030dc660e8dfb6",
+      "title": "kanrosensui5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/kanrosensui2_2000px.webp",
+      "bytes": 659804,
+      "sha256": "ef0cd6b9e44da2a3736aa02cdc3cd17bb62354d9c2240a8cc2bb1c70bc6b5b66",
+      "title": "kanrosensui2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/himenuma9_2000px.webp",
+      "bytes": 262814,
+      "sha256": "1c9cebf909bc6ebf9d488d61e1f7dc93a71a4ab70e280d71741ecec0f6452b75",
+      "title": "himenuma9_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/himenuma5_2000px.webp",
+      "bytes": 466440,
+      "sha256": "5400885ffbdce3f1b2952bade9ac9f5ec49d29e66edbc2195e0b61dc20ef2dbb",
+      "title": "himenuma5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/himenuma3_2000px.webp",
+      "bytes": 363792,
+      "sha256": "1f6e1749395da0222cdecfe2f9c16a9519ae6146400b1999168bb5480b8b195c",
+      "title": "himenuma3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/himenuma2_2000px-2.webp",
+      "bytes": 528434,
+      "sha256": "fac4a4f1796bf1529a044f9f29118de5d8fa12b18b63b143b416adc4d3db9821",
+      "title": "himenuma2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/himenuma1_2000px.webp",
+      "bytes": 387208,
+      "sha256": "dcbd59575eb9b2fb1bb45756be24d2b4da5ef8fc8cda6671ca7f2d975c9c68cc",
+      "title": "himenuma1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishiri-zan-zinja1_2000px.webp",
+      "bytes": 525464,
+      "sha256": "baf1570f529e6705724c8303289bae66b63c919e1289e185e6418d7e3088aa93",
+      "title": "rishiri-zan-zinja1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishiri-zan-zinja5_2000px.webp",
+      "bytes": 230228,
+      "sha256": "371016eb185dc7ddbbe61fffd7662ea99ac7682501736500ebbebfb7e72f1ca9",
+      "title": "rishiri-zan-zinja5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishiri-zan-zinja4_2000px.webp",
+      "bytes": 559196,
+      "sha256": "f3275dbd6876378af7f919d28b51589cc16d9dd7db5296b4e4af814d92319c5e",
+      "title": "rishiri-zan-zinja4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishiri-zan-zinja3_2000px.webp",
+      "bytes": 408576,
+      "sha256": "43bf6ecdf22fd54b475c02c03b8ed5b3acae25f658e79ae4b87f12df232db2a0",
+      "title": "rishiri-zan-zinja3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishiri-zan-zinja2_2000px.webp",
+      "bytes": 383102,
+      "sha256": "242a189a3909d731802222bf1ca0667fcbc3a5a5d83846c5f1a374d244b6f18e",
+      "title": "rishiri-zan-zinja2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/top-hero-1.webp",
+      "bytes": 54050,
+      "sha256": "6a9851b47c0f66a1a5cb483c1823a9a143b4e7bca0eeaf2782737dc4038dd2d8",
+      "title": "top-hero",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/DJI_20250712083100_0047_D-scaled.webp",
+      "bytes": 113294,
+      "sha256": "e97b40e2f71bf55420a9651a8621a0c7f2af1f23ffb0d91ddc9ff9769c29deeb",
+      "title": "DJI_20250712083100_0047_D",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/himenuma2_2000px.webp",
+      "bytes": 491412,
+      "sha256": "c5e926b2c832cd2b9b762c7ec4eb119961092c53d97188988efbf5dfa325318b",
+      "title": "himenuma2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/senhousi_2000px.webp",
+      "bytes": 106454,
+      "sha256": "b5397508666be6951bddc932c53849354d8fe5f13472cb86028d20b58151c78d",
+      "title": "senhousi_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/himenuma2_2000px-1.webp",
+      "bytes": 491412,
+      "sha256": "c5e926b2c832cd2b9b762c7ec4eb119961092c53d97188988efbf5dfa325318b",
+      "title": "himenuma2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fujinoenchi_2000px.webp",
+      "bytes": 424382,
+      "sha256": "9722625cd9d9d01033e81ce9dbab1150199caced5eaae4f7ab5ed7a494d17365",
+      "title": "fujinoenchi_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/izumin-no-fukuroma1_2000px.webp",
+      "bytes": 322396,
+      "sha256": "85efaa5d112d2b3fde29b15db5ddf7a04ed14feb64487c5a5385d8fee646f475",
+      "title": "izumin-no-fukuroma1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/izumin-no-fukuroma5_2000px.webp",
+      "bytes": 274052,
+      "sha256": "c2e2c4f35d4b68a0e7c8feabb7518a2e84f64bbbec317f4c1d11b59873542c7e",
+      "title": "izumin-no-fukuroma5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/izumin-no-fukuroma4_2000px.webp",
+      "bytes": 204690,
+      "sha256": "78bb3f5005511d59cf7d5d0289c6ef03957fb010c4f434ec135dc81ccf378679",
+      "title": "izumin-no-fukuroma4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/izumin-no-fukuroma3_2000px.webp",
+      "bytes": 319300,
+      "sha256": "de192e7a1d55242cc6b9864d0e84ab79e72f11c6bc36c2a09adc808d16bbaadd",
+      "title": "izumin-no-fukuroma3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/izumin-no-fukuroma2_2000px.webp",
+      "bytes": 343160,
+      "sha256": "1ff192b194fdfbc64b8065fe46ef982b270d0028389e54a0a4e2e896f97209c6",
+      "title": "izumin-no-fukuroma2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/shiroikoibito-no-oka6_2000px.webp",
+      "bytes": 383220,
+      "sha256": "d2275ddde39264fbddec743d64c7768b876292ec33f7fa997287cba46b343e7e",
+      "title": "shiroikoibito-no-oka6_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/shiroikoibito-no-oka5_2000px.webp",
+      "bytes": 223780,
+      "sha256": "71e43ab0b4e4bef045684f02410b15f80a27ea5fb2bf9b4a293fbd024e4e1e78",
+      "title": "shiroikoibito-no-oka5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/shiroikoibito-no-oka4_2000px.webp",
+      "bytes": 270040,
+      "sha256": "796108611a49feab64bd8f30aca9a4543e9953eaaf60038a18a6c21b71c67e01",
+      "title": "shiroikoibito-no-oka4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/shiroikoibito-no-oka3_2000px.webp",
+      "bytes": 248154,
+      "sha256": "317c42e8b65574e81530f76c57ab68b4f24cf96b6ab020066fe33cfea4512845",
+      "title": "shiroikoibito-no-oka3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/shiroikoibito-no-oka2_2000px.webp",
+      "bytes": 69528,
+      "sha256": "36ddb716998d06442e0ef8e9a55c72760f17588df8b7d4dd2bb385531fa9db5b",
+      "title": "shiroikoibito-no-oka2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/shiroikoibito-no-oka1_2000px.webp",
+      "bytes": 389872,
+      "sha256": "b359487de6669a67e1fdb7c7898c14a5984a738a17d75c5443bf08cf2f03cc56",
+      "title": "shiroikoibito-no-oka1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/minato-beergarden7_2000px.webp",
+      "bytes": 62896,
+      "sha256": "64875e4264ed7b9ebb576ceac497b5f879f6976ca03b27cb77ce303549e88c7a",
+      "title": "minato-beergarden7_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/minato-beergarden30_2000px.webp",
+      "bytes": 89022,
+      "sha256": "1441b251cc48e5b21d6fba419a1a817c3364a57a132d49b286eb5d023e6e440d",
+      "title": "minato-beergarden30_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/minato-beergarden16_2000px.webp",
+      "bytes": 60988,
+      "sha256": "556090d427f8a901773175b1f4142787db4060c3f51107c1db2e6a472b14c85a",
+      "title": "minato-beergarden16_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/minato-beergarden21_2000px.webp",
+      "bytes": 67094,
+      "sha256": "6b7ca0b8a1efbfb53097165e966c0b85269c19fe26df27f2aae3d84dd35fed82",
+      "title": "minato-beergarden21_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/minato-beergarden13_2000px.webp",
+      "bytes": 29730,
+      "sha256": "27ab81c6ce6022d095d7c39c81b1a2f9c9b68b0c8dae472321494750a70c4d37",
+      "title": "minato-beergarden13_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/minato-beergarden24_2000px.webp",
+      "bytes": 90152,
+      "sha256": "4e11b466dea90e95828907743e2e7a6bb6ec99a49505c3e34454fa01a0972274",
+      "title": "minato-beergarden24_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/yuuyuurunning_6.webp",
+      "bytes": 39948,
+      "sha256": "3c4a7ad2a593f7821e964310ff715194c955847f68578dc551fc99ccd263c803",
+      "title": "yuuyuurunning_6",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/yuuyuurunning_18.webp",
+      "bytes": 100880,
+      "sha256": "7af6c735705d900d53d95a2cac258bb4ce8f939d358a1bb6faa0a87292e42d72",
+      "title": "yuuyuurunning_18",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/yuuyuurunning_15.webp",
+      "bytes": 30932,
+      "sha256": "ad9914af23fe451ed89fe0e12b623e22243b2fbeca3b964bc05a2f1449fd1235",
+      "title": "yuuyuurunning_15",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/yuuyuurunning_11.webp",
+      "bytes": 67886,
+      "sha256": "85ad07a4353bb935434ee8d9cd283e794345d3782985bfa9cfe22a424f44582b",
+      "title": "yuuyuurunning_11",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/yuuyuuruning5_2000px.webp",
+      "bytes": 53202,
+      "sha256": "4dca18e124967ac1b61c55a5816035742ce041151428c7689f53041da0356c59",
+      "title": "yuuyuuruning5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/shimamatsuri_oshidomari_23.webp",
+      "bytes": 44600,
+      "sha256": "495fc8ad6d06961edabb2326a15ac8c103c9f9b0dbf0111778aabc1feb27ede6",
+      "title": "shimamatsuri_oshidomari_23",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/shimamatsuri_oshidomari_22.webp",
+      "bytes": 63854,
+      "sha256": "86be27fa2ccad6562ffd170ff2b5ceaac71b9c40f047887c15f6c54f59cf88cb",
+      "title": "shimamatsuri_oshidomari_22",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/shimamatsuri_oniwaki_17.webp",
+      "bytes": 94304,
+      "sha256": "84037d8ff13b04bac7fd6862da87e24e2a0de03ef44cf860594abab7f8f36c40",
+      "title": "shimamatsuri_oniwaki_17",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/shimamatsuri_oniwaki_13.webp",
+      "bytes": 77166,
+      "sha256": "73178436a75a97a0ed3529e09410691fa7def9671ee020dbe09f3f3b08096ec8",
+      "title": "shimamatsuri_oniwaki_13",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/hokkaishimamatsuri6_2000px.webp",
+      "bytes": 37406,
+      "sha256": "9b37f03e1997d2da8ba44a67d7417f034afe648d87126c52195b6fe2dcb19033",
+      "title": "hokkaishimamatsuri6_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/hokkaishimamatsuri1_2000px.webp",
+      "bytes": 73270,
+      "sha256": "8b2c061c27a1168e349e395c8840487da9963ceb57bc129937dc50d2f63517af",
+      "title": "hokkaishimamatsuri1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/uniunifasR7_13.webp",
+      "bytes": 30798,
+      "sha256": "293e9bf194ec87b3dc86ba7be14419749821bf48049c930675255a57390484cd",
+      "title": "uniunifasR7_13",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/uniunifes1_2000px.webp",
+      "bytes": 64266,
+      "sha256": "410b16204ce397cfa813243881ced2748d11ecf122395f0d086a5f9defedb779",
+      "title": "uniunifes1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/uniunifasR7_32.webp",
+      "bytes": 63680,
+      "sha256": "51134c3fef79f4f32c88b20974499be1bac1e1ae15a9a7ae9bd6d69f93335d56",
+      "title": "uniunifasR7_32",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/uniunifasR7_29.webp",
+      "bytes": 36476,
+      "sha256": "efec7fe69c350801a5f1aa7cef64203658aec15814c83f4acd30e437b8b3630d",
+      "title": "uniunifasR7_29",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/uniunifasR7_25.webp",
+      "bytes": 36066,
+      "sha256": "29ae410bf5dac142e3f002f74c715d601325bd7a08a1ca87878cc2220f6bb263",
+      "title": "uniunifasR7_25",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/uniunifasR7_5.webp",
+      "bytes": 66012,
+      "sha256": "8372d0ddf3aab72b61b7d0ee95689d1342446031880747bdbeb0b1f74b215e59",
+      "title": "uniunifasR7_5",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fureaicycling_16.webp",
+      "bytes": 69588,
+      "sha256": "32d44c95e392d01a4b7c5c0617255b74c40b4876d1ee8f1eb49531e83029381a",
+      "title": "fureaicycling_16",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fureaicycling_26.webp",
+      "bytes": 40368,
+      "sha256": "c13ff0596fe45188430714c7813b72698ccd597ee1f90f257a344d0562f132de",
+      "title": "fureaicycling_26",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fureaicycling_25.webp",
+      "bytes": 74978,
+      "sha256": "c96932245cf78906fcab7910bac07bbf92f66b06978e7033400a8b0ba3529774",
+      "title": "fureaicycling_25",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fureaicycling_13.webp",
+      "bytes": 67150,
+      "sha256": "c3d6ef57512dfe32d1ff9511d03c5c8402a76d369f6adeb0c5e35d4601d706b5",
+      "title": "fureaicycling_13",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/fureaicycling_12.webp",
+      "bytes": 79502,
+      "sha256": "52c84a77f98130a1e866791e62369ab843a26e007a24af40aa08d3dbf2f1b69a",
+      "title": "fureaicycling_12",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishirizan-zinja-reitaisai2_2000px.webp",
+      "bytes": 66398,
+      "sha256": "ac995ace0f2604f305bc20e205e1f3fbe633e2678540ca59c572160b7406ff3b",
+      "title": "rishirizan-zinja-reitaisai2_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishirizan-zinja-reitaisai1_2000px.webp",
+      "bytes": 88384,
+      "sha256": "55deeddcb2082eedb49fa4708f4ec540d4ada1003153ef72a5ea2e89e4414ac2",
+      "title": "rishirizan-zinja-reitaisai1_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishirizan-zinja-reitaisai3_2000px.webp",
+      "bytes": 75680,
+      "sha256": "32378ea88061021970e5f763e28be7a423e4b99d96f59ef507d17540ef32460b",
+      "title": "rishirizan-zinja-reitaisai3_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishirizan-zinja-reitaisai4_2000px.webp",
+      "bytes": 53116,
+      "sha256": "61ceb1e0450ef042c0829a86264009e4a38da8792907db27d3a13cf5b3557c61",
+      "title": "rishirizan-zinja-reitaisai4_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishirizan-zinja-reitaisai5_2000px.webp",
+      "bytes": 60088,
+      "sha256": "476b78afec0a82c1cef1df9f976426666eab8e9fec30fa12c795a4d1d4e6305b",
+      "title": "rishirizan-zinja-reitaisai5_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishirizan-zinja-reitaisai6_2000px.webp",
+      "bytes": 65994,
+      "sha256": "12ecf8ab78a09610b6b3f6f561297b9fc6d73d2dc9579f0434bbae3c8c5d4585",
+      "title": "rishirizan-zinja-reitaisai6_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/07/rishirizan-zinja-reitaisai7_2000px.webp",
+      "bytes": 55652,
+      "sha256": "d2e1456729872ce777a87403d1ed59c11a42c38f4da47f7aae3c7927c862f572",
+      "title": "rishirizan-zinja-reitaisai7_2000px",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/voice-ogawa-kitai.webp",
+      "bytes": 108804,
+      "sha256": "babf124089f10b622f201fc7a575bd3fd768bdcb53e9f752d4833c1941cf8f6d",
+      "title": "voice: おがわさん・きたいさん",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/voice-yamazaki.webp",
+      "bytes": 139244,
+      "sha256": "50b9809565f2cd597b4b3b0c8f8bcf8d176932711d3f0e2a38ea3ae01ad03670",
+      "title": "voice: やまざきさん",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/voice-shirakawa.webp",
+      "bytes": 106948,
+      "sha256": "961223a7fe70db019130a8b220fccf1ab75a2b035e9aaabf317a900756c65a4a",
+      "title": "voice: しらかわさん",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/voice-iwagaki-minami.webp",
+      "bytes": 105486,
+      "sha256": "8796bb70f443ca17f800bec884f9a400d59bec1743cb489456876c40f35a9b1f",
+      "title": "voice: いわがきみなみさん",
+      "alt_text": ""
+    },
+    {
+      "relative_path": "2026/08/voice-yamagami-miyuki.webp",
+      "bytes": 91688,
+      "sha256": "3123aef9f1cfa3a4ecf8d9859fc33aab0ffb75d2b34c6655e4fb3cbb03ee2358",
+      "title": "voice: 山上みゆきさん",
+      "alt_text": ""
+    }
+  ],
+  "missing_local_files": [],
+  "scope": "Published CPT ACF images queried from local WordPress; not a complete WordPress backup."
+}
