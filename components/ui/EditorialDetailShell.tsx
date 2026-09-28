@@ -64,6 +64,18 @@ export function EditorialDetailSection({ eyebrow, label, children }: { eyebrow: 
   return <section className="relative mx-auto grid max-w-[1080px] gap-10 border-t border-[color:var(--c-deep-ocean)]/15 px-[var(--space-6)] py-16 first:border-t-0 md:grid-cols-[13rem_1fr] md:gap-20 md:py-24"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">{eyebrow}</p><p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">{label}</p></div><div>{children}</div></section>;
 }
 
+// 値が"実質空"か判定(null/undefined/空文字/空白のみの文字列 → 空扱い)。
+function isEmptyValue(value: ReactNode): boolean {
+  if (value === null || value === undefined) return true;
+  if (typeof value === "string") return value.trim() === "";
+  return false;
+}
+
+// items の中に描画可能な値が1つでもあるか(セクション非表示判定用)。
+export function hasAnyValue(items: Array<{ value: ReactNode }>): boolean {
+  return items.some((item) => !isEmptyValue(item.value));
+}
+
 export function EditorialFieldList({ items }: { items: Array<{ label: string; value: ReactNode }> }) {
-  return <dl className="border-t border-[color:var(--c-deep-ocean)]/15">{items.filter((item)=>item.value !== null && item.value !== undefined && item.value !== "").map((item)=><div key={item.label} className="grid grid-cols-[7rem_1fr] gap-5 border-b border-[color:var(--c-deep-ocean)]/15 py-5 text-sm md:grid-cols-[10rem_1fr] md:text-base"><dt className="font-bold text-[color:var(--c-text-secondary)]">{item.label}</dt><dd className="font-bold leading-7 text-[color:var(--c-text-primary)]">{renderMultiline(item.value)}</dd></div>)}</dl>;
+  return <dl className="border-t border-[color:var(--c-deep-ocean)]/15">{items.filter((item)=>!isEmptyValue(item.value)).map((item)=><div key={item.label} className="grid grid-cols-[7rem_1fr] gap-5 border-b border-[color:var(--c-deep-ocean)]/15 py-5 text-sm md:grid-cols-[10rem_1fr] md:text-base"><dt className="font-bold text-[color:var(--c-text-secondary)]">{item.label}</dt><dd className="font-bold leading-7 text-[color:var(--c-text-primary)]">{renderMultiline(item.value)}</dd></div>)}</dl>;
 }

@@ -131,17 +131,17 @@ export default async function VoiceDetailPage({ params }: PageProps) {
           style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }}
         />
 
-        <section className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
-              Interview
-            </p>
-            <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
-              本人の言葉
-            </p>
-          </div>
-          <div>
-            {qaList.length > 0 ? (
+        {qaList.length > 0 ? (
+          <section className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+                Interview
+              </p>
+              <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
+                本人の言葉
+              </p>
+            </div>
+            <div>
               <dl className="divide-y divide-[color:var(--c-deep-ocean)]/15">
                 {qaList.map((qa, index) => (
                   <div key={index} className="py-8 first:pt-0 last:pb-0 md:py-10">
@@ -159,13 +159,9 @@ export default async function VoiceDetailPage({ params }: PageProps) {
                   </div>
                 ))}
               </dl>
-            ) : (
-              <p className="text-base leading-9 text-[color:var(--c-text-secondary)]">
-                インタビュー本文を準備しています。
-              </p>
-            )}
-          </div>
-        </section>
+            </div>
+          </section>
+        ) : null}
 
         <aside className="relative overflow-hidden bg-[color:var(--c-deep-ocean)] px-[var(--space-6)] py-20 text-[color:var(--c-text-inverse)] md:py-28">
           <div
