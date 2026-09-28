@@ -15,7 +15,8 @@ const MODEL_BASE_SCALE_DESKTOP = 0.048;
 const MODEL_BASE_SCALE_MOBILE = 1.15;
 // SP 時にカメラの注視点を下にずらすことで、島を画面上方向へ寄せる。
 // カメラを寝かせた（DIRECTION Y=6）ので、LOOKAT も控えめに。
-const MOBILE_LOOKAT_Y_OFFSET = 15;
+// SP パネル(40dvh)拡張に合わせて島をさらに上へ(15→22)。
+const MOBILE_LOOKAT_Y_OFFSET = 22;
 const MAX_ROTATION = Math.PI / 4;
 const DAMP_SPEED = 4;
 const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;

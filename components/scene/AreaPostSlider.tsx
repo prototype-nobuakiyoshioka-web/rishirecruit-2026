@@ -323,7 +323,15 @@ function AreaPostSliderContent({
                 allowWrap = true;
               } else {
                 if (slideInfo.eventMeta.period) chips.push(slideInfo.eventMeta.period);
-                if (slideInfo.eventMeta.venueName) chips.push(flattenBrString(slideInfo.eventMeta.venueName));
+                if (slideInfo.eventMeta.venueName) {
+                  // venueName に <br /> があれば会場ごとに chip 分割(縦積み対応)
+                  const venueParts = slideInfo.eventMeta.venueName
+                    .split(/(?:\s*<br\s*\/?>\s*|\n)+/gi)
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                  chips.push(...venueParts);
+                  if (venueParts.length > 1) allowWrap = true;
+                }
               }
             }
             if (chips.length === 0) return null;
