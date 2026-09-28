@@ -52,7 +52,7 @@ export default async function ColumnsPage() {
                   <div
                     role="img"
                     aria-label={`${article.title}のサムネイル`}
-                    className="aspect-[1280/670] w-full rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)] bg-contain bg-no-repeat bg-center transition-transform duration-500 hover:scale-[1.02]"
+                    className={`aspect-[1280/670] w-full rounded-[var(--radius-2xl)] bg-[color:var(--c-ice)] bg-no-repeat bg-center transition-transform duration-500 hover:scale-[1.02] ${article.imageIsFallback ? "bg-cover" : "bg-contain"}`}
                     style={
                       article.imageUrl
                         ? { backgroundImage: `url(${JSON.stringify(article.imageUrl)})` }

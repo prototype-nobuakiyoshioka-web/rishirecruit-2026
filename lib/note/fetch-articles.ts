@@ -6,6 +6,9 @@ export interface NoteArticle {
   publishedAt: string;
   excerpt: string | null;
   imageUrl: string | null;
+  // true = RSS のサムネ/description に画像がなく、記事本文から拾ったフォールバック画像
+  // (この場合フロントは cover 表示で余白を出さない)
+  imageIsFallback: boolean;
 }
 
 interface NoteFeedItem {
@@ -123,6 +126,7 @@ export async function fetchNoteArticles(): Promise<NoteArticle[]> {
             item.contentSnippet ?? item.descriptionHtml ?? item.content,
           ),
           imageUrl: rssImage,
+          imageIsFallback: false,
         },
       ];
     });
@@ -131,7 +135,8 @@ export async function fetchNoteArticles(): Promise<NoteArticle[]> {
     return await Promise.all(
       items.map(async (item) => {
         if (item.imageUrl) return item;
-        return { ...item, imageUrl: await fetchArticleOgImage(item.link) };
+        const fallback = await fetchArticleOgImage(item.link);
+        return { ...item, imageUrl: fallback, imageIsFallback: fallback !== null };
       }),
     );
   } catch (error: unknown) {

@@ -46,7 +46,7 @@ export default async function EventsPage() {
                   <p className="mt-3 text-lg font-black text-[color:var(--c-deep-ocean)]">{period || "開催日調整中"}</p>
                   <h2 className="mt-2 text-2xl font-black leading-tight tracking-[-0.02em] text-[color:var(--c-deep-ocean)] md:text-3xl">{event.title}</h2>
                   {fields?.catchCopy ? <p className="mt-2 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
-                  {fields?.venueName ? <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">会場　{fields.venueName}</p> : null}
+                  {fields?.venueName ? <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">会場　{fields.venueName.replace(/<br\s*\/?>/gi, " / ").replace(/\s+/g, " ").trim()}</p> : null}
                   <Link href={`/events/${event.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">開催情報を見る →</Link>
                 </div>
               </article>
