@@ -7,7 +7,12 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 // そのままだと `<br />` が文字列として表示されてしまう問題を吸収する。
 function renderMultiline(value: ReactNode): ReactNode {
   if (typeof value !== "string") return value;
-  const segments = value.split(/<br\s*\/?>|\n/gi).filter(Boolean);
+  // 連続する <br /> / \n / 空白 を1つの改行として扱う。
+  // 例: "A<br />\nB" や "A<br /><br />B" も1つの<br />で描画。
+  const segments = value
+    .split(/(?:\s*<br\s*\/?>\s*|\n)+/gi)
+    .map((s) => s.trim())
+    .filter(Boolean);
   if (segments.length <= 1) return value;
   return segments.map((seg, i) => (
     <Fragment key={i}>{i > 0 && <br />}{seg}</Fragment>
