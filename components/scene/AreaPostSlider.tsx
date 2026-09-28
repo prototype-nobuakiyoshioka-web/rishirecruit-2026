@@ -18,6 +18,24 @@ import { AreaInfoPanel } from "./AreaInfoPanel";
 
 type TabType = "job" | "event" | "spot";
 
+// ACF textarea(new_lines: 'br')由来の "A<br />B" を実際の改行として React に描画する。
+// 連続する <br /> / \n / 空白は1つの改行に集約。
+function renderBrString(value: string): ReactNode {
+  const segments = value
+    .split(/(?:\s*<br\s*\/?>\s*|\n)+/gi)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (segments.length <= 1) return value;
+  return segments.map((seg, i) => (
+    <span key={i}>{i > 0 && <br />}{seg}</span>
+  ));
+}
+
+// chip 表示など、1行にせざるを得ない場合に <br /> を区切り文字に置換して1行化。
+function flattenBrString(value: string): string {
+  return value.replace(/\s*<br\s*\/?>\s*/gi, " / ").replace(/\s+/g, " ").trim();
+}
+
 interface PostInfo {
   title: string;
   catchCopy: string | null;
@@ -305,7 +323,7 @@ function AreaPostSliderContent({
                 allowWrap = true;
               } else {
                 if (slideInfo.eventMeta.period) chips.push(slideInfo.eventMeta.period);
-                if (slideInfo.eventMeta.venueName) chips.push(slideInfo.eventMeta.venueName);
+                if (slideInfo.eventMeta.venueName) chips.push(flattenBrString(slideInfo.eventMeta.venueName));
               }
             }
             if (chips.length === 0) return null;
@@ -454,7 +472,7 @@ function AreaPostSliderContent({
                 });
               } else {
                 if (slideInfo.eventMeta.period) rows.push({ label: "開催時期", value: slideInfo.eventMeta.period });
-                if (slideInfo.eventMeta.venueName) rows.push({ label: "会場", value: slideInfo.eventMeta.venueName });
+                if (slideInfo.eventMeta.venueName) rows.push({ label: "会場", value: renderBrString(slideInfo.eventMeta.venueName) });
               }
             }
             if (rows.length === 0) return null;
