@@ -12,7 +12,7 @@ import type { AreaWithPosts } from "@/lib/wp/queries/areas";
 import type { JobPosting, Touristspot, WPEvent } from "@/lib/wp/types";
 import { selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
-import { formatEventPeriod } from "@/lib/utils/format-date";
+import { formatEventPeriod, formatScheduleEntries } from "@/lib/utils/format-date";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 import { AreaInfoPanel } from "./AreaInfoPanel";
 
@@ -32,6 +32,8 @@ interface PostInfo {
   eventMeta?: {
     period: string | null;
     venueName: string | null;
+    // 会場と日程リピーターの整形済み配列("〇会場 ◯月◯日")。入力があれば優先表示。
+    scheduleEntries: string[];
   };
 }
 
@@ -117,7 +119,10 @@ function getEventInfo(post: WPEvent): PostInfo {
     post.eventFields?.endDatetime ?? null,
     post.eventFields?.periodMonth?.[0] ?? null,
     post.eventFields?.periodRange?.[0] ?? null,
+    post.eventFields?.periodNth?.[0] ?? null,
+    post.eventFields?.periodWeekday?.[0] ?? null,
   );
+  const scheduleEntries = formatScheduleEntries(post.eventFields?.scheduleEntries);
 
   return {
     title: post.title,
@@ -128,6 +133,7 @@ function getEventInfo(post: WPEvent): PostInfo {
       // "日程未定" は表示しない
       period: period && period !== "日程未定" ? period : null,
       venueName: post.eventFields?.venueName ?? null,
+      scheduleEntries,
     },
   };
 }
@@ -286,28 +292,35 @@ function AreaPostSliderContent({
           )}
           {(() => {
             // タイトル・キャッチと詳細リンクの間に極小 chip でメタ情報を差し込む。
-            // SP の card 幅は狭いので、chip は最大 2 個までを想定し、はみ出しは省略する。
+            // scheduleEntries はカード高を許容して全件表示する(縦積み)。
             const chips: string[] = [];
+            let allowWrap = false;
             if (slideInfo.jobMeta) {
               if (slideInfo.jobMeta.employmentType) chips.push(slideInfo.jobMeta.employmentType);
               if (slideInfo.jobMeta.salary) chips.push(slideInfo.jobMeta.salary);
             }
             if (slideInfo.eventMeta) {
-              if (slideInfo.eventMeta.period) chips.push(slideInfo.eventMeta.period);
-              if (slideInfo.eventMeta.venueName) chips.push(slideInfo.eventMeta.venueName);
+              if (slideInfo.eventMeta.scheduleEntries.length > 0) {
+                chips.push(...slideInfo.eventMeta.scheduleEntries);
+                allowWrap = true;
+              } else {
+                if (slideInfo.eventMeta.period) chips.push(slideInfo.eventMeta.period);
+                if (slideInfo.eventMeta.venueName) chips.push(slideInfo.eventMeta.venueName);
+              }
             }
             if (chips.length === 0) return null;
+            const chipList = allowWrap ? chips : chips.slice(0, 2);
             return (
               <div
                 style={{
                   display: "flex",
-                  flexWrap: "nowrap",
+                  flexWrap: allowWrap ? "wrap" : "nowrap",
                   gap: "0.35rem",
                   marginBottom: "var(--space-1)",
-                  overflow: "hidden",
+                  overflow: allowWrap ? "visible" : "hidden",
                 }}
               >
-                {chips.slice(0, 2).map((chip) => (
+                {chipList.map((chip) => (
                   <span
                     key={chip}
                     style={{
@@ -319,10 +332,10 @@ function AreaPostSliderContent({
                       fontSize: "0.72rem",
                       fontWeight: 700,
                       lineHeight: 1.4,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      maxWidth: "48%",
+                      whiteSpace: allowWrap ? "normal" : "nowrap",
+                      overflow: allowWrap ? "visible" : "hidden",
+                      textOverflow: allowWrap ? "clip" : "ellipsis",
+                      maxWidth: allowWrap ? "100%" : "48%",
                     }}
                   >
                     {chip}
@@ -419,33 +432,44 @@ function AreaPostSliderContent({
               {slideInfo.catchCopy}
             </p>
           )}
-          {(slideInfo.jobMeta || slideInfo.eventMeta) && (
-            <dl
-              style={{
-                display: "grid",
-                gridTemplateColumns: "5rem 1fr",
-                rowGap: "clamp(var(--space-1), 0.8dvh, var(--space-2))",
-                columnGap: "var(--space-3)",
-                fontSize: "clamp(0.78rem, 1.7dvh, 0.85rem)",
-                marginBottom: "clamp(var(--space-2), 2dvh, var(--space-3))",
-              }}
-            >
-              {[
-                ...(slideInfo.jobMeta
-                  ? [
-                      { label: "雇用形態", value: slideInfo.jobMeta.employmentType },
-                      { label: "給与", value: slideInfo.jobMeta.salary },
-                    ]
-                  : []),
-                ...(slideInfo.eventMeta
-                  ? [
-                      { label: "開催時期", value: slideInfo.eventMeta.period },
-                      { label: "会場", value: slideInfo.eventMeta.venueName },
-                    ]
-                  : []),
-              ]
-                .filter((row) => row.value)
-                .map((row) => (
+          {(slideInfo.jobMeta || slideInfo.eventMeta) && (() => {
+            // event の場合 scheduleEntries があれば「会場と日程」を縦積み、無ければ period + venueName の従来2行
+            type Row = { label: string; value: React.ReactNode };
+            const rows: Row[] = [];
+            if (slideInfo.jobMeta) {
+              if (slideInfo.jobMeta.employmentType) rows.push({ label: "雇用形態", value: slideInfo.jobMeta.employmentType });
+              if (slideInfo.jobMeta.salary) rows.push({ label: "給与", value: slideInfo.jobMeta.salary });
+            }
+            if (slideInfo.eventMeta) {
+              if (slideInfo.eventMeta.scheduleEntries.length > 0) {
+                rows.push({
+                  label: "会場と日程",
+                  value: (
+                    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                      {slideInfo.eventMeta.scheduleEntries.map((entry) => (
+                        <li key={entry}>{entry}</li>
+                      ))}
+                    </ul>
+                  ),
+                });
+              } else {
+                if (slideInfo.eventMeta.period) rows.push({ label: "開催時期", value: slideInfo.eventMeta.period });
+                if (slideInfo.eventMeta.venueName) rows.push({ label: "会場", value: slideInfo.eventMeta.venueName });
+              }
+            }
+            if (rows.length === 0) return null;
+            return (
+              <dl
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "5rem 1fr",
+                  rowGap: "clamp(var(--space-1), 0.8dvh, var(--space-2))",
+                  columnGap: "var(--space-3)",
+                  fontSize: "clamp(0.78rem, 1.7dvh, 0.85rem)",
+                  marginBottom: "clamp(var(--space-2), 2dvh, var(--space-3))",
+                }}
+              >
+                {rows.map((row) => (
                   <div key={row.label} style={{ display: "contents" }}>
                     <dt
                       style={{
@@ -459,17 +483,17 @@ function AreaPostSliderContent({
                       style={{
                         color: "var(--c-deep-ocean)",
                         fontWeight: 700,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
+                        // scheduleEntries はリストで縦積みするため overflow / nowrap を外す
+                        margin: 0,
                       }}
                     >
                       {row.value}
                     </dd>
                   </div>
                 ))}
-            </dl>
-          )}
+              </dl>
+            );
+          })()}
           <Link
             href={slideInfo.href}
             style={{

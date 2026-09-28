@@ -33,7 +33,9 @@ export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
       <div
         className="fixed z-40 flex"
         style={{
-          top: "70dvh",
+          // SPパネル高を 40dvh に拡張(30→40dvh)、会場と日程が縦積みでも隠れないように。
+          // ColumnBoard(コラム看板)側も40dvhに合わせる。
+          top: "60dvh",
           right: 0,
           bottom: "var(--space-4)",
           width: "100vw",

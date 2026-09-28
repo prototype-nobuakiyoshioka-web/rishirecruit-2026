@@ -73,7 +73,8 @@
 @media (width < 768px) {
   .board {
     z-index: 49;
-    bottom: calc(30dvh + var(--space-2));
+    /* SPパネル高を 40dvh に拡張したため看板位置も追従(AreaSidePanels の top:60dvh と一致) */
+    bottom: calc(40dvh + var(--space-2));
     left: 4vw;
     width: 148px;
     height: 56px;
