@@ -19,7 +19,7 @@ export default async function EventDetailPage({params}:PageProps){
   const ogImage=ogImageFromField(fields?.thumbnailImage);
   const descriptionText=htmlToText(fields?.description);
   // 掲載イベントは全て毎年開催のため「毎年開催」行は表示ロジックから除外(ACFフィールドは保持)
-  const scheduleItems=[{label:"日程",value:period},{label:"開催パターン",value:fields?.recurrenceNote},{label:"会場",value:fields?.venueName},{label:"住所",value:fields?.address}];
+  const scheduleItems=[{label:"日程",value:period},{label:"開催詳細",value:fields?.recurrenceNote},{label:"会場",value:fields?.venueName},{label:"住所",value:fields?.address}];
   const joinItems=[{label:"アクセス",value:fields?.accessInfo},{label:"参加費",value:fields?.price},{label:"問い合わせ",value:fields?.contact},{label:"申込",value:fields?.registrationUrl?<a href={fields.registrationUrl} target="_blank" rel="noopener noreferrer" className="underline">申込ページを開く ↗</a>:null}];
   // イベント構造化データ。日時が取得できる場合のみ startDate を含める。
   const eventLd={"@context":"https://schema.org","@type":"Event",name:event.title,description:descriptionText||fields?.catchCopy||event.title,startDate:fields?.startDatetime??undefined,endDate:fields?.endDatetime??undefined,eventStatus:"https://schema.org/EventScheduled",location:{"@type":"Place",name:fields?.venueName??"利尻富士町",address:{"@type":"PostalAddress",addressRegion:"北海道",addressLocality:"利尻富士町",addressCountry:"JP",streetAddress:fields?.address??undefined}},image:ogImage?[ogImage.url]:undefined,url:absoluteUrl(`/events/${slug}`)};

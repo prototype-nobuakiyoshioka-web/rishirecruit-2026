@@ -214,10 +214,10 @@ add_action('acf/init', function (): void {
             ],
             [
                 'key' => 'field_ev_recurrence_note',
-                'label' => '開催パターン',
+                'label' => '開催詳細',
                 'name' => 'recurrence_note',
                 'type' => 'textarea',
-                'instructions' => '毎年開催の場合の開催パターンを入力してください。例: 毎年7月最終週',
+                'instructions' => '開催の詳細（毎年開催のパターン・時間帯・追記など）を入力してください。例: 毎年7月最終週 / 10:00〜16:00',
                 'required' => 0,
                 'rows' => 3,
                 'new_lines' => 'br',
