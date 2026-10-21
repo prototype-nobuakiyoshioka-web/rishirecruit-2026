@@ -273,6 +273,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
           prefecture: form.prefecture,
           address_line: form.addressLine,
           job_slug: jobSlug,
+          job_title: jobTitle,
           privacy: form.privacy ? "1" : "",
         },
         turnstileToken,

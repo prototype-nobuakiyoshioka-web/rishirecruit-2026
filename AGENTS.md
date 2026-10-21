@@ -342,6 +342,7 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [x] GA4・主要KPI計測 — `@next/third-parties`(16.2.6 pin)の `GoogleAnalytics` を `app/layout.tsx` に設置(`NEXT_PUBLIC_GA_ID` 設定時のみ読み込み、page_viewはenhanced measurementで自動)。カスタムイベントは `lib/analytics.ts` の `trackEvent()`(GA未設定時no-op)経由: 応募完了=`apply_submit`(job_slug/job_title)、問い合わせ完了=`contact_submit`(inquiry_type)、応募CTAクリック=`apply_cta_click`(StickyApplyCta)。GA_ID空→gtag読込0、GA_ID設定→gtag.js読込をdevで確認、`npm run build` 通過。**本番前に実GA4測定ID(G-XXXX)を `NEXT_PUBLIC_GA_ID` に設定が必要。GA4管理画面でのコンバージョン設定・実イベント着弾確認は吉岡さん側**
   - [~] Vitest / Playwright・アクセシビリティ・Lighthouse — **テスト基盤導入済み**。Vitest(4.1.11 pin)でユニット29件(`tests/unit/`: format/format-date/grid-spans/seo/turnstile、`@/`はViteネイティブtsconfigPaths、node環境)、Playwright(1.62.1 pin)でE2Eスモーク3件(`tests/e2e/smoke.spec.ts`: robots.txt/sitemap.xml/privacy、WP非依存の静的ルートのみ、webServerで`next dev`自動起動)。スクリプト: `npm run test`/`test:watch`/`test:e2e`。生成物は.gitignore除外済み。全29+3件パス確認。**残: アクセシビリティ監査・Lighthouse計測は未着手。E2Eのフォーム/WP実データ経路のテスト拡充も今後**
   - [ ] 本番ホスティング・環境変数・監視
+  - [x] 本番WPの投稿画像移行・参照修復（2026-09-25）— FTPS転送＋一時管理ツールで公開25投稿を照合し、不足28枚を登録、21投稿の画像ACFを修復。再照合で不足0・要修正0、公開6ページの画像読み込みを確認。一時ツールは無効化済み。既存重複は削除せず、画像メタの変更前バックアップ・適用後記録を保存。詳細と利尻山の同一画像共用による表示枚数差は `docs/10-media-migration.md`。
 
 ### 次に進める順序
 
