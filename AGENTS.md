@@ -110,14 +110,20 @@
 ├── acf-json/           ACF Local JSON 保存先
 ├── app/                Next.js App Router pages
 ├── components/
-│   ├── scene/          Canvas, Island, Pins, Lighting(3D関連)
-│   └── ui/             Modal, Filter, Nav(DOM側UI)
+│   ├── scene/          3D(IslandCanvas / IslandModel / Pin 等)＋トップの HUD(AreaSidePanels / AreaPostSlider / ColumnBoard)
+│   ├── layout/         Header / Footer / PageTransition / StickyApplyCta
+│   ├── ui/             下層ページ共通UI(Button / CardGrid / PageHero / Turnstile 等)
+│   ├── job/            応募フォーム
+│   └── seo/            JSON-LD
 ├── lib/
-│   ├── wp/             GraphQLクライアントとクエリ
-│   └── three/          Helpers(clamp回転、Billboard等)
+│   ├── wp/             GraphQLクライアントとクエリ、CF7送信
+│   ├── three/          ピン座標・飛行機の航路など
+│   └── seo.ts / analytics.ts / turnstile.ts
+├── middleware.ts       NEXT_PUBLIC_COMING_SOON=true で全ページを /coming-soon に差し替え
 ├── public/
-│   └── models/         現行の島GLBプロトタイプ
-├── store/              Zustand ストア(現在はスクロール・エリア状態)
+│   └── models/         島・飛行機の GLB(PC用 / SP用)
+├── store/              Zustand(scroll-progress-store = 回転角・表示中エリア・フッター表示 / active-pin-position-store)
+├── tests/              unit(Vitest) / e2e(Playwright)
 ├── docs/               要件・スキーマ・トークン等
 ├── reference/          完全仕様 HTML
 └── prompts/            Codex 用タスクプロンプト
@@ -180,6 +186,19 @@ useFrame((_, dt) => {
 
 **順序を間違えるとカクつく**: 必ず `clamp` → `damp` の順。
 
+### トップページのスクロールの仕組み(実装済みの現状)
+
+- トップ(`app/page.tsx`)の `<main>` は `100vw × 100vh`・`overflow-hidden` で、**ページ自体はスクロールしない**。スクロールは drei の `<ScrollControls>`(`components/scene/IslandCanvas.tsx`)がキャンバス上に作る内部要素で受けている
+- `pages`: **SP=3 / PC=6**(SP は早く鬼脇に届くよう短くしている)、`damping={0}`(慣性は `IslandModel` の `damp` 側で付ける)
+- `scroll.offset`(0〜1)を `components/scene/IslandModel.tsx` の `useFrame` で読み、次を決めている
+  - 島の回転(上記 clamp → damp、±45°)
+  - SP / 中間幅のみ:島の x 位置を offset に合わせて少しずらす、`lookAt` を毎フレーム固定
+  - `offset < 0.5` → 鴛泊、それ以上 → 鬼脇(`activeAreaSlug` を store に保存し、パネル・スライダー・ピンが追従)
+  - `offset >= 0.95`(`FOOTER_REVEAL_SCROLL_OFFSET`)→ フッター表示(`isRotationComplete`)
+- SP 判定は `(max-width: 767px)`。`IslandCanvas` と `AreaSidePanels` にそれぞれ書かれているので、変えるときは両方そろえる
+- SP の下部パネル(`AreaPostSlider` の SP 分岐)は横スクロール+`scroll-snap`。縦スクロール(島の回転)と指の操作がぶつかりやすいので、スクロール仕様を変えるときは実機またはモバイル表示で両方を確認する
+- Lenis は `<ScrollControls>` と競合して一度リバートした(下の「よくあるエラー」参照)
+
 ### モバイル時の GLB 切替
 
 デバイス判定で `island.glb` ↔ `island-mobile.glb` を切り替える。`dpr` も `[1, 1.5]` に制限し、影とポストエフェクトはオフ。
@@ -232,9 +251,18 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 | `npm run build` | 本番ビルド |
 | `npm run start` | 本番起動(ビルド後) |
 | `npm run lint` | ESLint |
+| `npm run typecheck` | 型チェック(`tsc --noEmit`) |
+| `npm run test` | Vitest(`tests/unit/`)。1ファイルだけなら `npx vitest run tests/unit/seo.test.ts` |
+| `npm run test:e2e` | Playwright(`tests/e2e/`、`next dev` を自動起動) |
 
-> テスト: ランナー未導入。Phase 5 以降で Vitest + Playwright を検討。
-> GraphQL Codegen / Lighthouse は Phase 4 で `codegen` / `lh` スクリプトを追加予定。
+> GraphQL Codegen / Lighthouse のスクリプト(`codegen` / `lh`)は未導入。
+
+## 環境と本番構成
+
+- **ローカル**: Local(Flywheel)のサイト `rishirecruit-2026`。WP は `http://rishirecruit-2026.local`(GraphQL の既定接続先)、Next.js は `npm run dev` で `http://localhost:3000`
+- **本番**: 表側は Vercel(`www.rishirecruit.com`)。WP は `wp.rishirecruit.com`(ロリポップ、Cloudflare 経由)。Next.js のソースは本番 WP には置いていない
+- 環境変数は `.env.example` を参照(WP の接続先・SITE_URL・再検証シークレット・Turnstile・GA)
+- 注意: `lib/wp/queries/*` はエラー時に `[]` / `null` を返すため、WP に届かない間に作り直されたページは 0 件のまま最大 1 時間キャッシュされる。直すには WP で公開中の投稿を 1 件更新して再検証を走らせる
 
 ---
 
@@ -258,9 +286,8 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
 1. `docs/03-content-schema.md` に CPT / ACF フィールド定義を追記
 2. `inc/cpt-registration.php` に CPT 登録を追加
 3. `inc/acf-fields-<post_type>.php` を新規作成して ACF フィールドを登録
-4. `lib/wp/queries/` に GraphQL クエリを追加 → `npm run codegen`
-5. `components/scene/Pins/` にピンコンポーネントを追加
-6. `store/uiStore.ts` のモーダル type に追記
+4. `lib/wp/queries/` に GraphQL クエリを追加し、型は `lib/wp/types.ts` に手書きで追加(Codegen 未導入)
+5. 一覧・詳細ページを `app/` に追加(トップの3Dはエリアピン＋投稿スライダー方式のため、投稿ごとのピンは作らない)
 
 ### 新しい 3D コンポーネントを追加する
 1. `"use client"` を冒頭に書く
