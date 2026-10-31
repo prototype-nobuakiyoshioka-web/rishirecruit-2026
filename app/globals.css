@@ -24,6 +24,9 @@
   --space-4: 1rem;
   --space-5: 1.25rem;
   --space-6: 1.5rem;
+  /* SP トップ下部カードの高さ。中身の最大(イベントの日程3件)に合わせた固定値。
+     AreaSidePanels と ColumnBoard(看板位置)の両方がこれを参照する */
+  --sp-area-panel-h: 13.75rem;
   --container-max: 1200px;
   --radius-md: 8px;
   --radius-lg: 12px;

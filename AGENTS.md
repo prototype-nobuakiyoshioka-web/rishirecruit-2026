@@ -360,6 +360,7 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [x] 応募フォーム・お問い合わせフォームの実送信 — Contact Form 7 REST(feedback)接続済み。お問い合わせ=form ID 176 / 求人応募=177。フロントは `lib/wp/submit-cf7.ts` 経由で送信(`_wpcf7_unit_tag` 等の制御フィールド付与が必須)。curl で両フォーム `mail_sent` 確認済み。実ブラウザでの手動送信テストは吉岡さん側で最終確認
   - [x] WordPress更新のISRまたはOn-demand Revalidation — タグ方式で実装。WP実データfetchに `next: { tags: ['wp'], revalidate: 3600 }` を付与(`lib/wp/client.ts`)。`app/api/revalidate` がシークレット照合後に `revalidateTag('wp','max')` + 任意 `revalidatePath(path,'page')`。WP側 `inc/revalidate-hook.php` が対象4CPTの `transition_post_status` で `wp_remote_post`(非同期)。エンドポイント/シークレットはテーマ非保持で mu-plugin(`wp-content/mu-plugins/rishi-revalidate-config.php`・リポジトリ外)から定数注入。curlで401/200を確認済み。実WP保存→再検証の疎通は吉岡さん側で最終確認
 - [ ] **Phase 7: モバイル最適化** — レイアウト調整は進行済み、性能最適化は未着手
+  - [x] SP トップの見え方を調整（2026-10-31）。下部カードを 40dvh → 固定 220px（`--sp-area-panel-h`、ColumnBoard も同じ変数で追従）。島は SP のみ俯瞰寄りの角度＋寄り、描画を 24px 上へ（`IslandModel.tsx` の `SP_*` 定数。縦に余裕のある端末は追加で寄せ、高さ720px以下は少し引く）。エリアカードは見出し拡大＋「求人/イベント/スポット 件数」ボタン（0件は非表示、押すと該当タブへ）。375×667 / 375×812 / 390×844 / 360×780 / 412×915 / 430×932 で鴛泊・鬼脇の表示を確認。実機確認は未実施
   - [x] モバイル用軽量GLB切替 — `rishiri-miniature-mobile.glb`。判定後に必要なモデルのみ取得
   - [x] DPR制限・影/ポストエフェクト制御 — SPのDPR上限1.5、影・ポストエフェクトなし、海面メッシュを160分割へ削減
   - [ ] iOS Safari / Android Chrome実機確認

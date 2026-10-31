@@ -14,7 +14,7 @@ import { selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { formatEventPeriod, formatScheduleEntries } from "@/lib/utils/format-date";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
-import { AreaInfoPanel } from "./AreaInfoPanel";
+import { AreaInfoPanel, type AreaShortcut } from "./AreaInfoPanel";
 
 type TabType = "job" | "event" | "spot";
 
@@ -232,6 +232,26 @@ function AreaPostSliderContent({
     setSlideIndex(0);
     setPreviousIndex(null);
     setDirection("next");
+  };
+
+  // SP エリアカードの件数ボタン。0件のタブは出さない
+  const areaShortcuts: AreaShortcut[] = [
+    { key: "job", label: "求人", count: jobPostings.length, color: "var(--c-pin-job)" },
+    { key: "event", label: "イベント", count: events.length, color: "var(--c-pin-event)" },
+    { key: "spot", label: "スポット", count: touristspots.length, color: "var(--c-pin-spot)" },
+  ].filter((shortcut) => shortcut.count > 0);
+
+  // 件数ボタン → 該当タブを開き、カルーセルを記事カードまで送る
+  const handleShortcutSelect = (key: string) => {
+    if (key !== "job" && key !== "event" && key !== "spot") return;
+    handleTabChange(key);
+    const carousel = mobileCarouselRef.current;
+    if (!carousel) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    carousel.scrollTo({
+      left: carousel.scrollWidth,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
   };
 
   // ページャーの前後/ドットジャンプに応じて previousIndex と direction をセットしてから index を更新
@@ -628,7 +648,11 @@ function AreaPostSliderContent({
               scrollSnapAlign: "start",
             }}
           >
-            <AreaInfoPanel isMobile />
+            <AreaInfoPanel
+              isMobile
+              shortcuts={areaShortcuts}
+              onShortcutSelect={handleShortcutSelect}
+            />
           </div>
 
           <div

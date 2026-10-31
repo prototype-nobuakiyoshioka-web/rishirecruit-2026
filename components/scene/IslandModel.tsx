@@ -23,6 +23,25 @@ const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;
 // Y を下げると カメラが低く（水平寄り）になり、水平線が下がって自然な位置に見える。
 // 14 → 6 で PC (Y:5) に近い自然な俯瞰角度に。
 const MOBILE_CAMERA_DIRECTION = new THREE.Vector3(-6, 6, 18).normalize();
+// SP(isMobile)のみ:少し上から見下ろす角度にし、自動フィットより寄せて島の迫力を出す。
+// 中間幅(PC の狭いウィンドウ)は上の DIRECTION・等倍のまま。
+const SP_CAMERA_DIRECTION = new THREE.Vector3(-6, 10, 18).normalize();
+const SP_CAMERA_ZOOM = 0.88;
+// 縦に余裕のある端末ほど少しだけ追加で寄せる(島の下に海だけの空白ができるのを防ぐ)。
+// 余裕 = (画面高 - 下部カード・看板ぶん) / 画面幅。390x844 前後(≒1.42)を基準に、それより縦長なら寄せる
+const SP_BOTTOM_UI_HEIGHT_PX = 290;
+const SP_ROOM_BASELINE = 1.42;
+const SP_ROOM_ZOOM_RATE = 0.5;
+const SP_MIN_CAMERA_ZOOM = 0.8;
+// 背の低い端末(iPhone SE 等)は島を約5%小さくして、鬼脇ピンと看板の間に余裕を作る
+const SP_COMPACT_CAMERA_ZOOM = 1.05;
+// 下部カードを低くしたぶん、島を少し下(画面中央寄り)に置く。
+// 背の低い端末(高さ720px以下)は元から島が大きく出るため、寄せずに少し引き(SP_COMPACT_CAMERA_ZOOM)、
+// 下部カードに重ならないよう上寄せを強めにする
+const SP_LOOKAT_Y_OFFSET = 14;
+const SP_COMPACT_LOOKAT_Y_OFFSET = 32;
+// SP のみ、描画全体を画面上で何px上にずらすか(端末によらず同じpx量で動く)
+const SP_SCREEN_SHIFT_Y_PX = 24;
 const MOBILE_CAMERA_FOV = 60;
 const MOBILE_HORIZONTAL_MARGIN = 16;
 const ADAPTIVE_FIT_MAX_WIDTH = 768;
@@ -65,6 +84,22 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   const isIntermediateViewport = !isMobile && shouldAutoFit;
   const fitCameraFov = isMobile ? MOBILE_CAMERA_FOV : 55;
   const isCompactMobile = viewportHeight <= 720;
+  const spRoom =
+    (viewportHeight - SP_BOTTOM_UI_HEIGHT_PX) / Math.max(viewportSize.width, 1);
+  const cameraZoom = !isMobile
+    ? 1
+    : isCompactMobile
+      ? SP_COMPACT_CAMERA_ZOOM
+      : THREE.MathUtils.clamp(
+          SP_CAMERA_ZOOM - (spRoom - SP_ROOM_BASELINE) * SP_ROOM_ZOOM_RATE,
+          SP_MIN_CAMERA_ZOOM,
+          SP_CAMERA_ZOOM
+        );
+  const lookAtYOffset = isMobile
+    ? isCompactMobile
+      ? SP_COMPACT_LOOKAT_Y_OFFSET
+      : SP_LOOKAT_Y_OFFSET
+    : MOBILE_LOOKAT_Y_OFFSET;
   const mobileScale = isCompactMobile ? 3.12 : 2.63;
   const mobilePositionX = isIntermediateViewport
     ? -0.58
@@ -135,16 +170,39 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
 
     if (shouldAutoFit && mobileCameraDistance !== null) {
       camera.position
-        .copy(MOBILE_CAMERA_DIRECTION)
-        .multiplyScalar(mobileCameraDistance);
+        .copy(isMobile ? SP_CAMERA_DIRECTION : MOBILE_CAMERA_DIRECTION)
+        .multiplyScalar(mobileCameraDistance * cameraZoom);
       // SP のみ注視点を下に下げると、島が画面上方向へ寄って見える
-      camera.lookAt(0, -MOBILE_LOOKAT_Y_OFFSET, 0);
+      camera.lookAt(0, -lookAtYOffset, 0);
     } else {
       camera.position.copy(DESKTOP_CAMERA_POSITION);
       camera.lookAt(0, 0, 0);
     }
+    // 描画範囲を下にずらす = 島(と海・ピン)が画面上で上に動く。
+    // lookAt と違い角度・大きさは変えず、px 単位で位置だけを調整できる
+    if (isMobile) {
+      camera.setViewOffset(
+        viewportSize.width,
+        viewportSize.height,
+        0,
+        SP_SCREEN_SHIFT_Y_PX,
+        viewportSize.width,
+        viewportSize.height
+      );
+    } else {
+      camera.clearViewOffset();
+    }
     camera.updateProjectionMatrix();
-  }, [camera, mobileCameraDistance, shouldAutoFit]);
+  }, [
+    camera,
+    cameraZoom,
+    isMobile,
+    lookAtYOffset,
+    mobileCameraDistance,
+    shouldAutoFit,
+    viewportSize.height,
+    viewportSize.width,
+  ]);
 
   useFrame((_, dt) => {
     if (!groupRef.current) return;
@@ -166,7 +224,7 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
         scroll.offset
       );
       // SP のみ毎フレーム lookAt を強制（HMR で定数変更が即反映されるようにする）
-      camera.lookAt(0, -MOBILE_LOOKAT_Y_OFFSET, 0);
+      camera.lookAt(0, -lookAtYOffset, 0);
     }
     setRotationAngle(groupRef.current.rotation.y);
 
