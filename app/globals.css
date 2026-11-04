@@ -12,6 +12,7 @@
   --c-text-inverse: #FAF6EE;
   --c-border-subtle: #F0EBE0;
   --c-warning: #F4B942;
+  --c-danger: #B53A1B;
   --c-pin-job: #FF7B5B;
   --c-pin-spot: #F4B942;
   --c-pin-event: #FF8FB1;
@@ -44,6 +45,13 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
+}
+
+/* トップは島が全面を覆う。Safari のツールバー周りに紙色が出ないよう、海の色にする */
+html:has(main[data-home-island]),
+html:has(main[data-home-island]) body {
+  background: #3aa6c6;
+  overscroll-behavior: none;
 }
 
 html,

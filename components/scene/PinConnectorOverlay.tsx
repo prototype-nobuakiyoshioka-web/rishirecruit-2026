@@ -103,8 +103,8 @@ export function PinConnectorOverlay() {
       style={{
         position: "fixed",
         inset: 0,
-        width: "100vw",
-        height: "100vh",
+        width: "100%",
+        height: "100%",
         pointerEvents: "none",
         opacity: 0,
         transition: "opacity 240ms ease",

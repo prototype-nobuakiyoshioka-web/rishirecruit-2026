@@ -20,6 +20,9 @@ const MOBILE_LOOKAT_Y_OFFSET = 22;
 const MAX_ROTATION = Math.PI / 4;
 const DAMP_SPEED = 4;
 const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;
+// スクロール位置の復元を待つ上限(フレーム)と、復元できたとみなす誤差
+const RESTORE_MAX_FRAMES = 60;
+const RESTORE_TOLERANCE = 0.02;
 // Y を下げると カメラが低く（水平寄り）になり、水平線が下がって自然な位置に見える。
 // 14 → 6 で PC (Y:5) に近い自然な俯瞰角度に。
 const MOBILE_CAMERA_DIRECTION = new THREE.Vector3(-6, 6, 18).normalize();
@@ -145,7 +148,14 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   ]);
   const groupRef = useRef<Group>(null);
   const rotationCompleteRef = useRef(false);
-  const currentAreaRef = useRef<string>("oshidomari");
+  // store はページ移動をまたいで残るので、ずれないよう初期値をそろえる
+  const currentAreaRef = useRef<string>(
+    useScrollProgressStore.getState().activeAreaSlug
+  );
+  const restoreFramesRef = useRef(0);
+  const isRestoringRef = useRef(
+    useScrollProgressStore.getState().lastScrollOffset > 0
+  );
   const scroll = useScroll();
   const setRotationComplete = useScrollProgressStore(
     (state) => state.setRotationComplete
@@ -159,6 +169,14 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   const setActiveAreaSlug = useScrollProgressStore(
     (state) => state.setActiveAreaSlug
   );
+  const setScrollElement = useScrollProgressStore(
+    (state) => state.setScrollElement
+  );
+
+  useEffect(() => {
+    setScrollElement(scroll.el);
+    return () => setScrollElement(null);
+  }, [scroll.el, setScrollElement]);
 
   useEffect(() => {
     rotationCompleteRef.current = false;
@@ -206,6 +224,36 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
 
   useFrame((_, dt) => {
     if (!groupRef.current) return;
+
+    // 戻ってきたとき:スクロール領域ができ次第、前回の位置へ戻す。
+    // 反映されるまでは先頭の位置で判定しない(エリアが一瞬切り替わるのを防ぐ)
+    if (isRestoringRef.current) {
+      const { lastScrollOffset: savedOffset, scrollElement } =
+        useScrollProgressStore.getState();
+      if (scrollElement) {
+        const scrollable =
+          scrollElement.scrollHeight - scrollElement.clientHeight;
+        if (scrollable > 0) scrollElement.scrollTop = savedOffset * scrollable;
+        // ScrollControls は初回の scroll イベントを無視するので、反映されるまで送り直す
+        scrollElement.dispatchEvent(new Event("scroll"));
+      }
+      restoreFramesRef.current += 1;
+      const isReached =
+        Math.abs(scroll.offset - savedOffset) < RESTORE_TOLERANCE;
+      if (!isReached && restoreFramesRef.current < RESTORE_MAX_FRAMES) return;
+      isRestoringRef.current = false;
+      // 回転し直す動きを見せず、その位置から始める
+      groupRef.current.rotation.y = THREE.MathUtils.clamp(
+        (scroll.offset - 0.5) * 2 * MAX_ROTATION,
+        -MAX_ROTATION,
+        MAX_ROTATION
+      );
+    }
+    const scrollStore = useScrollProgressStore.getState();
+    if (scrollStore.lastScrollOffset !== scroll.offset) {
+      scrollStore.setLastScrollOffset(scroll.offset);
+    }
+
     const target = THREE.MathUtils.clamp(
       (scroll.offset - 0.5) * 2 * MAX_ROTATION,
       -MAX_ROTATION,

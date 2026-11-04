@@ -336,6 +336,8 @@ function AreaPostSliderContent({
             if (slideInfo.jobMeta) {
               if (slideInfo.jobMeta.employmentType) chips.push(slideInfo.jobMeta.employmentType);
               if (slideInfo.jobMeta.salary) chips.push(slideInfo.jobMeta.salary);
+              // 給与は省略せず読めるようにする(1行に収まらなければ折り返す)
+              allowWrap = true;
             }
             if (slideInfo.eventMeta) {
               if (slideInfo.eventMeta.scheduleEntries.length > 0) {

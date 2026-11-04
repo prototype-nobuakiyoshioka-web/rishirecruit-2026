@@ -10,7 +10,7 @@ import { EVENT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getEvents } from "@/lib/wp/queries/events";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
 
-export const metadata: Metadata = buildMetadata({ title: "利尻富士町のイベント", description: "利尻富士町で開催中・開催予定のイベント情報。日時、会場、参加方法を確認できます。", path: "/events" });
+export const metadata: Metadata = buildMetadata({ title: "利尻富士町のイベント", description: "利尻富士町の年間の行事。日時、会場、参加方法を確認できます。", path: "/events" });
 
 export default async function EventsPage() {
   const events = await getEvents();
@@ -20,7 +20,7 @@ export default async function EventsPage() {
       title={<>今、この島で<br />起きていること。</>}
       lead={<>季節の催し、人が集まる時間。<br />島の今を、予定から見つけられます。</>}
       introEyebrow="Event calendar"
-      introLabel="開催中・開催予定"
+      introLabel="年間の行事"
       introTitle={<>参加することで、<br />町との距離が近くなる。</>}
       introBody="行事や小さな集まりは、島の人や季節に触れる入口です。開催日と場所を確認して、気になる時間に足を運んでみてください。"
     >
@@ -29,6 +29,7 @@ export default async function EventsPage() {
           {events.map((event, index) => {
             const fields = event.eventFields;
             const category = selectFirst(fields?.category);
+            const status = eventStatus(fields?.startDatetime, fields?.endDatetime);
             const imageUrl = fields?.thumbnailImage?.node?.sourceUrl ?? null;
             const imageAlt = fields?.thumbnailImage?.node?.altText ?? `${event.title}の写真`;
             const scheduleEntries = formatScheduleEntries(fields?.scheduleEntries);
@@ -43,7 +44,7 @@ export default async function EventsPage() {
                   </Link>
                 ) : null}
                 <div className="mt-6">
-                  <div className="flex flex-wrap gap-3 text-xs font-black"><span className="text-[color:var(--c-warning)]">{category ? EVENT_CATEGORY_LABELS[category] ?? category : "Event"}</span><span className="text-[color:var(--c-text-secondary)]">{eventStatus(fields?.startDatetime)}</span></div>
+                  <div className="flex flex-wrap gap-3 text-xs font-black"><span className="text-[color:var(--c-warning)]">{category ? EVENT_CATEGORY_LABELS[category] ?? category : "Event"}</span>{status ? <span className="text-[color:var(--c-text-secondary)]">{status}</span> : null}</div>
                   {scheduleEntries.length > 0 ? (
                     <ul className="mt-3 space-y-1 text-lg font-black text-[color:var(--c-deep-ocean)]">
                       {scheduleEntries.map((entry) => <li key={entry}>{entry}</li>)}

@@ -7,6 +7,7 @@ import { submitForm, isCf7Success } from "@/lib/wp/submit-cf7";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
 import { Turnstile } from "@/components/ui/Turnstile";
+import { focusFirstError } from "@/lib/forms/focus-first-error";
 
 // CF7 求人応募フォームの数値ID（管理画面の post=ID）
 const CF7_APPLY_ID = process.env.NEXT_PUBLIC_CF7_APPLY_ID ?? "177";
@@ -160,11 +161,11 @@ function validateForm(form: FormState) {
   return errors;
 }
 
-function FieldError({ message }: { message?: string }) {
+function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
 
   return (
-    <p className="mt-[var(--space-2)] text-sm font-bold text-[color:var(--c-pin-job)]">
+    <p id={id} className="mt-[var(--space-2)] text-sm font-bold text-[color:var(--c-danger)]">
       {message}
     </p>
   );
@@ -249,7 +250,10 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
 
     const nextErrors = validateForm(form);
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+    if (Object.keys(nextErrors).length > 0) {
+      focusFirstError(event.currentTarget);
+      return;
+    }
 
     // Turnstile 未完了なら送信しない。
     if (!turnstileToken) {
@@ -339,6 +343,11 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
       </div>
 
       <form noValidate onSubmit={handleSubmit} className="mt-[var(--space-6)] grid gap-[var(--space-5)]">
+        <p role="alert" className="sr-only">
+          {Object.keys(errors).length > 0
+            ? `${Object.keys(errors).length}件の入力内容を確認してください。`
+            : ""}
+        </p>
         <input type="hidden" name="job_slug" value={jobSlug} />
 
         <div className="grid gap-[var(--space-4)] md:grid-cols-2">
@@ -348,6 +357,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
             </label>
             <input
               id="full-name"
+              aria-invalid={Boolean(errors.fullName)}
+              aria-describedby={errors.fullName ? "full-name-error" : undefined}
               name="full_name"
               type="text"
               autoComplete="name"
@@ -356,7 +367,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
               className={`${inputClassName} mt-[var(--space-2)]`}
               required
             />
-            <FieldError message={errors.fullName} />
+            <FieldError id="full-name-error" message={errors.fullName} />
           </div>
 
           <div>
@@ -365,6 +376,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
             </label>
             <input
               id="full-name-kana"
+              aria-invalid={Boolean(errors.fullNameKana)}
+              aria-describedby={errors.fullNameKana ? "full-name-kana-error" : undefined}
               name="full_name_kana"
               type="text"
               value={form.fullNameKana}
@@ -372,7 +385,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
               className={`${inputClassName} mt-[var(--space-2)]`}
               required
             />
-            <FieldError message={errors.fullNameKana} />
+            <FieldError id="full-name-kana-error" message={errors.fullNameKana} />
           </div>
         </div>
 
@@ -383,6 +396,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
             </label>
             <select
               id="gender"
+              aria-invalid={Boolean(errors.gender)}
+              aria-describedby={errors.gender ? "gender-error" : undefined}
               name="gender"
               value={form.gender}
               onChange={handleTextChange("gender")}
@@ -393,7 +408,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
               <option value="男性">男性</option>
               <option value="女性">女性</option>
             </select>
-            <FieldError message={errors.gender} />
+            <FieldError id="gender-error" message={errors.gender} />
           </div>
 
           <div>
@@ -418,6 +433,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
             </label>
             <input
               id="phone"
+              aria-invalid={Boolean(errors.phone)}
+              aria-describedby={errors.phone ? "phone-error" : undefined}
               name="phone"
               type="tel"
               autoComplete="tel"
@@ -426,7 +443,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
               className={`${inputClassName} mt-[var(--space-2)]`}
               required
             />
-            <FieldError message={errors.phone} />
+            <FieldError id="phone-error" message={errors.phone} />
           </div>
 
           <div>
@@ -435,6 +452,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
             </label>
             <input
               id="email"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? "email-error" : undefined}
               name="email"
               type="email"
               autoComplete="email"
@@ -443,7 +462,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
               className={`${inputClassName} mt-[var(--space-2)]`}
               required
             />
-            <FieldError message={errors.email} />
+            <FieldError id="email-error" message={errors.email} />
           </div>
         </div>
 
@@ -459,6 +478,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
               </label>
               <input
                 id="zip-code"
+                aria-invalid={Boolean(errors.zipCode)}
+                aria-describedby={errors.zipCode ? "zip-code-error" : undefined}
                 name="zip_code"
                 type="text"
                 inputMode="numeric"
@@ -468,7 +489,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
                 className={`${inputClassName} mt-[var(--space-2)]`}
                 required
               />
-              <FieldError message={errors.zipCode} />
+              <FieldError id="zip-code-error" message={errors.zipCode} />
               {isZipLoading ? (
                 <p className="mt-[var(--space-2)] text-sm text-[color:var(--c-text-secondary)]">
                   住所を確認しています。
@@ -487,6 +508,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
               </label>
               <select
                 id="prefecture"
+                aria-invalid={Boolean(errors.prefecture)}
+                aria-describedby={errors.prefecture ? "prefecture-error" : undefined}
                 name="prefecture"
                 value={form.prefecture}
                 onChange={handleTextChange("prefecture")}
@@ -500,7 +523,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
                   </option>
                 ))}
               </select>
-              <FieldError message={errors.prefecture} />
+              <FieldError id="prefecture-error" message={errors.prefecture} />
             </div>
           </div>
 
@@ -510,6 +533,8 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
             </label>
             <input
               id="address-line"
+              aria-invalid={Boolean(errors.addressLine)}
+              aria-describedby={errors.addressLine ? "address-line-error" : undefined}
               name="address_line"
               type="text"
               autoComplete="street-address"
@@ -518,7 +543,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
               className={`${inputClassName} mt-[var(--space-2)]`}
               required
             />
-            <FieldError message={errors.addressLine} />
+            <FieldError id="address-line-error" message={errors.addressLine} />
           </div>
         </fieldset>
 
@@ -527,19 +552,21 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
             <input
               name="privacy"
               type="checkbox"
+              aria-invalid={Boolean(errors.privacy)}
+              aria-describedby={errors.privacy ? "privacy-error" : undefined}
               checked={form.privacy}
               onChange={(event) => updateField("privacy", event.target.checked)}
               className="mt-[0.2rem] size-5 rounded border-[color:var(--c-border-subtle)] accent-[color:var(--c-pin-job)]"
               required
             />
             <span>
-              <Link href="/privacy" className="text-[color:var(--c-deep-ocean)] underline">
+              <Link href="/privacy" target="_blank" className="text-[color:var(--c-deep-ocean)] underline">
                 プライバシーポリシー
               </Link>
               に同意します <span aria-label="必須">*</span>
             </span>
           </label>
-          <FieldError message={errors.privacy} />
+          <FieldError id="privacy-error" message={errors.privacy} />
         </div>
 
         {/* ハニーポット: 画面外に隠し、人間は入力しない。ボットが埋めると送信を無効化する。 */}
@@ -557,7 +584,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
         <Turnstile onToken={setTurnstileToken} />
 
         {submitError && (
-          <p role="alert" className="text-sm font-bold text-[color:var(--c-pin-job)]">
+          <p role="alert" className="text-sm font-bold text-[color:var(--c-danger)]">
             {submitError}
           </p>
         )}

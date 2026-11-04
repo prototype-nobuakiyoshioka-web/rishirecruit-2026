@@ -8,7 +8,7 @@
 ## プロジェクト概要
 
 利尻島を3Dローポリ&ポップに表現したインタラクティブサイト。
-スクロールで島が左右に回転（範囲制限あり）し、ピンをクリックすると **求人 / イベント / 観光地 / コラム** の詳細が表示される。
+スクロールで島が左右に回転（範囲制限あり）し、鴛泊・鬼脇のエリアごとに **求人 / イベント / 観光地** をカードで見られる。
 参考: <https://haru-ni.net>
 
 ---
@@ -188,7 +188,7 @@ useFrame((_, dt) => {
 
 ### トップページのスクロールの仕組み(実装済みの現状)
 
-- トップ(`app/page.tsx`)の `<main>` は `100vw × 100vh`・`overflow-hidden` で、**ページ自体はスクロールしない**。スクロールは drei の `<ScrollControls>`(`components/scene/IslandCanvas.tsx`)がキャンバス上に作る内部要素で受けている
+- トップ(`app/page.tsx`)の `<main>` は `position: fixed`・高さ `100lvh`・`overflow-hidden` で、**ページ自体はスクロールしない**(in-flow の 100vh だと iOS で文書がスクロールして島だけずれる)。スクロールは drei の `<ScrollControls>`(`components/scene/IslandCanvas.tsx`)がキャンバス上に作る内部要素で受けている
 - `pages`: **SP=3 / PC=6**(SP は早く鬼脇に届くよう短くしている)、`damping={0}`(慣性は `IslandModel` の `damp` 側で付ける)
 - `scroll.offset`(0〜1)を `components/scene/IslandModel.tsx` の `useFrame` で読み、次を決めている
   - 島の回転(上記 clamp → damp、±45°)
@@ -197,6 +197,9 @@ useFrame((_, dt) => {
   - `offset >= 0.95`(`FOOTER_REVEAL_SCROLL_OFFSET`)→ フッター表示(`isRotationComplete`)
 - SP 判定は `(max-width: 767px)`。`IslandCanvas` と `AreaSidePanels` にそれぞれ書かれているので、変えるときは両方そろえる
 - SP の下部パネル(`AreaPostSlider` の SP 分岐)は横スクロール+`scroll-snap`。縦スクロール(島の回転)と指の操作がぶつかりやすいので、スクロール仕様を変えるときは実機またはモバイル表示で両方を確認する
+- カード上の縦スクロール(タッチ・ホイール)は `useForwardScrollToIsland` で島のスクロールに渡す。SP のパネルは `touch-action: pan-x` で、横はカルーセルに任せる
+- 詳細から戻ったときは `lastScrollOffset`(store)から位置を復元する(`IslandModel`)。ScrollControls の内部要素は store の `scrollElement` で参照できる
+- 3D が使えないとき(WebGL 非対応、モデル取得失敗)は `IslandFallback` を出す(`IslandCanvas` のエラーバウンダリ)
 - Lenis は `<ScrollControls>` と競合して一度リバートした(下の「よくあるエラー」参照)
 
 ### モバイル時の GLB 切替
@@ -361,6 +364,7 @@ prefix は post_type のイニシャル(`job_posting → jp`, `touristspot → t
   - [x] WordPress更新のISRまたはOn-demand Revalidation — タグ方式で実装。WP実データfetchに `next: { tags: ['wp'], revalidate: 3600 }` を付与(`lib/wp/client.ts`)。`app/api/revalidate` がシークレット照合後に `revalidateTag('wp','max')` + 任意 `revalidatePath(path,'page')`。WP側 `inc/revalidate-hook.php` が対象4CPTの `transition_post_status` で `wp_remote_post`(非同期)。エンドポイント/シークレットはテーマ非保持で mu-plugin(`wp-content/mu-plugins/rishi-revalidate-config.php`・リポジトリ外)から定数注入。curlで401/200を確認済み。実WP保存→再検証の疎通は吉岡さん側で最終確認
 - [ ] **Phase 7: モバイル最適化** — レイアウト調整は進行済み、性能最適化は未着手
   - [x] SP トップの見え方を調整（2026-10-31）。下部カードを 40dvh → 固定 220px（`--sp-area-panel-h`、ColumnBoard も同じ変数で追従）。島は SP のみ俯瞰寄りの角度＋寄り、描画を 24px 上へ（`IslandModel.tsx` の `SP_*` 定数。縦に余裕のある端末は追加で寄せ、高さ720px以下は少し引く）。エリアカードは見出し拡大＋「求人/イベント/スポット 件数」ボタン（0件は非表示、押すと該当タブへ）。375×667 / 375×812 / 390×844 / 360×780 / 412×915 / 430×932 で鴛泊・鬼脇の表示を確認。実機確認は未実施
+  - [x] 本番全体チェックの修正（2026-11-04）。トップの固定化と海の色の背景(iOS のずれと白い帯)、カード上の縦スクロールを島へ渡す、詳細から戻ったときの位置復元、3D 失敗時の代替表示と `app/error.tsx`、エリアカードの「鬼脇へ / 鴛泊へ」ボタン、給与の省略解消、イベントの終了判定、フォームのエラー移動と Turnstile 失敗時の案内。iOS シミュレーターの Safari と Chrome で確認。実機は未確認
   - [x] モバイル用軽量GLB切替 — `rishiri-miniature-mobile.glb`。判定後に必要なモデルのみ取得
   - [x] DPR制限・影/ポストエフェクト制御 — SPのDPR上限1.5、影・ポストエフェクトなし、海面メッシュを160分割へ削減
   - [ ] iOS Safari / Android Chrome実機確認

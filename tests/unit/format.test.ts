@@ -50,14 +50,34 @@ describe("htmlToText", () => {
   });
 });
 
+
 describe("eventStatus", () => {
-  it("開始日時が無ければ予定", () => {
-    expect(eventStatus(null)).toBe("予定");
+  const now = new Date("2026-11-04T12:00:00+09:00");
+
+  it("開始前は予定", () => {
+    expect(eventStatus("2026-11-05T00:00:00+00:00", "2026-11-05T00:00:00+00:00", now)).toBe("予定");
   });
-  it("過去なら開催中", () => {
-    expect(eventStatus("2000-01-01T00:00:00")).toBe("開催中");
+
+  it("開催期間中は開催中(開始日・終了日の当日を含む)", () => {
+    expect(eventStatus("2026-11-04T00:00:00+00:00", "2026-11-04T00:00:00+00:00", now)).toBe("開催中");
+    expect(eventStatus("2026-11-01T00:00:00+00:00", "2026-11-10T00:00:00+00:00", now)).toBe("開催中");
   });
-  it("未来なら予定", () => {
-    expect(eventStatus("2999-01-01T00:00:00")).toBe("予定");
+
+  it("終了日を過ぎたら終了", () => {
+    expect(eventStatus("2026-08-11T00:00:00+00:00", "2026-08-11T00:00:00+00:00", now)).toBe("終了");
+  });
+
+  it("終了日がなければ開始日の1日だけのイベントとして扱う", () => {
+    expect(eventStatus("2026-11-04T00:00:00+00:00", null, now)).toBe("開催中");
+    expect(eventStatus("2026-11-03T00:00:00+00:00", null, now)).toBe("終了");
+  });
+
+  it("開始日がなければ状態を出さない", () => {
+    expect(eventStatus(null, null, now)).toBeNull();
+  });
+
+  it("日本時間の日付の変わり目で判定する", () => {
+    const justAfterMidnight = new Date("2026-11-05T00:10:00+09:00");
+    expect(eventStatus("2026-11-04T00:00:00+00:00", null, justAfterMidnight)).toBe("終了");
   });
 });

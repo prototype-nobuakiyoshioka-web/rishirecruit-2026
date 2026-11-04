@@ -52,8 +52,19 @@ export function splitByBr(value: string | null | undefined): string[] {
   return value.split(/<br\s*\/?>/gi);
 }
 
-export function eventStatus(startDatetime: string | null | undefined): "開催中" | "予定" {
-  if (!startDatetime) return "予定";
+// WP の日時は現地の暦をそのまま持つので、日付部分だけを日本時間の今日と比べる。
+// 日付が未定のイベント(毎年「7月中旬」など)は状態を出さない。
+export function eventStatus(
+  startDatetime: string | null | undefined,
+  endDatetime: string | null | undefined,
+  now: Date = new Date(),
+): "開催中" | "予定" | "終了" | null {
+  if (!startDatetime) return null;
 
-  return new Date(startDatetime).getTime() <= Date.now() ? "開催中" : "予定";
+  const today = now.toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+  const startDate = startDatetime.slice(0, 10);
+  const endDate = (endDatetime ?? startDatetime).slice(0, 10);
+
+  if (today < startDate) return "予定";
+  return today > endDate ? "終了" : "開催中";
 }

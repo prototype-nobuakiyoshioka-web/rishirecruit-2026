@@ -1,0 +1,93 @@
+/* コラム看板・共通ボタンと同じ、ブルーのおもちゃのプレートをカード内用に小さくしたもの */
+.jump {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 5px 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #b2dbea;
+  color: var(--c-deep-ocean);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: inset 0 2px 0 #ffffff85, 0 4px 0 #74a7b7, 0 8px 8px -6px #143d423d;
+  transition: background-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+
+/* 見た目は小さく、押せる範囲は 44px 以上にする */
+.jump::after {
+  content: "";
+  position: absolute;
+  inset: -4px -4px -8px;
+}
+
+.tile {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #eaf5facf;
+  box-shadow: inset 0 2px 0 #ffffffa6, 0 1px 0 #0a2e4e18;
+}
+
+.tile svg {
+  width: 14px;
+  height: 14px;
+  /* もう一方のエリアがあることに気づけるよう、表示時に2回だけ小さく動かす */
+  animation: jump-nudge 900ms ease-in-out 1200ms 2;
+}
+
+@keyframes jump-nudge {
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+@media (hover: hover) {
+  .jump:hover {
+    background: #c0e2ee;
+  }
+}
+
+.jump:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 2px 0 #ffffff50, 0 1px 0 #74a7b7;
+}
+
+.jump:focus-visible {
+  outline: 3px solid var(--c-deep-ocean);
+  outline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+  .jump {
+    top: clamp(var(--space-4), 2.5dvh, var(--space-6));
+    right: clamp(var(--space-4), 2.5dvh, var(--space-6));
+    height: 40px;
+    padding: 0 6px 0 14px;
+    font-size: 14px;
+  }
+
+  .tile {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jump {
+    transition: none;
+  }
+
+  .tile svg {
+    animation: none;
+  }
+}

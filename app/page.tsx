@@ -31,13 +31,9 @@ export default async function Home() {
   return (
     <>
       <JsonLd data={organizationLd} />
-      <main
-        className="h-screen w-screen overflow-hidden"
-        style={{
-          width: "100vw",
-          height: "100vh",
-        }}
-      >
+      {/* in-flow の 100vh だと iOS で文書がスクロールして島だけずれるため fixed にする。
+          高さは従来の 100vh と同じ lvh(ツールバーの裏まで描画し、島の見え方を保つ) */}
+      <main data-home-island className="fixed inset-x-0 top-0 h-lvh overflow-hidden">
         <IslandCanvas />
       </main>
       <ColumnBoard />

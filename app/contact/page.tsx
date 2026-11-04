@@ -8,6 +8,7 @@ import { submitForm, isCf7Success } from "@/lib/wp/submit-cf7";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
 import { Turnstile } from "@/components/ui/Turnstile";
+import { focusFirstError } from "@/lib/forms/focus-first-error";
 
 // CF7 お問い合わせフォームの数値ID（管理画面の post=ID）
 const CF7_CONTACT_ID = process.env.NEXT_PUBLIC_CF7_CONTACT_ID ?? "176";
@@ -76,9 +77,9 @@ function validateForm(form: ContactFormState) {
   return errors;
 }
 
-function FieldError({ message }: { message?: string }) {
+function FieldError({ id, message }: { id: string; message?: string }) {
   return message ? (
-    <p className="mt-2 text-sm font-bold text-[color:var(--c-pin-job)]" role="alert">
+    <p id={id} className="mt-2 text-sm font-bold text-[color:var(--c-danger)]">
       {message}
     </p>
   ) : null;
@@ -115,7 +116,10 @@ export default function ContactPage() {
     event.preventDefault();
     const nextErrors = validateForm(form);
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+    if (Object.keys(nextErrors).length > 0) {
+      focusFirstError(event.currentTarget);
+      return;
+    }
 
     // Turnstile 未完了なら送信しない。
     if (!turnstileToken) {
@@ -204,35 +208,36 @@ export default function ContactPage() {
             </aside>
 
             <form noValidate onSubmit={handleSubmit} className="grid gap-10">
+              <p role="alert" className="sr-only">{Object.keys(errors).length > 0 ? `${Object.keys(errors).length}件の入力内容を確認してください。` : ""}</p>
               <fieldset>
                 <legend className={labelClass}>問い合わせ項目 <span aria-hidden="true">*</span></legend>
                 <p className="mt-2 text-sm text-[color:var(--c-text-secondary)]">最も近いものを選んでください。</p>
                 <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
                   {INQUIRY_OPTIONS.map((option) => (
-                    <label key={option} className="flex min-h-14 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border border-[color:var(--c-deep-ocean)]/15 bg-white/60 px-3 text-center text-sm font-black text-[color:var(--c-text-primary)] transition-colors has-checked:border-[color:var(--c-deep-ocean)] has-checked:bg-[color:var(--c-deep-ocean)] has-checked:text-white">
-                      <input type="radio" name="inquiry_type" value={option} checked={form.inquiryType === option} onChange={(event) => updateField("inquiryType", event.target.value)} className="sr-only" required />
+                    <label key={option} className="flex min-h-14 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border border-[color:var(--c-deep-ocean)]/15 bg-white/60 px-3 text-center text-sm font-black text-[color:var(--c-text-primary)] transition-colors has-focus-visible:ring-2 has-focus-visible:ring-[color:var(--c-deep-ocean)] has-[[data-invalid=true]]:border-[color:var(--c-danger)] has-checked:border-[color:var(--c-deep-ocean)] has-checked:bg-[color:var(--c-deep-ocean)] has-checked:text-white">
+                      <input type="radio" data-invalid={Boolean(errors.inquiryType)} aria-describedby={errors.inquiryType ? "inquiry-type-error" : undefined} name="inquiry_type" value={option} checked={form.inquiryType === option} onChange={(event) => updateField("inquiryType", event.target.value)} className="sr-only" required />
                       {option}
                     </label>
                   ))}
                 </div>
-                <FieldError message={errors.inquiryType} />
+                <FieldError id="inquiry-type-error" message={errors.inquiryType} />
               </fieldset>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <div><label htmlFor="name" className={labelClass}>名前 <span aria-hidden="true">*</span></label><input id="name" name="name" autoComplete="name" value={form.name} onChange={handleTextChange("name")} className={inputClass} required /><FieldError message={errors.name} /></div>
-                <div><label htmlFor="furigana" className={labelClass}>フリガナ <span aria-hidden="true">*</span></label><input id="furigana" name="furigana" value={form.furigana} onChange={handleTextChange("furigana")} className={inputClass} required /><FieldError message={errors.furigana} /></div>
+                <div><label htmlFor="name" className={labelClass}>名前 <span aria-hidden="true">*</span></label><input id="name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "name-error" : undefined} name="name" autoComplete="name" value={form.name} onChange={handleTextChange("name")} className={inputClass} required /><FieldError id="name-error" message={errors.name} /></div>
+                <div><label htmlFor="furigana" className={labelClass}>フリガナ <span aria-hidden="true">*</span></label><input id="furigana" aria-invalid={Boolean(errors.furigana)} aria-describedby={errors.furigana ? "furigana-error" : undefined} name="furigana" value={form.furigana} onChange={handleTextChange("furigana")} className={inputClass} required /><FieldError id="furigana-error" message={errors.furigana} /></div>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <div><label htmlFor="email" className={labelClass}>メールアドレス <span aria-hidden="true">*</span></label><input id="email" name="email" type="email" autoComplete="email" value={form.email} onChange={handleTextChange("email")} className={inputClass} required /><FieldError message={errors.email} /></div>
+                <div><label htmlFor="email" className={labelClass}>メールアドレス <span aria-hidden="true">*</span></label><input id="email" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "email-error" : undefined} name="email" type="email" autoComplete="email" value={form.email} onChange={handleTextChange("email")} className={inputClass} required /><FieldError id="email-error" message={errors.email} /></div>
                 <div><label htmlFor="phone" className={labelClass}>電話番号 <span className="ml-2 font-normal text-[color:var(--c-text-secondary)]">任意</span></label><input id="phone" name="phone" type="tel" autoComplete="tel" value={form.phone} onChange={handleTextChange("phone")} className={inputClass} /></div>
               </div>
 
-              <div><label htmlFor="message" className={labelClass}>問い合わせ内容 <span aria-hidden="true">*</span></label><textarea id="message" name="message" value={form.message} onChange={handleTextChange("message")} className={`${inputClass} min-h-48 py-4 leading-8`} placeholder="気になっていることや、確認したいことをご記入ください。" required /><FieldError message={errors.message} /></div>
+              <div><label htmlFor="message" className={labelClass}>問い合わせ内容 <span aria-hidden="true">*</span></label><textarea id="message" aria-invalid={Boolean(errors.message)} aria-describedby={errors.message ? "message-error" : undefined} name="message" value={form.message} onChange={handleTextChange("message")} className={`${inputClass} min-h-48 py-4 leading-8`} placeholder="気になっていることや、確認したいことをご記入ください。" required /><FieldError id="message-error" message={errors.message} /></div>
 
               <div className="border-t border-[color:var(--c-deep-ocean)]/15 pt-8">
-                <label className="flex cursor-pointer gap-3 text-sm font-bold leading-6 text-[color:var(--c-text-primary)]"><input name="privacy" type="checkbox" checked={form.privacy} onChange={(event) => updateField("privacy", event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[color:var(--c-pin-job)]" required /><span><Link href="/privacy" target="_blank" className="text-[color:var(--c-deep-ocean)] underline">プライバシーポリシー</Link>に同意します <span aria-hidden="true">*</span></span></label>
-                <FieldError message={errors.privacy} />
+                <label className="flex cursor-pointer gap-3 text-sm font-bold leading-6 text-[color:var(--c-text-primary)]"><input name="privacy" type="checkbox" aria-invalid={Boolean(errors.privacy)} aria-describedby={errors.privacy ? "privacy-error" : undefined} checked={form.privacy} onChange={(event) => updateField("privacy", event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[color:var(--c-pin-job)]" required /><span><Link href="/privacy" target="_blank" className="text-[color:var(--c-deep-ocean)] underline">プライバシーポリシー</Link>に同意します <span aria-hidden="true">*</span></span></label>
+                <FieldError id="privacy-error" message={errors.privacy} />
               </div>
 
               {/* ハニーポット: 画面外に隠し、人間は入力しない。ボットが埋めると送信を無効化する。 */}

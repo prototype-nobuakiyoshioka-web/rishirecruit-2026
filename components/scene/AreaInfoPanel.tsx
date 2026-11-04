@@ -1,6 +1,7 @@
 "use client";
 
 import { AREA_INFO } from "@/lib/constants/areas";
+import { AreaJumpLink } from "./AreaJumpLink";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
 export interface AreaShortcut {
@@ -53,6 +54,7 @@ export function AreaInfoPanel({
       className="area-panel-enter"
       data-pin-connector-target="area-info"
       style={{
+        position: "relative",
         width: isMobile ? "82vw" : "100%",
         // SP はタブカードと高さを揃えるため 100%。内容がはみ出す場合はカード内スクロール。
         height: isMobile ? "100%" : undefined,
@@ -71,6 +73,7 @@ export function AreaInfoPanel({
         willChange: "transform, opacity",
       }}
     >
+      <AreaJumpLink areaSlug={areaSlug} />
       <p
         style={{
           fontSize: isMobile ? "0.7rem" : "0.75rem",

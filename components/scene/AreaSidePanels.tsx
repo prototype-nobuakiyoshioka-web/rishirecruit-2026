@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AreaWithPosts } from "@/lib/wp/queries/areas";
+import { AREA_INFO } from "@/lib/constants/areas";
+import { useScrollProgressStore } from "@/store/scroll-progress-store";
 import { AreaInfoPanel } from "./AreaInfoPanel";
 import { AreaPostSlider } from "./AreaPostSlider";
+import { useForwardScrollToIsland } from "./useForwardScrollToIsland";
 
 interface AreaSidePanelsProps {
   areaData: Record<string, AreaWithPosts | null>;
@@ -25,12 +28,27 @@ function useMediaQuery(query: string) {
   return matches;
 }
 
+// 見えているエリアが変わったことをスクリーンリーダーに伝える
+function AreaLiveStatus() {
+  const areaSlug = useScrollProgressStore((state) => state.activeAreaSlug);
+  return (
+    <p className="sr-only" aria-live="polite">
+      {AREA_INFO[areaSlug]?.name}エリアを表示しています
+    </p>
+  );
+}
+
 export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const panelRef = useRef<HTMLDivElement>(null);
+  useForwardScrollToIsland(panelRef, isMobile);
 
   if (isMobile) {
     return (
+      <>
+      <AreaLiveStatus />
       <div
+        ref={panelRef}
         className="fixed z-40 flex"
         style={{
           // 画面高の割合だと縦長端末で空白が増えるため、中身に合わせた固定高にする。
@@ -42,6 +60,8 @@ export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
           flexDirection: "column",
           minHeight: 0,
           pointerEvents: "none",
+          // 横はカルーセルに任せ、縦はフックで受けて島を回す
+          touchAction: "pan-x",
         }}
       >
         <div
@@ -55,11 +75,15 @@ export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
           <AreaPostSlider areaData={areaData} isMobile />
         </div>
       </div>
+      </>
     );
   }
 
   return (
+    <>
+    <AreaLiveStatus />
     <div
+      ref={panelRef}
       className="fixed z-40 hidden md:flex"
       style={{
         top: "calc(var(--space-6) + 6rem)",
@@ -84,5 +108,6 @@ export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
         <AreaPostSlider areaData={areaData} />
       </div>
     </div>
+    </>
   );
 }

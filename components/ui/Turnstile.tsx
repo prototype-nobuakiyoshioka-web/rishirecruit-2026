@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Turnstile サイトキー(公開値)。未設定時はローカル用の公式テストキー(常に成功)を使う。
 const SITE_KEY =
@@ -40,7 +40,12 @@ function loadTurnstileScript(): Promise<void> {
     script.async = true;
     script.defer = true;
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Failed to load Turnstile."));
+    script.onerror = () => {
+      // 再試行で読み込み直せるように、失敗した読み込みを残さない
+      scriptPromise = null;
+      script.remove();
+      reject(new Error("Failed to load Turnstile."));
+    };
     document.head.appendChild(script);
   });
 
@@ -55,6 +60,8 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const onTokenRef = useRef(onToken);
+  const [hasFailed, setHasFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   // 最新の onToken を ref に保持（描画中ではなく effect で更新する）。
   useEffect(() => {
@@ -71,11 +78,15 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
           sitekey: SITE_KEY,
           callback: (token) => onTokenRef.current(token),
           "expired-callback": () => onTokenRef.current(""),
-          "error-callback": () => onTokenRef.current(""),
+          "error-callback": () => {
+            onTokenRef.current("");
+            setHasFailed(true);
+          },
         });
       })
       .catch(() => {
-        // 読み込み失敗時はトークン無し=送信不可のままにする。
+        // 読み込み失敗時はトークン無し=送信不可のままにして、案内を出す。
+        if (!cancelled) setHasFailed(true);
       });
 
     return () => {
@@ -89,7 +100,26 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
         widgetId.current = null;
       }
     };
-  }, []);
+  }, [attempt]);
 
-  return <div ref={containerRef} />;
+  return (
+    <div>
+      <div ref={containerRef} />
+      {hasFailed ? (
+        <div role="alert" className="text-sm font-bold leading-6 text-[color:var(--c-danger)]">
+          <p>認証を読み込めませんでした。通信環境をご確認のうえ、もう一度お試しください。</p>
+          <button
+            type="button"
+            onClick={() => {
+              setHasFailed(false);
+              setAttempt((current) => current + 1);
+            }}
+            className="mt-[var(--space-2)] min-h-11 underline"
+          >
+            もう一度試す
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
 }
