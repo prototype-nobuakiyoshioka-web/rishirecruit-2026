@@ -88,7 +88,7 @@ export function IslandCanvas() {
         <hemisphereLight args={["#fff7e7", "#a9c5b6", 0.5]} />
         <directionalLight position={[10, 10, 5]} intensity={1.6} />
         {/* SP はスクロール量を減らして早く鬼脇まで届くように */}
-        <ScrollControls pages={isMobile ? 3 : 6} damping={0}>
+        <ScrollControls pages={isMobile ? 1.5 : 6} damping={0}>
           <Suspense fallback={null}>
             <IslandModel isMobile={isMobile}>
               {SHOW_PINS && (

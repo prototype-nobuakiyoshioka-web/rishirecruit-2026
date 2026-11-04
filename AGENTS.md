@@ -189,7 +189,7 @@ useFrame((_, dt) => {
 ### トップページのスクロールの仕組み(実装済みの現状)
 
 - トップ(`app/page.tsx`)の `<main>` は `position: fixed`・高さ `100lvh`・`overflow-hidden` で、**ページ自体はスクロールしない**(in-flow の 100vh だと iOS で文書がスクロールして島だけずれる)。スクロールは drei の `<ScrollControls>`(`components/scene/IslandCanvas.tsx`)がキャンバス上に作る内部要素で受けている
-- `pages`: **SP=3 / PC=6**(SP は早く鬼脇に届くよう短くしている)、`damping={0}`(慣性は `IslandModel` の `damp` 側で付ける)
+- `pages`: **SP=1.5 / PC=6**(SP は早く鬼脇に届くよう短くしている)、`damping={0}`(慣性は `IslandModel` の `damp` 側で付ける)
 - `scroll.offset`(0〜1)を `components/scene/IslandModel.tsx` の `useFrame` で読み、次を決めている
   - 島の回転(上記 clamp → damp、±45°)
   - SP / 中間幅のみ:島の x 位置を offset に合わせて少しずらす、`lookAt` を毎フレーム固定
