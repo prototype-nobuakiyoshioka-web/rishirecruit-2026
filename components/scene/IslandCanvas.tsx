@@ -91,7 +91,9 @@ export function IslandCanvas() {
         <ScrollControls pages={isMobile ? 3 : 6} damping={0}>
           <Suspense fallback={null}>
             <IslandModel isMobile={isMobile}>
-              {SHOW_PINS && <PinLayer activeAreaSlug={activeAreaSlug} />}
+              {SHOW_PINS && (
+                <PinLayer activeAreaSlug={activeAreaSlug} isMobile={isMobile} />
+              )}
               <Airplane />
               <Boat />
               <FishingBoats />

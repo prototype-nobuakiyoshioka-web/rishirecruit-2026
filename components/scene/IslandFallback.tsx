@@ -1,5 +1,9 @@
+"use client";
+
+import { useEffect } from "react";
 import { FooterLegalLinks } from "@/components/layout/FooterInfo";
 import { Button } from "@/components/ui/Button";
+import { setIntroPhase } from "@/lib/three/island-intro";
 
 /**
  * 3D を表示できないとき(WebGL 非対応、モデルの取得失敗)の代替表示。
@@ -7,6 +11,9 @@ import { Button } from "@/components/ui/Button";
  * 島を回して出す PC のフッターは出せないので、規約へのリンクをここに置く。
  */
 export function IslandFallback() {
+  // オープニングは島がないと再生できないので、隠していた UI をすぐ出す
+  useEffect(() => setIntroPhase(null), []);
+
   return (
     <div
       className="flex h-dvh flex-col items-center gap-[var(--space-4)] pt-28 md:items-start md:justify-end md:pb-40 md:pl-[var(--space-6)] md:pt-0"

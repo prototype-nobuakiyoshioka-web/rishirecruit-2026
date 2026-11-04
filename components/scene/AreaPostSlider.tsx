@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  useRef,
   useState,
   type AnimationEvent,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import type { AreaWithPosts } from "@/lib/wp/queries/areas";
@@ -14,7 +14,7 @@ import { selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { formatEventPeriod, formatScheduleEntries } from "@/lib/utils/format-date";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
-import { AreaInfoPanel, type AreaShortcut } from "./AreaInfoPanel";
+import { AreaInfoPanel } from "./AreaInfoPanel";
 
 type TabType = "job" | "event" | "spot";
 
@@ -108,6 +108,19 @@ interface AreaPostSliderProps {
   isMobile?: boolean;
 }
 
+const MOBILE_PAGER_BUTTON_STYLE: CSSProperties = {
+  width: "2rem",
+  height: "2rem",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  border: "none",
+  background: "transparent",
+  color: "inherit",
+  cursor: "pointer",
+  padding: 0,
+};
+
 interface AreaPostSliderContentProps extends AreaPostSliderProps {
   areaSlug: string;
 }
@@ -192,7 +205,6 @@ function AreaPostSliderContent({
   const [direction, setDirection] = useState<"next" | "prev">("next");
   // 遷移中のみセットされる直前スライドの index。遷移完了で null に戻す。
   const [previousIndex, setPreviousIndex] = useState<number | null>(null);
-  const mobileCarouselRef = useRef<HTMLDivElement>(null);
 
   const trackAnimClass =
     direction === "prev" ? "slide-track-prev" : "slide-track-next";
@@ -232,26 +244,6 @@ function AreaPostSliderContent({
     setSlideIndex(0);
     setPreviousIndex(null);
     setDirection("next");
-  };
-
-  // SP エリアカードの件数ボタン。0件のタブは出さない
-  const areaShortcuts: AreaShortcut[] = [
-    { key: "job", label: "求人", count: jobPostings.length, color: "var(--c-pin-job)" },
-    { key: "event", label: "イベント", count: events.length, color: "var(--c-pin-event)" },
-    { key: "spot", label: "スポット", count: touristspots.length, color: "var(--c-pin-spot)" },
-  ].filter((shortcut) => shortcut.count > 0);
-
-  // 件数ボタン → 該当タブを開き、カルーセルを記事カードまで送る
-  const handleShortcutSelect = (key: string) => {
-    if (key !== "job" && key !== "event" && key !== "spot") return;
-    handleTabChange(key);
-    const carousel = mobileCarouselRef.current;
-    if (!carousel) return;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    carousel.scrollTo({
-      left: carousel.scrollWidth,
-      behavior: reduceMotion ? "auto" : "smooth",
-    });
   };
 
   // ページャーの前後/ドットジャンプに応じて previousIndex と direction をセットしてから index を更新
@@ -622,7 +614,6 @@ function AreaPostSliderContent({
         }}
       >
         <div
-          ref={mobileCarouselRef}
           aria-label="エリアと投稿のカルーセル"
           style={{
             width: "100vw",
@@ -650,11 +641,7 @@ function AreaPostSliderContent({
               scrollSnapAlign: "start",
             }}
           >
-            <AreaInfoPanel
-              isMobile
-              shortcuts={areaShortcuts}
-              onShortcutSelect={handleShortcutSelect}
-            />
+            <AreaInfoPanel isMobile />
           </div>
 
           <div
@@ -685,7 +672,7 @@ function AreaPostSliderContent({
                   onClick={() => handleTabChange(tab.key)}
                   style={{
                     minHeight: "32px",
-                    padding: "0.1rem clamp(1rem, 5vw, 1.25rem)",
+                    padding: "0.1rem clamp(0.625rem, 3.5vw, 1.25rem)",
                     borderRadius: "var(--radius-md) var(--radius-md) 0 0",
                     background:
                       activeTab === tab.key
@@ -702,6 +689,53 @@ function AreaPostSliderContent({
                   {tab.label}
                 </button>
               ))}
+
+              {/* カードを低くするため、ページ送りはタブの行に置く */}
+              {postsLength > 1 && (
+                <div
+                  style={{
+                    marginLeft: "auto",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 var(--space-1)",
+                    borderRadius: "var(--radius-md) var(--radius-md) 0 0",
+                    background: "rgba(255, 255, 255, 0.95)",
+                    color: "var(--c-deep-ocean)",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={goPrev}
+                    aria-label="前の投稿"
+                    style={MOBILE_PAGER_BUTTON_STYLE}
+                  >
+                    <ChevronLeftIcon />
+                  </button>
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      minWidth: "2.25rem",
+                      textAlign: "center",
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {currentIndex + 1}/{postsLength}
+                  </span>
+                  <span className="sr-only" aria-live="polite">
+                    {postsLength}件中{currentIndex + 1}件目
+                  </span>
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    aria-label="次の投稿"
+                    style={MOBILE_PAGER_BUTTON_STYLE}
+                  >
+                    <ChevronRightIcon />
+                  </button>
+                </div>
+              )}
             </div>
 
             <article
@@ -713,11 +747,14 @@ function AreaPostSliderContent({
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                padding: "var(--space-3)",
+                padding: "var(--space-2) var(--space-3)",
                 boxSizing: "border-box",
                 background: "rgba(255, 255, 255, 0.95)",
                 backdropFilter: "blur(8px)",
-                borderRadius: "0 var(--radius-lg) var(--radius-lg) var(--radius-lg)",
+                borderRadius:
+                  postsLength > 1
+                    ? "0 0 var(--radius-lg) var(--radius-lg)"
+                    : "0 var(--radius-lg) var(--radius-lg) var(--radius-lg)",
                 boxShadow: "var(--shadow-md)",
                 overflow: "hidden",
                 willChange: "transform, opacity",
@@ -734,84 +771,6 @@ function AreaPostSliderContent({
                 {renderSlideArea(renderMobileSlide)}
               </div>
 
-              {postsLength > 1 && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "var(--space-3)",
-                    marginTop: "var(--space-1)",
-                    paddingTop: "var(--space-1)",
-                    borderTop: "1px solid rgba(10, 46, 78, 0.08)",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={goPrev}
-                    aria-label="前の投稿"
-                    style={{
-                      width: "2rem",
-                      height: "2rem",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: "9999px",
-                      border: "none",
-                      background: "rgba(10, 46, 78, 0.06)",
-                      color: "var(--c-deep-ocean)",
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                  >
-                    <ChevronLeftIcon />
-                  </button>
-
-                  <div style={{ display: "flex", gap: "0.3rem" }}>
-                    {Array.from({ length: postsLength }, (_, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => goTo(index)}
-                        aria-label={`スライド ${index + 1}`}
-                        style={{
-                          width: "0.45rem",
-                          height: "0.45rem",
-                          borderRadius: "9999px",
-                          border: "none",
-                          cursor: "pointer",
-                          padding: 0,
-                          background:
-                            index === currentIndex
-                              ? "var(--c-deep-ocean)"
-                              : "rgba(10, 46, 78, 0.2)",
-                        }}
-                      />
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    aria-label="次の投稿"
-                    style={{
-                      width: "2rem",
-                      height: "2rem",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: "9999px",
-                      border: "none",
-                      background: "rgba(10, 46, 78, 0.06)",
-                      color: "var(--c-deep-ocean)",
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                  >
-                    <ChevronRightIcon />
-                  </button>
-                </div>
-              )}
             </article>
           </div>
         </div>

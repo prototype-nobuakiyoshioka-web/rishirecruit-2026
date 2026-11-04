@@ -49,6 +49,7 @@ export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
       <AreaLiveStatus />
       <div
         ref={panelRef}
+        data-intro-ui="panel"
         className="fixed z-40 flex"
         style={{
           // 画面高の割合だと縦長端末で空白が増えるため、中身に合わせた固定高にする。
@@ -84,6 +85,7 @@ export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
     <AreaLiveStatus />
     <div
       ref={panelRef}
+      data-intro-ui="panel"
       className="fixed z-40 hidden md:flex"
       style={{
         top: "calc(var(--space-6) + 6rem)",

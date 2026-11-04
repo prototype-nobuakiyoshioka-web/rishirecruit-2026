@@ -5,7 +5,12 @@ import styles from "./ColumnBoard.module.css";
 
 export function ColumnBoard() {
   return (
-    <Link href="/columns" aria-label="コラム一覧を見る" className={styles.board}>
+    <Link
+      href="/columns"
+      aria-label="コラム一覧を見る"
+      className={styles.board}
+      data-intro-ui="board"
+    >
       <span aria-hidden="true" className={styles.book}>
         <svg viewBox="0 0 32 36" fill="none" focusable="false">
           <path d="M7 3h18a3 3 0 0 1 3 3v26H8a4 4 0 0 1-4-4V6a3 3 0 0 1 3-3Z" fill="#eaf5fa" />

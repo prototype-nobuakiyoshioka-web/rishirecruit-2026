@@ -4,46 +4,11 @@ import { AREA_INFO } from "@/lib/constants/areas";
 import { AreaJumpLink } from "./AreaJumpLink";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
-export interface AreaShortcut {
-  key: string;
-  label: string;
-  count: number;
-  color: string;
-}
-
 interface AreaInfoPanelProps {
   isMobile?: boolean;
-  // SP のみ:カード下部に出す「求人 12」などの件数ボタン。0件のものは呼び出し側で除外する
-  shortcuts?: AreaShortcut[];
-  onShortcutSelect?: (key: string) => void;
 }
 
-function ArrowRightIcon() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-      style={{ flexShrink: 0 }}
-    >
-      <path
-        d="M6 3.5L10.5 8L6 12.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-export function AreaInfoPanel({
-  isMobile = false,
-  shortcuts = [],
-  onShortcutSelect,
-}: AreaInfoPanelProps) {
+export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
   const areaSlug = useScrollProgressStore((state) => state.activeAreaSlug);
   const info = AREA_INFO[areaSlug];
   if (!info) return null;
@@ -60,7 +25,7 @@ export function AreaInfoPanel({
         height: isMobile ? "100%" : undefined,
         overflowY: isMobile ? "auto" : undefined,
         boxSizing: isMobile ? "border-box" : undefined,
-        // SP は固定高のカードなので、見出し=上・本文=中央・件数ボタン=下に余白を振り分ける
+        // SP は固定高のカードなので、見出し=上・本文=下に余白を振り分ける
         display: isMobile ? "flex" : undefined,
         flexDirection: isMobile ? "column" : undefined,
         background: "rgba(255, 255, 255, 0.92)",
@@ -184,58 +149,6 @@ export function AreaInfoPanel({
         </div>
       )}
 
-      {isMobile && shortcuts.length > 0 && (
-        <div
-          style={{
-            marginTop: "auto",
-            paddingTop: "var(--space-2)",
-            borderTop: "1px solid rgba(10, 46, 78, 0.08)",
-            display: "flex",
-            gap: "var(--space-1)",
-          }}
-        >
-          {shortcuts.map((shortcut) => (
-            <button
-              key={shortcut.key}
-              type="button"
-              onClick={() => onShortcutSelect?.(shortcut.key)}
-              aria-label={`${info.name}の${shortcut.label} ${shortcut.count}件を見る`}
-              style={{
-                // 文字数の多いボタン(スポット 11 など)が詰まらないよう、幅は中身に応じて配分
-                flex: "1 1 auto",
-                minHeight: "36px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "3px",
-                padding: "0 8px",
-                borderRadius: "var(--radius-full)",
-                border: "none",
-                background: "rgba(10, 46, 78, 0.06)",
-                color: "var(--c-deep-ocean)",
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                whiteSpace: "nowrap",
-                cursor: "pointer",
-              }}
-            >
-              <span
-                aria-hidden="true"
-                style={{
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "var(--radius-full)",
-                  background: shortcut.color,
-                  flexShrink: 0,
-                }}
-              />
-              {shortcut.label}
-              <span style={{ fontSize: "0.875rem" }}>{shortcut.count}</span>
-              <ArrowRightIcon />
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

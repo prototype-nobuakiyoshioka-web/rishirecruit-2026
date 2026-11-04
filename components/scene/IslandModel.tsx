@@ -2,9 +2,26 @@
 
 import { useGLTF, useScroll } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  type ReactNode,
+} from "react";
 import * as THREE from "three";
 import type { Group } from "three";
+import {
+  getIntroEase,
+  getIntroPhase,
+  INTRO_DISTANCE_SCALE,
+  INTRO_DURATION_S,
+  INTRO_REVEAL_AT_S,
+  INTRO_ROTATION,
+  INTRO_SKIP_SPEED,
+  INTRO_UI_DURATION_MS,
+  markIntroPlayed,
+  setIntroPhase,
+} from "@/lib/three/island-intro";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
 const MODEL_PATH = "/models/rishiri-miniature.glb?v=mountain-hut-removed-1";
@@ -23,6 +40,8 @@ const FOOTER_REVEAL_SCROLL_OFFSET = 0.95;
 // スクロール位置の復元を待つ上限(フレーム)と、復元できたとみなす誤差
 const RESTORE_MAX_FRAMES = 60;
 const RESTORE_TOLERANCE = 0.02;
+// 読み込み直後の重いフレームでオープニングが飛ばないよう、1フレームに進める秒数を抑える
+const INTRO_MAX_FRAME_S = 1 / 15;
 // Y を下げると カメラが低く（水平寄り）になり、水平線が下がって自然な位置に見える。
 // 14 → 6 で PC (Y:5) に近い自然な俯瞰角度に。
 const MOBILE_CAMERA_DIRECTION = new THREE.Vector3(-6, 6, 18).normalize();
@@ -45,6 +64,8 @@ const SP_LOOKAT_Y_OFFSET = 14;
 const SP_COMPACT_LOOKAT_Y_OFFSET = 32;
 // SP のみ、描画全体を画面上で何px上にずらすか(端末によらず同じpx量で動く)
 const SP_SCREEN_SHIFT_Y_PX = 24;
+// 背の低い端末はコラム看板が島に掛からないよう、さらに上へ
+const SP_COMPACT_SCREEN_SHIFT_Y_PX = 52;
 const MOBILE_CAMERA_FOV = 60;
 const MOBILE_HORIZONTAL_MARGIN = 16;
 const ADAPTIVE_FIT_MAX_WIDTH = 768;
@@ -60,6 +81,13 @@ interface IslandModelProps {
 // - Terrain_Cliff: 島の土台の縁（厚みのあるベージュのプラットフォーム）
 // - HimePond*: 姫沼およびそのランドマーク一式（LandmarkGrass/Water/Wood/LeavesSage/Trunk）
 const HIDDEN_NODE_NAMES = ["Vegetation", "Terrain_Cliff", "HimePond*"];
+
+// ページを離れる操作も先にここを通るので、タイマーはそのまま走らせて UI を必ず元に戻す
+function revealIntroUi() {
+  if (getIntroPhase() !== "playing") return;
+  setIntroPhase("reveal");
+  window.setTimeout(() => setIntroPhase(null), INTRO_UI_DURATION_MS);
+}
 
 export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   const { scene } = useGLTF(isMobile ? MOBILE_MODEL_PATH : MODEL_PATH, "/draco/") as unknown as {
@@ -156,6 +184,9 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   const isRestoringRef = useRef(
     useScrollProgressStore.getState().lastScrollOffset > 0
   );
+  const introStartedRef = useRef(false);
+  const introRef = useRef<{ elapsed: number; speed: number } | null>(null);
+  const cameraBaseRef = useRef(new THREE.Vector3());
   const scroll = useScroll();
   const setRotationComplete = useScrollProgressStore(
     (state) => state.setRotationComplete
@@ -203,7 +234,7 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
         viewportSize.width,
         viewportSize.height,
         0,
-        SP_SCREEN_SHIFT_Y_PX,
+        isCompactMobile ? SP_COMPACT_SCREEN_SHIFT_Y_PX : SP_SCREEN_SHIFT_Y_PX,
         viewportSize.width,
         viewportSize.height
       );
@@ -211,9 +242,11 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
       camera.clearViewOffset();
     }
     camera.updateProjectionMatrix();
+    cameraBaseRef.current.copy(camera.position);
   }, [
     camera,
     cameraZoom,
+    isCompactMobile,
     isMobile,
     lookAtYOffset,
     mobileCameraDistance,
@@ -222,8 +255,33 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
     viewportSize.width,
   ]);
 
+  // オープニング中に操作されたら、UI をすぐ出して島も早送りで終わらせる
+  useEffect(() => {
+    const skipIntro = () => {
+      if (!introRef.current) return;
+      introRef.current.speed = INTRO_SKIP_SPEED;
+      revealIntroUi();
+    };
+    const events = ["pointerdown", "wheel", "touchstart", "keydown"];
+    events.forEach((name) =>
+      window.addEventListener(name, skipIntro, { passive: true })
+    );
+    return () => {
+      events.forEach((name) => window.removeEventListener(name, skipIntro));
+    };
+  }, []);
+
   useFrame((_, dt) => {
     if (!groupRef.current) return;
+
+    if (!introStartedRef.current) {
+      introStartedRef.current = true;
+      if (getIntroPhase() === "pending") {
+        setIntroPhase("playing");
+        markIntroPlayed();
+        introRef.current = { elapsed: 0, speed: 1 };
+      }
+    }
 
     // 戻ってきたとき:スクロール領域ができ次第、前回の位置へ戻す。
     // 反映されるまでは先頭の位置で判定しない(エリアが一瞬切り替わるのを防ぐ)
@@ -259,12 +317,25 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
       -MAX_ROTATION,
       MAX_ROTATION
     );
-    groupRef.current.rotation.y = THREE.MathUtils.damp(
-      groupRef.current.rotation.y,
-      target,
-      DAMP_SPEED,
-      dt
-    );
+    const intro = introRef.current;
+    if (intro) {
+      intro.elapsed += Math.min(dt, INTRO_MAX_FRAME_S) * intro.speed;
+      const remaining = 1 - getIntroEase(intro.elapsed);
+      groupRef.current.rotation.y = target + INTRO_ROTATION * remaining;
+      camera.position
+        .copy(cameraBaseRef.current)
+        .multiplyScalar(1 + (INTRO_DISTANCE_SCALE - 1) * remaining);
+      if (!shouldAutoFit) camera.lookAt(0, 0, 0);
+      if (intro.elapsed >= INTRO_REVEAL_AT_S) revealIntroUi();
+      if (intro.elapsed >= INTRO_DURATION_S) introRef.current = null;
+    } else {
+      groupRef.current.rotation.y = THREE.MathUtils.damp(
+        groupRef.current.rotation.y,
+        target,
+        DAMP_SPEED,
+        dt
+      );
+    }
     if (shouldAutoFit) {
       groupRef.current.position.x = THREE.MathUtils.lerp(
         mobilePositionX,

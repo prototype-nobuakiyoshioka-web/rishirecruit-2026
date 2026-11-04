@@ -25,9 +25,9 @@
   --space-4: 1rem;
   --space-5: 1.25rem;
   --space-6: 1.5rem;
-  /* SP トップ下部カードの高さ。中身の最大(イベントの日程3件)に合わせた固定値。
+  /* SP トップ下部カードの高さ。中身の最大(320px 幅の求人)に合わせた固定値。
      AreaSidePanels と ColumnBoard(看板位置)の両方がこれを参照する */
-  --sp-area-panel-h: 13.75rem;
+  --sp-area-panel-h: 11.25rem;
   --container-max: 1200px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -288,5 +288,50 @@ body {
     to {
       opacity: 1;
     }
+  }
+}
+
+/* トップのオープニング(lib/three/island-intro.ts)。島が動く間は UI を隠し、順に出す。 */
+html[data-intro="pending"] header,
+html[data-intro="playing"] header,
+html[data-intro="pending"] [data-intro-ui],
+html[data-intro="playing"] [data-intro-ui] {
+  visibility: hidden;
+}
+
+/* 全体で 900ms(INTRO_UI_DURATION_MS)に収める */
+html[data-intro="reveal"] [data-intro-ui="panel"] {
+  animation: intro-ui-rise 620ms cubic-bezier(0.34, 1.3, 0.64, 1) 100ms both;
+}
+
+html[data-intro="reveal"] [data-intro-ui="board"] {
+  animation: intro-ui-rise 560ms cubic-bezier(0.34, 1.3, 0.64, 1) 300ms both;
+}
+
+html[data-intro="reveal"] header {
+  animation: intro-ui-drop 520ms ease-out 360ms both;
+}
+
+@keyframes intro-ui-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes intro-ui-drop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -16px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }

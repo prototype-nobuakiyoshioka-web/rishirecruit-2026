@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { GA_ID } from "@/lib/analytics";
+import { INTRO_BOOT_SCRIPT } from "@/lib/three/island-intro";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -65,8 +66,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className="h-full antialiased">
+    // data-intro は下のスクリプトがハイドレーション前に付ける
+    <html lang="ja" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
         <Header />
         <PageTransition />
         {children}

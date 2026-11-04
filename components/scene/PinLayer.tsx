@@ -10,9 +10,10 @@ const AREAS = [
 
 interface PinLayerProps {
   activeAreaSlug: string;
+  isMobile?: boolean;
 }
 
-export function PinLayer({ activeAreaSlug }: PinLayerProps) {
+export function PinLayer({ activeAreaSlug, isMobile = false }: PinLayerProps) {
   return (
     <group>
       {AREAS.map((area) => {
@@ -28,6 +29,7 @@ export function PinLayer({ activeAreaSlug }: PinLayerProps) {
             areaName={area.name}
             position={[pos.x, pos.y, pos.z]}
             isActive
+            shouldPulse={isMobile}
           />
         );
       })}

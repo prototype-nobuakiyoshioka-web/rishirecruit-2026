@@ -14,7 +14,8 @@ const PIN_EDGE_GAP = 12;
  * - Fixed 全画面 SVG、pointer-events: none
  * - rAF ループで store 直接読み + パネル DOM の getBoundingClientRect
  * - 描画は React 再レンダを避けて imperative に SVG 属性を書き換える
- * - パネルが不在(SP等) or ピンが視錐台外なら非表示
+ * - SP は出さない(カードが横に動くため。選択中のピンは Pin 側で脈打たせる)
+ * - パネルが不在 or ピンが視錐台外なら非表示
  */
 export function PinConnectorOverlay() {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -44,7 +45,8 @@ export function PinConnectorOverlay() {
         '[data-pin-connector-target="area-info"]',
       );
 
-      const shouldShow = visible && target !== null;
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      const shouldShow = !isMobile && visible && target !== null;
 
       if (!shouldShow) {
         if (svg.style.opacity !== "0") svg.style.opacity = "0";
@@ -62,12 +64,9 @@ export function PinConnectorOverlay() {
       lastVisible = true;
 
       const rect = target.getBoundingClientRect();
-      // ピンから見てパネルのどの辺が最も近いかで終点を決める。
-      // 画面幅が狭い（SP）とパネルは下にあるため上辺中央、
-      // 広い（PC）とパネルは右にあるため左辺中央に終点を置く。
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      const targetX = isMobile ? rect.left + rect.width / 2 : rect.left;
-      const targetY = isMobile ? rect.top : rect.top + rect.height / 2;
+      // パネルは右にあるため左辺中央に終点を置く
+      const targetX = rect.left;
+      const targetY = rect.top + rect.height / 2;
 
       // ピン中心 → パネルへの単位ベクトル
       const dx = targetX - pinX;
@@ -99,6 +98,7 @@ export function PinConnectorOverlay() {
     <svg
       ref={svgRef}
       aria-hidden="true"
+      data-intro-ui="line"
       className="pin-connector-overlay"
       style={{
         position: "fixed",
