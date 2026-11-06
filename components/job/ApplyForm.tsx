@@ -331,10 +331,10 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
       className="scroll-mt-[calc(var(--space-6)*6)] rounded-[var(--radius-lg)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-snow)] p-[var(--space-6)] shadow-[var(--shadow-md)]"
     >
       <div>
-        <p className="text-sm font-bold text-[color:var(--c-deep-ocean)]">Apply</p>
-        <h2 className="mt-[var(--space-2)] text-2xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
+        {/* 「応募について」(h2)の中に置くので h3 */}
+        <h3 className="text-2xl font-bold tracking-normal text-[color:var(--c-text-primary)]">
           応募フォーム
-        </h2>
+        </h3>
         <div className="mt-[var(--space-5)] rounded-[var(--radius-md)] border border-[color:var(--c-border-subtle)] bg-[color:var(--c-paper)] p-[var(--space-4)]">
           <p className="text-xs font-bold text-[color:var(--c-text-secondary)]">応募先</p>
           <p className="mt-[var(--space-1)] text-lg font-bold text-[color:var(--c-text-primary)]">

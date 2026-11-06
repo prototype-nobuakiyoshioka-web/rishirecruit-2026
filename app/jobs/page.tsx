@@ -19,7 +19,6 @@ export default async function JobsPage() {
       eyebrow="Jobs in Rishirifuji"
       title={<>あなたの<wbr />行き先を、<br />ここから。</>}
       lead={<>利尻富士町で募集中の仕事を、<br />条件と暮らしの両方から確かめられます。</>}
-      introEyebrow="Open positions"
       introLabel="現在募集中の仕事"
       introTitle={<>島で暮らすことを、<br />仕事から考える。</>}
       introBody="職種名だけでなく、仕事内容、給与、勤務時間、住居サポートまで。気になる求人を開き、自分の経験や希望と重なる部分があるかを確かめてください。"

@@ -1,0 +1,84 @@
+/* 詳細ページの冒頭(水色の背景)に置く島の地図。色はすべて既存のトークン */
+.where {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 2rem;
+  color: var(--c-deep-ocean);
+}
+
+.map {
+  position: relative;
+  flex: none;
+  width: 7.5rem;
+  /* 地図の絵(700×790)の比率 */
+  aspect-ratio: 700 / 790;
+}
+
+/* 島の全体(利尻町を含む)。薄い紺で、丸い島の形だけを見せる */
+.island,
+.town {
+  position: absolute;
+  inset: 0;
+  background: var(--c-deep-ocean);
+  -webkit-mask: var(--mask) center / contain no-repeat;
+  mask: var(--mask) center / contain no-repeat;
+}
+
+.island {
+  opacity: 0.3;
+}
+
+.pin {
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  transform: translate(-50%, -50%);
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* 地図の文字は透過させない(水色の背景で 4.5:1 を割るため) */
+.area {
+  margin-top: 0.25rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.area small {
+  margin-left: 0.15em;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.sub {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .where {
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .map {
+    width: 9.5rem;
+  }
+
+  .area {
+    font-size: 1.75rem;
+  }
+
+  .sub {
+    font-size: 0.9375rem;
+  }
+}

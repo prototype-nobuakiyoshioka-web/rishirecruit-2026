@@ -3,7 +3,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
+import { ExternalLinkIcon } from "@/components/ui/ExternalLinkIcon";
 import { EditorialDetailSection, EditorialDetailShell, EditorialFieldList, hasAnyValue } from "@/components/ui/EditorialDetailShell";
+import { eventLocation } from "@/lib/map/island-locator";
 import { absoluteUrl, buildMetadata, ogImageFromField } from "@/lib/seo";
 import { formatEventPeriod, formatScheduleEntries } from "@/lib/utils/format-date";
 import { eventStatus, galleryFromField, htmlToText, selectFirst } from "@/lib/wp/format";
@@ -15,7 +17,7 @@ export async function generateStaticParams(){return(await getEvents()).map(event
 export async function generateMetadata({params}:PageProps):Promise<Metadata>{const{slug}=await params;const event=await getEventBySlug(slug);if(!event)return{};return buildMetadata({title:event.title,description:event.eventFields?.catchCopy??undefined,path:`/events/${slug}`,image:ogImageFromField(event.eventFields?.thumbnailImage,`${event.title}の写真`)});}
 
 export default async function EventDetailPage({params}:PageProps){
-  const{slug}=await params;const event=await getEventBySlug(slug);if(!event)notFound();const fields=event.eventFields;const category=selectFirst(fields?.category);const categoryLabel=category?(EVENT_CATEGORY_LABELS[category]??category):"Event";const imageNode=fields?.thumbnailImage?.node;const image=imageNode?.sourceUrl?{sourceUrl:imageNode.sourceUrl,altText:imageNode.altText||`${event.title}の写真`,width:imageNode.mediaDetails?.width,height:imageNode.mediaDetails?.height}:null;const gallery=galleryFromField(fields?.galleryImages);const period=formatEventPeriod(fields?.dateDisplayType?.[0]??null,fields?.startDatetime??null,fields?.endDatetime??null,fields?.periodMonth?.[0]??null,fields?.periodRange?.[0]??null,fields?.periodNth?.[0]??null,fields?.periodWeekday?.[0]??null);
+  const{slug}=await params;const event=await getEventBySlug(slug);if(!event)notFound();const fields=event.eventFields;const category=selectFirst(fields?.category);const categoryLabel=category?(EVENT_CATEGORY_LABELS[category]??category):null;const imageNode=fields?.thumbnailImage?.node;const image=imageNode?.sourceUrl?{sourceUrl:imageNode.sourceUrl,altText:imageNode.altText||`${event.title}の写真`,width:imageNode.mediaDetails?.width,height:imageNode.mediaDetails?.height}:null;const gallery=galleryFromField(fields?.galleryImages);const period=formatEventPeriod(fields?.dateDisplayType?.[0]??null,fields?.startDatetime??null,fields?.endDatetime??null,fields?.periodMonth?.[0]??null,fields?.periodRange?.[0]??null,fields?.periodNth?.[0]??null,fields?.periodWeekday?.[0]??null);
   const ogImage=ogImageFromField(fields?.thumbnailImage);
   const descriptionText=htmlToText(fields?.description);
   const scheduleEntries=formatScheduleEntries(fields?.scheduleEntries);
@@ -24,18 +26,18 @@ export default async function EventDetailPage({params}:PageProps){
   const scheduleItems=scheduleEntries.length>0
     ?[{label:"会場と日程",value:<ul className="space-y-1">{scheduleEntries.map(e=><li key={e}>{e}</li>)}</ul>},{label:"開催詳細",value:fields?.recurrenceNote},{label:"住所",value:fields?.address}]
     :[{label:"日程",value:period},{label:"開催詳細",value:fields?.recurrenceNote},{label:"会場",value:fields?.venueName},{label:"住所",value:fields?.address}];
-  const joinItems=[{label:"アクセス",value:fields?.accessInfo},{label:"参加費",value:fields?.price},{label:"問い合わせ",value:fields?.contact},{label:"申込",value:fields?.registrationUrl?<a href={fields.registrationUrl} target="_blank" rel="noopener noreferrer" className="underline">申込ページを開く ↗</a>:null}];
+  const joinItems=[{label:"アクセス",value:fields?.accessInfo},{label:"参加費",value:fields?.price},{label:"問い合わせ",value:fields?.contact},{label:"申込",value:fields?.registrationUrl?<a href={fields.registrationUrl} target="_blank" rel="noopener noreferrer" className="underline">申込ページを開く<ExternalLinkIcon /></a>:null}];
   // イベント構造化データ。日時が取得できる場合のみ startDate を含める。
   const status=eventStatus(fields?.startDatetime,fields?.endDatetime);
   const eventLd={"@context":"https://schema.org","@type":"Event",name:event.title,description:descriptionText||fields?.catchCopy||event.title,startDate:fields?.startDatetime??undefined,endDate:fields?.endDatetime??undefined,eventStatus:"https://schema.org/EventScheduled",location:{"@type":"Place",name:fields?.venueName??"利尻富士町",address:{"@type":"PostalAddress",addressRegion:"北海道",addressLocality:"利尻富士町",addressCountry:"JP",streetAddress:fields?.address??undefined}},image:ogImage?[ogImage.url]:undefined,url:absoluteUrl(`/events/${slug}`)};
   return <>
     <JsonLd data={eventLd} />
-    <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"イベント",href:"/events"},{label:event.title}]} eyebrow="Event / Island calendar" meta={status ? `${categoryLabel} ・ ${status}` : categoryLabel} title={event.title} lead={fields?.catchCopy} image={image}>
-    {hasAnyValue(scheduleItems)?<EditorialDetailSection eyebrow="Schedule" label="開催情報"><EditorialFieldList items={scheduleItems} /></EditorialDetailSection>:null}
-    {descriptionText?<EditorialDetailSection eyebrow="About" label="イベントについて"><div className="grid gap-7 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">{descriptionText.split(/\n+/).filter(Boolean).map(p=><p key={p}>{p}</p>)}</div></EditorialDetailSection>:null}
-    {gallery.length?<EditorialDetailSection eyebrow="Scenes" label="会場の風景"><div className="grid gap-5 md:grid-cols-2">{gallery.map((img,index)=><Image key={`${img.sourceUrl}-${index}`} src={img.sourceUrl} alt={img.altText||`${event.title}の写真 ${index+1}`} width={1200} height={900} className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover" />)}</div></EditorialDetailSection>:null}
-    {hasAnyValue(joinItems)?<EditorialDetailSection eyebrow="Join" label="参加・アクセス"><EditorialFieldList items={joinItems} /></EditorialDetailSection>:null}
-    <aside className="relative bg-[color:var(--c-deep-ocean)] px-6 py-20 text-[color:var(--c-text-inverse)]"><div className="mx-auto grid max-w-[1080px] gap-8 md:grid-cols-[1fr_auto] md:items-end"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">Next / Jobs</p><h2 className="mt-5 text-3xl font-black md:text-5xl">島の日常を、仕事から知る。</h2></div><Button variant="aqua" href="/jobs" className="md:w-auto">求人一覧を見る</Button></div></aside>
+    <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"イベント",href:"/events"},{label:event.title}]} eyebrow="Event / Island calendar" meta={[categoryLabel,status].filter(Boolean).join(" ・ ")||null} title={event.title} lead={fields?.catchCopy} location={eventLocation(event)} image={image}>
+    {hasAnyValue(scheduleItems)?<EditorialDetailSection label="開催情報"><EditorialFieldList items={scheduleItems} /></EditorialDetailSection>:null}
+    {descriptionText?<EditorialDetailSection label="イベントについて"><div className="grid gap-7 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">{descriptionText.split(/\n+/).filter(Boolean).map(p=><p key={p}>{p}</p>)}</div></EditorialDetailSection>:null}
+    {gallery.length?<EditorialDetailSection label="会場の風景"><div className="grid gap-5 md:grid-cols-2">{gallery.map((img,index)=><Image key={`${img.sourceUrl}-${index}`} src={img.sourceUrl} alt={img.altText||`${event.title}の写真 ${index+1}`} width={1200} height={900} className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover" />)}</div></EditorialDetailSection>:null}
+    {hasAnyValue(joinItems)?<EditorialDetailSection label="参加・アクセス"><EditorialFieldList items={joinItems} /></EditorialDetailSection>:null}
+    <aside className="relative bg-[color:var(--c-deep-ocean)] px-6 py-20 text-[color:var(--c-text-inverse)]"><div className="mx-auto grid max-w-[1080px] gap-8 md:grid-cols-[1fr_auto] md:items-end"><div><h2 className="text-3xl font-black md:text-5xl">島の日常を、仕事から知る。</h2></div><Button variant="aqua" href="/jobs" className="md:w-auto">求人一覧を見る</Button></div></aside>
   </EditorialDetailShell>
   </>;
 }

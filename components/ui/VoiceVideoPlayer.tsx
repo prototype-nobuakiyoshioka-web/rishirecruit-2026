@@ -165,9 +165,6 @@ export function VoiceVideoPlayer({ videoId, title }: Props) {
         ) : null}
         {ended ? (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black/85 px-6 text-center text-[color:var(--c-text-inverse)]">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
-              End of video
-            </p>
             <p className="max-w-[36ch] text-base font-bold leading-7 md:text-lg md:leading-8">
               最後までご覧いただきありがとうございました。
             </p>

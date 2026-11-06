@@ -1,7 +1,9 @@
 import Image from "next/image";
 import { Fragment, type CSSProperties, type ReactNode } from "react";
+import { IslandLocator } from "@/components/map/IslandLocator";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PhraseText } from "@/components/ui/PhraseText";
+import type { IslandLocation } from "@/lib/map/island-locator";
 import { longestPhraseLength } from "@/lib/text/phrases";
 
 // 文字列値に含まれる <br /> や \n を実際の改行 (<br />) として描画する。
@@ -27,12 +29,14 @@ type EditorialDetailShellProps = {
   meta?: string | null;
   title: string;
   lead?: string | null;
+  // 島の地図(求人・観光地・イベントの詳細)。位置もエリアもないときは null で、地図ごと出さない
+  location?: IslandLocation | null;
   // 画像が無い場合は null を渡すと画像領域を出さない（求人詳細で画像未設定時など）
   image: { sourceUrl: string; altText: string; width?: number | null; height?: number | null } | null;
   children: ReactNode;
 };
 
-export function EditorialDetailShell({ breadcrumbs, eyebrow, meta, title, lead, image, children }: EditorialDetailShellProps) {
+export function EditorialDetailShell({ breadcrumbs, eyebrow, meta, title, lead, location, image, children }: EditorialDetailShellProps) {
   return (
     <main className="overflow-hidden bg-[#1a8fa8]">
       <section className="relative pb-32 pt-36 md:pb-44 md:pt-40" style={{ background: "radial-gradient(circle at 78% 18%, rgba(201, 226, 240, 0.78), transparent 27%), linear-gradient(160deg, #5BB4E0 0%, #37A9C7 55%, #1A8FA8 100%)" }}>
@@ -49,6 +53,7 @@ export function EditorialDetailShell({ breadcrumbs, eyebrow, meta, title, lead, 
                 <PhraseText text={title} />
               </h1>
               {lead ? <p className="mt-6 max-w-2xl text-base font-bold leading-8 text-[color:var(--c-deep-ocean)]/75 md:text-lg">{lead}</p> : null}
+              {location ? <IslandLocator location={location} /> : null}
             </div>
             {image ? (
               <div className="mt-10 lg:mt-0">
@@ -71,8 +76,17 @@ export function EditorialDetailShell({ breadcrumbs, eyebrow, meta, title, lead, 
   );
 }
 
-export function EditorialDetailSection({ eyebrow, label, children }: { eyebrow: string; label: string; children: ReactNode }) {
-  return <section className="relative mx-auto grid max-w-[1080px] gap-10 border-t border-[color:var(--c-deep-ocean)]/15 px-[var(--space-6)] py-16 first:border-t-0 md:grid-cols-[13rem_1fr] md:gap-20 md:py-24"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">{eyebrow}</p><p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">{label}</p></div><div>{children}</div></section>;
+/**
+ * 詳細ページのセクション。英字の小見出しは付けず(英字はページ冒頭の1か所だけ)、日本語の見出しを h2 にする。
+ * PC では見出しを sticky にし、長いセクションを読んでいる間も今どこかが左に見え続けるようにする
+ */
+export function EditorialDetailSection({ label, children }: { label: string; children: ReactNode }) {
+  return <section className="relative mx-auto grid max-w-[1080px] gap-10 border-t border-[color:var(--c-deep-ocean)]/15 px-[var(--space-6)] py-16 first:border-t-0 md:grid-cols-[13rem_1fr] md:gap-20 md:py-24"><div className="md:sticky md:top-28 md:self-start"><SectionHeading>{label}</SectionHeading></div><div>{children}</div></section>;
+}
+
+/** セクションの見出し(紺・極太、SP 22px / PC 26px)。詳細ページのセクションと、同じ形の見出しを持つページで使う */
+export function SectionHeading({ children }: { children: ReactNode }) {
+  return <h2 className="text-balance text-[1.375rem] font-black leading-[1.4] tracking-[-0.01em] text-[color:var(--c-deep-ocean)] md:text-[1.625rem]">{children}</h2>;
 }
 
 // 値が"実質空"か判定(null/undefined/空文字/空白のみの文字列 → 空扱い)。

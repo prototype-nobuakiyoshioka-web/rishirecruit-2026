@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { EditorialIntro } from "@/components/ui/EditorialIndexShell";
 import { buildMetadata } from "@/lib/seo";
 import { TextArrow } from "@/components/ui/TextArrow";
 
@@ -14,7 +15,6 @@ export const metadata: Metadata = buildMetadata({
 
 const STORIES = [
   {
-    eyebrow: "Work and community",
     title: "仕事の先に、\n島の日常がある。",
     body: [
       "利尻富士町は、北海道の北、日本海に浮かぶ利尻島の町です。人口は約2,000人。島の中央に利尻山がそびえ、その裾野に、海とともにある暮らしが広がっています。",
@@ -22,7 +22,6 @@ const STORIES = [
     ],
   },
   {
-    eyebrow: "Living together",
     title: "人との近さを、\n力に変える。",
     body: [
       "道ですれ違えば挨拶を交わし、困っている人がいれば声をかける。利尻富士町には、顔が見える距離で支え合う日常があります。初めて島へ来た人を気にかけてくれる人もいます。",
@@ -105,43 +104,26 @@ export default function MessagePage() {
           }}
         />
 
-        <header className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-              Message
-            </p>
-            <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
-              島を選ぶ前に
-            </p>
-          </div>
-          <div>
-            <h2 className="text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-5xl md:leading-[1.2]">
-              きれいな景色だけで、
-              <br />
-              働く場所は決められない。
-            </h2>
-            <div className="mt-8 grid max-w-3xl gap-5 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg md:leading-9">
-              <p>
-                求人票の条件だけでも、島の美しさだけでも、働く場所を決めることはできません。
-              </p>
-              <p>
-                仕事のことも、暮らしのことも。利尻富士町を選ぶ前に、知ってほしいことを正直にお伝えします。
-              </p>
-            </div>
-          </div>
-        </header>
+        <EditorialIntro
+          label="島を選ぶ前に"
+          title={<>きれいな景色だけで、<br />働く場所は決められない。</>}
+        >
+          <p>
+            求人票の条件だけでも、島の美しさだけでも、働く場所を決めることはできません。
+          </p>
+          <p>
+            仕事のことも、暮らしのことも。利尻富士町を選ぶ前に、知ってほしいことを正直にお伝えします。
+          </p>
+        </EditorialIntro>
 
         <div className="relative mx-auto max-w-[1080px] px-[var(--space-6)]">
           {STORIES.map((story) => (
             <section
-              key={story.eyebrow}
+              key={story.title}
               className="grid gap-10 border-t border-[color:var(--c-deep-ocean)]/15 py-16 md:grid-cols-[minmax(16rem,0.85fr)_1.15fr] md:gap-24 md:py-24"
             >
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-                  {story.eyebrow}
-                </p>
-                <h2 className="mt-5 whitespace-pre-line text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-4xl">
+                <h2 className="whitespace-pre-line text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-4xl">
                   {story.title}
                 </h2>
               </div>
@@ -155,10 +137,7 @@ export default function MessagePage() {
         </div>
 
         <section className="relative mx-auto max-w-[1080px] border-t border-[color:var(--c-deep-ocean)]/15 px-[var(--space-6)] py-20 md:py-28">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-            Before you decide
-          </p>
-          <h2 className="mt-5 max-w-3xl text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-5xl md:leading-[1.2]">
+          <h2 className="max-w-3xl text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-5xl md:leading-[1.2]">
             次の行き先を選ぶために、
             <br />
             大切にしてほしいこと。
@@ -194,10 +173,7 @@ export default function MessagePage() {
           />
           <div className="relative mx-auto grid max-w-[1080px] gap-10 md:grid-cols-[1fr_auto] md:items-end md:gap-20">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
-                Next / Jobs
-              </p>
-              <h2 className="mt-5 max-w-3xl text-balance text-3xl font-black leading-snug tracking-[-0.025em] md:text-5xl md:leading-tight">
+              <h2 className="max-w-3xl text-balance text-3xl font-black leading-snug tracking-[-0.025em] md:text-5xl md:leading-tight">
                 まずは、今ある仕事を
                 <br />
                 見るところから。

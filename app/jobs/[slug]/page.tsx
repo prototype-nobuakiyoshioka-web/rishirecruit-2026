@@ -4,6 +4,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { ApplyForm } from "@/components/job/ApplyForm";
 import { StickyApplyCta } from "@/components/layout/StickyApplyCta";
 import { EditorialDetailSection, EditorialDetailShell, EditorialFieldList, hasAnyValue } from "@/components/ui/EditorialDetailShell";
+import { jobLocation } from "@/lib/map/island-locator";
 import { SITE_URL, absoluteUrl, buildMetadata, ogImageFromField } from "@/lib/seo";
 import { htmlToText, selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
@@ -30,12 +31,12 @@ export default async function JobDetailPage({ params }: PageProps) {
   const jobLd={"@context":"https://schema.org","@type":"JobPosting",title:job.title,description:descriptionText||fields?.catchCopy||job.title,datePosted:job.date??undefined,employmentType:type?(SCHEMA_EMPLOYMENT_TYPE[type]??"OTHER"):undefined,hiringOrganization:{"@type":"Organization",name:"利尻富士町",sameAs:SITE_URL},jobLocation:{"@type":"Place",address:{"@type":"PostalAddress",addressRegion:"北海道",addressLocality:"利尻富士町",addressCountry:"JP",streetAddress:fields?.workAddress??undefined}},url:absoluteUrl(`/jobs/${slug}`)};
   return <>
     <JsonLd data={jobLd} />
-    <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"求人",href:"/jobs"},{label:job.title}]} eyebrow="Job / Open position" meta={typeLabel} title={job.title} lead={fields?.catchCopy} image={image}>
-      {descriptionText?<EditorialDetailSection eyebrow="Overview" label="仕事について"><div className="grid gap-7 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">{descriptionText.split(/\n+/).filter(Boolean).map(p=><p key={p}>{p}</p>)}</div></EditorialDetailSection>:null}
-      {hasAnyValue(requirementsItems)?<EditorialDetailSection eyebrow="Requirements" label="応募資格"><EditorialFieldList items={requirementsItems} /></EditorialDetailSection>:null}
-      {hasAnyValue(conditionsItems)?<EditorialDetailSection eyebrow="Conditions" label="条件・待遇"><EditorialFieldList items={conditionsItems} /></EditorialDetailSection>:null}
-      {hasAnyValue(workplaceItems)?<EditorialDetailSection eyebrow="Workplace" label="勤務地"><EditorialFieldList items={workplaceItems} /></EditorialDetailSection>:null}
-      <EditorialDetailSection eyebrow="Application" label="応募について"><div className="grid gap-8">{applicationFlowText?<p className="whitespace-pre-line text-base leading-8 text-[color:var(--c-text-secondary)]">{applicationFlowText}</p>:null}<ApplyForm jobTitle={job.title} jobSlug={job.slug} /></div></EditorialDetailSection>
+    <EditorialDetailShell breadcrumbs={[{label:"ホーム",href:"/"},{label:"求人",href:"/jobs"},{label:job.title}]} eyebrow="Job / Open position" meta={typeLabel} title={job.title} lead={fields?.catchCopy} location={jobLocation(job)} image={image}>
+      {descriptionText?<EditorialDetailSection label="仕事について"><div className="grid gap-7 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">{descriptionText.split(/\n+/).filter(Boolean).map(p=><p key={p}>{p}</p>)}</div></EditorialDetailSection>:null}
+      {hasAnyValue(requirementsItems)?<EditorialDetailSection label="応募資格"><EditorialFieldList items={requirementsItems} /></EditorialDetailSection>:null}
+      {hasAnyValue(conditionsItems)?<EditorialDetailSection label="条件・待遇"><EditorialFieldList items={conditionsItems} /></EditorialDetailSection>:null}
+      {hasAnyValue(workplaceItems)?<EditorialDetailSection label="勤務地"><EditorialFieldList items={workplaceItems} /></EditorialDetailSection>:null}
+      <EditorialDetailSection label="応募について"><div className="grid gap-8">{applicationFlowText?<p className="whitespace-pre-line text-base leading-8 text-[color:var(--c-text-secondary)]">{applicationFlowText}</p>:null}<ApplyForm jobTitle={job.title} jobSlug={job.slug} /></div></EditorialDetailSection>
     </EditorialDetailShell><StickyApplyCta />
   </>;
 }

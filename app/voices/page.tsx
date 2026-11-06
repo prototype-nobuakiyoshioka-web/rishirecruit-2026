@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { splitByBr } from "@/lib/wp/format";
 import { Button } from "@/components/ui/Button";
+import { EditorialIntro } from "@/components/ui/EditorialIndexShell";
 import { VoiceVideoPlayer } from "@/components/ui/VoiceVideoPlayer";
 import { buildMetadata } from "@/lib/seo";
 import { getTestimonials } from "@/lib/wp/queries/voices";
@@ -78,43 +79,27 @@ export default async function VoicesPage() {
           style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }}
         />
 
-        <header className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-              Real stories
-            </p>
-            <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
-              島で働く人たち
-            </p>
-          </div>
-          <div>
-            <h2 className="text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-5xl md:leading-[1.2]">
-              求人票の向こうにある、
-              <br />
-              一人ひとりの暮らし。
-            </h2>
-            <p className="mt-8 max-w-3xl text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg md:leading-9">
-              島での暮らしに、ひとつの正解はありません。移住前に感じていたこと、働き始めて分かったこと、今も戸惑うこと。実際に暮らす人の経験を、あなたの判断材料として読んでください。
-            </p>
-          </div>
-        </header>
+        <EditorialIntro
+          label="島で働く人たち"
+          title={<>求人票の向こうにある、<br />一人ひとりの暮らし。</>}
+        >
+          <p>
+            島での暮らしに、ひとつの正解はありません。移住前に感じていたこと、働き始めて分かったこと、今も戸惑うこと。実際に暮らす人の経験を、あなたの判断材料として読んでください。
+          </p>
+        </EditorialIntro>
 
         {videoItems.length > 0 ? (
           <section className="relative mx-auto max-w-[960px] px-[var(--space-6)] pb-24 md:pb-32">
-            <div className="mb-10 text-center md:mb-14">
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-                Video interviews
-              </p>
-            </div>
             <div className="flex flex-col items-center gap-16 md:gap-20">
               {videoItems.map((video) => (
                 <article
                   key={video.id}
                   className="flex w-full flex-col items-center gap-5"
                 >
-                  <h4 className="w-full text-balance text-center text-xl font-black leading-snug text-[color:var(--c-deep-ocean)] md:text-2xl">
+                  {/* 動画も、下の一人ずつのカードと同じ階層(h2)にする */}
+                  <h2 className="w-full text-balance text-center text-xl font-black leading-snug text-[color:var(--c-deep-ocean)] md:text-2xl">
                     {video.title}
-                  </h4>
+                  </h2>
                   <div className="w-full">
                     <VoiceVideoPlayer
                       videoId={video.videoId}
@@ -154,10 +139,7 @@ export default async function VoicesPage() {
                       </Link>
                     ) : null}
                     <div className="mt-6">
-                      <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-                        Voice {String(index + 1).padStart(2, "0")}
-                      </p>
-                      <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
+                      <p className="text-sm font-bold text-[color:var(--c-text-secondary)]">
                         {fields?.age ?? "移住者インタビュー"}
                       </p>
                       <h2 className="mt-2 text-balance text-2xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-3xl">
@@ -204,10 +186,7 @@ export default async function VoicesPage() {
           />
           <div className="relative mx-auto grid max-w-[1080px] gap-10 md:grid-cols-[1fr_auto] md:items-end md:gap-20">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
-                Next / Jobs
-              </p>
-              <h2 className="mt-5 text-balance text-3xl font-black leading-snug tracking-[-0.025em] md:text-5xl md:leading-tight">
+              <h2 className="text-balance text-3xl font-black leading-snug tracking-[-0.025em] md:text-5xl md:leading-tight">
                 誰かの経験を、
                 <br />
                 自分の選択肢へ。

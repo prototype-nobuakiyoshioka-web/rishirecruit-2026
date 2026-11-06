@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ChangeEvent, FormEvent } from "react";
 import { useState } from "react";
+import { SectionHeading } from "@/components/ui/EditorialDetailShell";
 import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { submitForm, isCf7Success } from "@/lib/wp/submit-cf7";
 import { trackEvent } from "@/lib/analytics";
@@ -168,7 +169,6 @@ export default function ContactPage() {
       eyebrow="Contact rishirecruit"
       title={<>気になる<wbr />ことを、<br />話す<wbr />ところから。</>}
       lead={<>求人のことも、島での暮らしも。<br />まだ決めていない段階から相談できます。</>}
-      introEyebrow="Before you contact"
       introLabel="お問い合わせの前に"
       introTitle={<>応募する前でも、<br />聞いて大丈夫です。</>}
       introBody="住まい、冬の生活、働き方、イベントや観光について。情報を見ても分からないことや、誰に聞けばよいか迷うことをお送りください。求人応募は、各求人詳細ページの応募フォームから受け付けています。"
@@ -176,10 +176,7 @@ export default function ContactPage() {
       <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
         {isSubmitted ? (
           <div className="border-y border-[color:var(--c-deep-ocean)]/15 py-20 md:py-28" aria-live="polite">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-              Thank you
-            </p>
-            <h2 className="mt-5 text-balance text-3xl font-black leading-tight text-[color:var(--c-deep-ocean)] md:text-5xl">
+            <h2 className="text-balance text-3xl font-black leading-tight text-[color:var(--c-deep-ocean)] md:text-5xl">
               お問い合わせを受け付けました。
             </h2>
             <p className="mt-6 max-w-2xl text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg">
@@ -193,12 +190,7 @@ export default function ContactPage() {
         ) : (
           <div className="grid gap-12 border-t border-[color:var(--c-deep-ocean)]/15 pt-14 md:grid-cols-[15rem_1fr] md:gap-20 md:pt-20">
             <aside>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-                Contact form
-              </p>
-              <h2 className="mt-4 text-2xl font-black text-[color:var(--c-deep-ocean)]">
-                お問い合わせ
-              </h2>
+              <SectionHeading>お問い合わせ</SectionHeading>
               <div className="mt-6 grid gap-4 text-sm leading-7 text-[color:var(--c-text-secondary)]">
                 <p><span className="font-black text-[color:var(--c-text-primary)]">*</span> は必須項目です。</p>
                 <p>求人への応募は、求人詳細ページの「応募する」からお進みください。</p>

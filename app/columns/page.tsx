@@ -34,7 +34,6 @@ export default async function ColumnsPage() {
       eyebrow="Columns from the island"
       title={<>島の<wbr />ことばを、<br />綴っていく。</>}
       lead={<>Noteで連載中の、島ぐらしコラム。<br />暮らしの手ざわりを、言葉で残します。</>}
-      introEyebrow="Island columns"
       introLabel="島ぐらしの記録"
       introTitle={<>求人の外側にある、<br />島の暮らしの話。</>}
       introBody="働くことの周りには、日々の暮らしがあります。島の四季や人、ふとした出来事を綴ったコラムから、ここで流れる時間を感じてみてください。"
@@ -63,10 +62,7 @@ export default async function ColumnsPage() {
                 </a>
                 <div className="mt-6 flex flex-col gap-4">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-accent-text)]">
-                      Column {String(index + 1).padStart(2, "0")}
-                    </p>
-                    <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
+                    <p className="text-sm font-bold text-[color:var(--c-text-secondary)]">
                       {formatPublishedAt(article.publishedAt)}
                     </p>
                     <h2 className="mt-2 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">

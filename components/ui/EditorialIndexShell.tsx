@@ -4,7 +4,6 @@ type EditorialIndexShellProps = {
   eyebrow: string;
   title: ReactNode;
   lead: ReactNode;
-  introEyebrow: string;
   introLabel: string;
   introTitle: ReactNode;
   introBody: string;
@@ -15,7 +14,6 @@ export function EditorialIndexShell({
   eyebrow,
   title,
   lead,
-  introEyebrow,
   introLabel,
   introTitle,
   introBody,
@@ -54,26 +52,33 @@ export function EditorialIndexShell({
           className="pointer-events-none absolute inset-0 bg-repeat opacity-[0.035]"
           style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }}
         />
-        <header className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-              {introEyebrow}
-            </p>
-            <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
-              {introLabel}
-            </p>
-          </div>
-          <div>
-            <h2 className="text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-5xl md:leading-[1.2]">
-              {introTitle}
-            </h2>
-            <p className="mt-8 max-w-3xl text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg md:leading-9">
-              {introBody}
-            </p>
-          </div>
-        </header>
+        <EditorialIntro label={introLabel} title={introTitle}>
+          <p>{introBody}</p>
+        </EditorialIntro>
         {children}
       </article>
     </main>
+  );
+}
+
+/**
+ * 一覧ページなどの導入(左に短い見出し、右に大きな見出しと本文)。
+ * 英字の小見出しは付けない。左の見出しは右の大見出し(h2)より小さくし、主従を保つ
+ */
+export function EditorialIntro({ label, title, children }: { label: string; title: ReactNode; children: ReactNode }) {
+  return (
+    <header className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
+      <div>
+        <p className="text-lg font-black leading-[1.4] text-[color:var(--c-deep-ocean)] md:text-xl">{label}</p>
+      </div>
+      <div>
+        <h2 className="text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-5xl md:leading-[1.2]">
+          {title}
+        </h2>
+        <div className="mt-8 grid max-w-3xl gap-5 text-base leading-8 text-[color:var(--c-text-secondary)] md:text-lg md:leading-9">
+          {children}
+        </div>
+      </div>
+    </header>
   );
 }

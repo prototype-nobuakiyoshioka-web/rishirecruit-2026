@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { EditorialDetailSection } from "@/components/ui/EditorialDetailShell";
 import { PhraseText } from "@/components/ui/PhraseText";
 import { longestPhraseLength } from "@/lib/text/phrases";
 import { buildMetadata, ogImageFromField } from "@/lib/seo";
@@ -135,16 +136,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
         />
 
         {qaList.length > 0 ? (
-          <section className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
-                Interview
-              </p>
-              <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
-                本人の言葉
-              </p>
-            </div>
-            <div>
+          <EditorialDetailSection label="本人の言葉">
               <dl className="divide-y divide-[color:var(--c-deep-ocean)]/15">
                 {qaList.map((qa, index) => (
                   <div key={index} className="py-8 first:pt-0 last:pb-0 md:py-10">
@@ -162,8 +154,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
                   </div>
                 ))}
               </dl>
-            </div>
-          </section>
+          </EditorialDetailSection>
         ) : null}
 
         <aside className="relative overflow-hidden bg-[color:var(--c-deep-ocean)] px-[var(--space-6)] py-20 text-[color:var(--c-text-inverse)] md:py-28">
@@ -174,10 +165,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
           />
           <div className="relative mx-auto grid max-w-[1080px] gap-10 md:grid-cols-[1fr_auto] md:items-end md:gap-20">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
-                Next / Jobs
-              </p>
-              <h2 className="mt-5 max-w-3xl text-balance text-3xl font-black leading-snug tracking-[-0.025em] md:text-5xl md:leading-tight">
+              <h2 className="max-w-3xl text-balance text-3xl font-black leading-snug tracking-[-0.025em] md:text-5xl md:leading-tight">
                 自分につながる仕事を探す。
               </h2>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[color:var(--c-ice)] md:text-lg">

@@ -20,7 +20,6 @@ export default async function EventsPage() {
       eyebrow="Events on the island"
       title={<>今、<wbr />この島で<br />起きている<wbr />こと。</>}
       lead={<>季節の催し、人が集まる時間。<br />島の今を、予定から見つけられます。</>}
-      introEyebrow="Event calendar"
       introLabel="年間の行事"
       introTitle={<>参加することで、<br />町との距離が近くなる。</>}
       introBody="行事や小さな集まりは、島の人や季節に触れる入口です。開催日と場所を確認して、気になる時間に足を運んでみてください。"
