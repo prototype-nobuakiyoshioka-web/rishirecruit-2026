@@ -13,7 +13,7 @@ export function PageHero({ title, lead, eyebrow }: PageHeroProps) {
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="max-w-5xl text-balance text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
+        <h1 className="text-phrase max-w-5xl text-balance text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
           {title}
         </h1>
         <p className="mt-[var(--space-5)] max-w-2xl text-balance text-base font-medium leading-8 tracking-normal text-[color:var(--c-text-secondary)] md:text-lg">

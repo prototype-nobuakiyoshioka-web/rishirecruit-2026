@@ -17,7 +17,7 @@ export default async function EventsPage() {
   return (
     <EditorialIndexShell
       eyebrow="Events on the island"
-      title={<>今、この島で<br />起きていること。</>}
+      title={<>今、<wbr />この島で<br />起きている<wbr />こと。</>}
       lead={<>季節の催し、人が集まる時間。<br />島の今を、予定から見つけられます。</>}
       introEyebrow="Event calendar"
       introLabel="年間の行事"
@@ -44,7 +44,7 @@ export default async function EventsPage() {
                   </Link>
                 ) : null}
                 <div className="mt-6">
-                  <div className="flex flex-wrap gap-3 text-xs font-black"><span className="text-[color:var(--c-warning)]">{category ? EVENT_CATEGORY_LABELS[category] ?? category : "Event"}</span>{status ? <span className="text-[color:var(--c-text-secondary)]">{status}</span> : null}</div>
+                  <div className="flex flex-wrap gap-3 text-xs font-black"><span className="text-[color:var(--c-accent-text)]">{category ? EVENT_CATEGORY_LABELS[category] ?? category : "Event"}</span>{status ? <span className="text-[color:var(--c-text-secondary)]">{status}</span> : null}</div>
                   {scheduleEntries.length > 0 ? (
                     <ul className="mt-3 space-y-1 text-lg font-black text-[color:var(--c-deep-ocean)]">
                       {scheduleEntries.map((entry) => <li key={entry}>{entry}</li>)}

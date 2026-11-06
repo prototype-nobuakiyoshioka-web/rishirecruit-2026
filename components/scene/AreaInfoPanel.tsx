@@ -43,7 +43,7 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
         style={{
           fontSize: isMobile ? "0.7rem" : "0.75rem",
           fontWeight: 700,
-          color: "var(--c-pin-spot)",
+          color: "var(--c-accent-text)",
           letterSpacing: "0.05em",
           marginBottom: isMobile
             ? "2px"

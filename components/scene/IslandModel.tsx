@@ -206,6 +206,9 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
 
   useEffect(() => {
     setScrollElement(scroll.el);
+    // スクロール領域はキーボードのフォーカスを受けるので、何の領域かを名前で伝える
+    scroll.el.setAttribute("role", "region");
+    scroll.el.setAttribute("aria-label", "島を回す(スクロールで鴛泊と鬼脇を切り替え)");
     return () => setScrollElement(null);
   }, [scroll.el, setScrollElement]);
 

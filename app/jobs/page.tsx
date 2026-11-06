@@ -21,7 +21,7 @@ export default async function JobsPage() {
   return (
     <EditorialIndexShell
       eyebrow="Jobs in Rishirifuji"
-      title={<>あなたの行き先を、<br />ここから。</>}
+      title={<>あなたの<wbr />行き先を、<br />ここから。</>}
       lead={<>利尻富士町で募集中の仕事を、<br />条件と暮らしの両方から確かめられます。</>}
       introEyebrow="Open positions"
       introLabel="現在募集中の仕事"
@@ -45,7 +45,7 @@ export default async function JobsPage() {
                   </Link>
                 ) : null}
                 <div className="p-6 md:p-8">
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-accent-text)]">
                     {employmentType ? EMPLOYMENT_TYPE_LABELS[employmentType] ?? employmentType : "Job"}
                   </p>
                   <h2 className="mt-2 text-2xl font-black tracking-[-0.02em] text-[color:var(--c-deep-ocean)]">{job.title}</h2>

@@ -31,7 +31,7 @@ export default async function ColumnsPage() {
   return (
     <EditorialIndexShell
       eyebrow="Columns from the island"
-      title={<>島のことばを、<br />綴っていく。</>}
+      title={<>島の<wbr />ことばを、<br />綴っていく。</>}
       lead={<>Noteで連載中の、島ぐらしコラム。<br />暮らしの手ざわりを、言葉で残します。</>}
       introEyebrow="Island columns"
       introLabel="島ぐらしの記録"
@@ -47,7 +47,7 @@ export default async function ColumnsPage() {
                   href={article.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${article.title}をNoteで読む`}
+                  aria-label={`${article.title}をNoteで読む(新しいタブで開きます)`}
                 >
                   <div
                     role="img"
@@ -62,7 +62,7 @@ export default async function ColumnsPage() {
                 </a>
                 <div className="mt-6 flex flex-col gap-4">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-accent-text)]">
                       Column {String(index + 1).padStart(2, "0")}
                     </p>
                     <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
@@ -81,9 +81,14 @@ export default async function ColumnsPage() {
                     href={article.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center font-black text-[color:var(--c-deep-ocean)] hover:underline"
+                    className="inline-flex min-h-11 items-center gap-1.5 font-black text-[color:var(--c-deep-ocean)] hover:underline"
                   >
-                    Noteで読む →
+                    Noteで読む
+                    {/* 外部サイトを新しいタブで開くことを、見た目と読み上げの両方で伝える */}
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9.5 2.5h4v4M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3" />
+                    </svg>
+                    <span className="sr-only">(新しいタブで開きます)</span>
                   </a>
                 </div>
               </article>
@@ -103,7 +108,7 @@ export default async function ColumnsPage() {
         <div className="mt-20 border-t border-[color:var(--c-deep-ocean)]/15 pt-10">
           <Link
             href="/jobs"
-            className="font-black text-[color:var(--c-deep-ocean)] hover:underline"
+            className="hit-target [--hit-y:-12px] font-black text-[color:var(--c-deep-ocean)] hover:underline"
           >
             この島で働く →
           </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
+import { useReducedMotionRef } from "./useReducedMotionRef";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { Group } from "three";
@@ -78,6 +79,7 @@ export function Clouds() {
 
 function Cloud({ def }: { def: CloudDef }) {
   const groupRef = useRef<Group>(null);
+  const reducedMotion = useReducedMotionRef();
   const puffMeshes = useMemo(
     () =>
       def.puffs.map((p, i) => (
@@ -100,7 +102,9 @@ function Cloud({ def }: { def: CloudDef }) {
 
   useFrame((state) => {
     if (!groupRef.current) return;
-    const t = state.clock.elapsedTime * def.drift + def.offset;
+    // 動きを減らす設定では流さない
+    const elapsed = reducedMotion.current ? 0 : state.clock.elapsedTime;
+    const t = elapsed * def.drift + def.offset;
     const x = ((t + WRAP_HALF_WIDTH) % (WRAP_HALF_WIDTH * 2)) - WRAP_HALF_WIDTH;
     groupRef.current.position.set(def.base.x + x, def.base.y, def.base.z);
   });

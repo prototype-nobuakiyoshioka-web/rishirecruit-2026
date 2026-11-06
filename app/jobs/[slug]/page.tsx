@@ -18,7 +18,7 @@ export async function generateMetadata({params}:PageProps):Promise<Metadata>{con
 
 export default async function JobDetailPage({ params }: PageProps) {
   const { slug } = await params; const job = await getJobPostingBySlug(slug); if (!job) notFound();
-  const fields=job.jobPostingFields; const type=selectFirst(fields?.employmentType); const typeLabel=type?(EMPLOYMENT_TYPE_LABELS[type]??type):"求人"; const imageNode=fields?.thumbnailImage?.node; const image=imageNode?.sourceUrl?{sourceUrl:imageNode.sourceUrl,altText:imageNode.altText||`${job.title}の求人写真`}:null;
+  const fields=job.jobPostingFields; const type=selectFirst(fields?.employmentType); const typeLabel=type?(EMPLOYMENT_TYPE_LABELS[type]??type):"求人"; const imageNode=fields?.thumbnailImage?.node; const image=imageNode?.sourceUrl?{sourceUrl:imageNode.sourceUrl,altText:imageNode.altText||`${job.title}の求人写真`,width:imageNode.mediaDetails?.width,height:imageNode.mediaDetails?.height}:null;
   const descriptionText=htmlToText(fields?.description);
   const applicationFlowText=htmlToText(fields?.applicationFlow).trim();
   const requirementsItems=[{label:"必要資格・応募条件",value:fields?.requiredQualifications}];

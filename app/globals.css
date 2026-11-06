@@ -12,6 +12,10 @@
   --c-text-inverse: #FAF6EE;
   --c-border-subtle: #F0EBE0;
   --c-warning: #F4B942;
+  /* 黄色(--c-warning)は文字に使うと明るい背景で読めない(白の上で 1.8:1)。
+     黄色はピン・線・点などの飾りと、紺の上の文字に限る。
+     紙色・白の上の文字はこの黄土色(紙色の上で 5.1:1)、水色の上の文字は紺にする */
+  --c-accent-text: #8A6100;
   --c-danger: #B53A1B;
   --c-pin-job: #FF7B5B;
   --c-pin-spot: #F4B942;
@@ -68,6 +72,45 @@ body {
     sans-serif;
 }
 
+/* 見た目の大きさを変えずに、押せる範囲を広げる。
+   --hit-x / --hit-y に広げたい量を負の値で入れる(例: 32px の部品は -6px で 44px)。
+   隣の部品の押せる範囲と重ならない量にすること */
+.hit-target {
+  position: relative;
+}
+
+.hit-target::before {
+  content: "";
+  position: absolute;
+  inset: var(--hit-y, 0px) var(--hit-x, 0px);
+}
+
+/* カード全体を押せるリンクにする。一番近い position: relative の要素いっぱいに広がる。
+   カードの中にほかのボタンやリンクを置くときは使わない(入れ子になる) */
+.stretched-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* 見出しを文節で折り返す。区切りは <wbr>(PhraseText か手書き)で置く。
+   word-break: auto-phrase は Safari で効かないため使わない。
+   文節が1行に収まらないときだけ、overflow-wrap で途中を切ってはみ出しを防ぐ */
+.text-phrase {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+
+/* スマホの詳細ページの見出し。いちばん長い文節(--phrase-max 文字)が1行に収まる大きさにする。
+   36px を上限、24px を下限とし、下限でも収まらない文節だけ overflow-wrap で切る。
+   100vw - 3rem は左右の余白(各 24px)、0.97em は字間(-0.03em)を引いた1文字の幅 */
+@media (max-width: 767px) {
+  .text-phrase-fit {
+    font-size: clamp(1.5rem, calc((100vw - 3rem) / (var(--phrase-max, 8) * 0.97 + 0.4)), 2.25rem);
+  }
+}
+
 .page-transition {
   position: fixed;
   inset: 0;
@@ -106,7 +149,8 @@ body {
 }
 
 .page-transition__message p:first-child {
-  color: var(--c-warning);
+  /* 水色の幕の上なので、黄色ではなく紺(--c-accent-text の注記を参照) */
+  color: var(--c-deep-ocean);
   font-size: 0.875rem;
   font-weight: 900;
   letter-spacing: 0.18em;

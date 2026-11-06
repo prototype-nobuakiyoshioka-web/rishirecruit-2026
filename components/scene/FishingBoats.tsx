@@ -1,6 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
+import { useReducedMotionRef } from "./useReducedMotionRef";
 import { useRef } from "react";
 import type { Group } from "three";
 
@@ -67,10 +68,12 @@ export function FishingBoats() {
 
 function FishingBoat({ def }: { def: BoatDef }) {
   const groupRef = useRef<Group>(null);
+  const reducedMotion = useReducedMotionRef();
 
   useFrame((state) => {
     if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
+    // 動きを減らす設定では揺れを止める
+    const t = reducedMotion.current ? 0 : state.clock.elapsedTime;
     const bob =
       Math.sin(t * ((Math.PI * 2) / BOB_PERIOD) + def.bobPhase) * BOB_AMPLITUDE;
     const roll =

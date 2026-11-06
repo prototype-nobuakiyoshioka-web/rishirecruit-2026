@@ -34,6 +34,8 @@ export default async function Home() {
       {/* in-flow の 100vh だと iOS で文書がスクロールして島だけずれるため fixed にする。
           高さは従来の 100vh と同じ lvh(ツールバーの裏まで描画し、島の見え方を保つ) */}
       <main data-home-island className="fixed inset-x-0 top-0 h-lvh overflow-hidden">
+        {/* 見た目は島が主役なので、見出しは読み上げ用にだけ置く */}
+        <h1 className="sr-only">リシリクルート 利尻富士町の求人・移住・観光</h1>
         <IslandCanvas />
       </main>
       <ColumnBoard />

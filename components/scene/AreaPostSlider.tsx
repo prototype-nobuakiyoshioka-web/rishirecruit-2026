@@ -108,7 +108,10 @@ interface AreaPostSliderProps {
   isMobile?: boolean;
 }
 
-const MOBILE_PAGER_BUTTON_STYLE: CSSProperties = {
+// 見た目は 32px のまま、押せる範囲を上下左右 6px ずつ広げて 44px にする(.hit-target)
+const MOBILE_PAGER_BUTTON_STYLE = {
+  "--hit-x": "-6px",
+  "--hit-y": "-6px",
   width: "2rem",
   height: "2rem",
   display: "flex",
@@ -119,7 +122,7 @@ const MOBILE_PAGER_BUTTON_STYLE: CSSProperties = {
   color: "inherit",
   cursor: "pointer",
   padding: 0,
-};
+} as CSSProperties;
 
 interface AreaPostSliderContentProps extends AreaPostSliderProps {
   areaSlug: string;
@@ -246,7 +249,7 @@ function AreaPostSliderContent({
     setDirection("next");
   };
 
-  // ページャーの前後/ドットジャンプに応じて previousIndex と direction をセットしてから index を更新
+  // ページャーの前後に応じて previousIndex と direction をセットしてから index を更新
   const goPrev = () => {
     if (postsLength < 2) return;
     setDirection("prev");
@@ -258,12 +261,6 @@ function AreaPostSliderContent({
     setDirection("next");
     setPreviousIndex(currentIndex);
     setSlideIndex((index) => (index + 1) % postsLength);
-  };
-  const goTo = (index: number) => {
-    if (index === currentIndex) return;
-    setDirection(index > currentIndex ? "next" : "prev");
-    setPreviousIndex(currentIndex);
-    setSlideIndex(index);
   };
 
   // トラックの animation が終わったら previousIndex を消して通常表示に戻す。
@@ -307,15 +304,29 @@ function AreaPostSliderContent({
           </h3>
           {slideInfo.catchCopy && (
             <p
-              style={{
-                fontSize: "0.875rem",
-                color: "var(--c-text-secondary)",
-                lineHeight: 1.35,
-                marginBottom: "var(--space-1)",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
+              style={
+                slideInfo.jobMeta || slideInfo.eventMeta
+                  ? {
+                      fontSize: "0.875rem",
+                      color: "var(--c-text-secondary)",
+                      lineHeight: 1.35,
+                      marginBottom: "var(--space-1)",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }
+                  : {
+                      // 観光地は日程などの情報がないので、キャッチを2行まで見せる
+                      fontSize: "0.875rem",
+                      color: "var(--c-text-secondary)",
+                      lineHeight: 1.45,
+                      marginBottom: "var(--space-2)",
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: 2,
+                      overflow: "hidden",
+                    }
+              }
             >
               {slideInfo.catchCopy}
             </p>
@@ -384,8 +395,10 @@ function AreaPostSliderContent({
               </div>
             );
           })()}
+          {/* カード全体を押せるようにする(.stretched-link)。カードの中にほかのボタンはない */}
           <Link
             href={slideInfo.href}
+            className="stretched-link"
             style={{
               fontSize: "0.875rem",
               fontWeight: 700,
@@ -400,6 +413,8 @@ function AreaPostSliderContent({
           <div
             data-mobile-thumbnail
             style={{
+              // 写真の上もカードのリンク(.stretched-link)として押せるようにする
+              pointerEvents: "none",
               width: "28vw",
               maxWidth: "7rem",
               aspectRatio: "4 / 3",
@@ -536,6 +551,7 @@ function AreaPostSliderContent({
           })()}
           <Link
             href={slideInfo.href}
+            className="stretched-link"
             style={{
               fontSize: "0.9rem",
               fontWeight: 700,
@@ -552,6 +568,8 @@ function AreaPostSliderContent({
         {slideInfo.imageUrl && (
           <div
             style={{
+              // 写真の上もカードのリンク(.stretched-link)として押せるようにする
+              pointerEvents: "none",
               width: "clamp(9rem, 13.5vw, 12rem)",
               height: "clamp(6rem, 15dvh, 8rem)",
               position: "relative",
@@ -593,10 +611,10 @@ function AreaPostSliderContent({
         }}
         onAnimationEnd={handleTrackAnimationEnd}
       >
-        <div style={{ width: "50%", flexShrink: 0, minWidth: 0 }}>
+        <div style={{ position: "relative", width: "50%", flexShrink: 0, minWidth: 0 }}>
           {renderSlide(first)}
         </div>
-        <div style={{ width: "50%", flexShrink: 0, minWidth: 0 }}>
+        <div style={{ position: "relative", width: "50%", flexShrink: 0, minWidth: 0 }}>
           {renderSlide(second)}
         </div>
       </div>
@@ -617,12 +635,15 @@ function AreaPostSliderContent({
           aria-label="エリアと投稿のカルーセル"
           style={{
             width: "100vw",
-            height: "100%",
             display: "flex",
             gap: "var(--space-4)",
             overflowX: "auto",
             overflowY: "hidden",
-            padding: "0 0 0 4vw",
+            // タブの押せる範囲(上に 6px)がスクロール領域で切られないよう、上に 6px の余白を足す。
+            // 見た目の位置と高さ(カード 180px)は変えない
+            height: "calc(100% + 6px)",
+            marginTop: "-6px",
+            padding: "6px 0 0 4vw",
             boxSizing: "border-box",
             scrollSnapType: "x mandatory",
             // 右端に 8px の余白を確保（スナップ位置を 8px 内側に寄せる）
@@ -670,7 +691,12 @@ function AreaPostSliderContent({
                   key={tab.key}
                   type="button"
                   onClick={() => handleTabChange(tab.key)}
+                  // 見た目は高さ 32px のまま、押せる範囲を上下 6px ずつ広げて 44px にする。
+                  // 下に広げた分がカードの上の余白に重なるので、カードより手前に置く
+                  className="hit-target"
                   style={{
+                    "--hit-y": "-6px",
+                    zIndex: 1,
                     minHeight: "32px",
                     padding: "0.1rem clamp(0.625rem, 3.5vw, 1.25rem)",
                     borderRadius: "var(--radius-md) var(--radius-md) 0 0",
@@ -684,7 +710,7 @@ function AreaPostSliderContent({
                     border: "none",
                     cursor: "pointer",
                     transition: "background 220ms ease",
-                  }}
+                  } as CSSProperties}
                 >
                   {tab.label}
                 </button>
@@ -694,6 +720,9 @@ function AreaPostSliderContent({
               {postsLength > 1 && (
                 <div
                   style={{
+                    // 押せる範囲(下に 6px)がカードより手前に来るようにする
+                    position: "relative",
+                    zIndex: 1,
                     marginLeft: "auto",
                     display: "flex",
                     alignItems: "center",
@@ -707,6 +736,7 @@ function AreaPostSliderContent({
                     type="button"
                     onClick={goPrev}
                     aria-label="前の投稿"
+                    className="hit-target"
                     style={MOBILE_PAGER_BUTTON_STYLE}
                   >
                     <ChevronLeftIcon />
@@ -730,6 +760,7 @@ function AreaPostSliderContent({
                     type="button"
                     onClick={goNext}
                     aria-label="次の投稿"
+                    className="hit-target"
                     style={MOBILE_PAGER_BUTTON_STYLE}
                   >
                     <ChevronRightIcon />
@@ -760,12 +791,16 @@ function AreaPostSliderContent({
                 willChange: "transform, opacity",
               }}
             >
+              {/* 中身が少ないとき(観光地など)も空きが下に偏らないよう、上下の中央に置く */}
               <div
                 style={{
                   position: "relative",
                   overflow: "hidden",
                   flex: 1,
                   minHeight: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
                 }}
               >
                 {renderSlideArea(renderMobileSlide)}
@@ -798,7 +833,11 @@ function AreaPostSliderContent({
             key={tab.key}
             type="button"
             onClick={() => handleTabChange(tab.key)}
+            // 見た目は変えず、押せる範囲を上下 3px ずつ広げて 44px 前後にする(iPad の横向きなど)
+            className="hit-target"
             style={{
+              "--hit-y": "-3px",
+              zIndex: 1,
               padding:
                 isMobile
                   ? "0.35rem clamp(1rem, 5vw, 1.25rem)"
@@ -817,7 +856,7 @@ function AreaPostSliderContent({
               border: "none",
               cursor: "pointer",
               transition: "background 220ms ease",
-            }}
+            } as CSSProperties}
           >
             {tab.label}
           </button>
@@ -867,7 +906,11 @@ function AreaPostSliderContent({
               type="button"
               onClick={goPrev}
               aria-label="前の投稿"
+              // 見た目の大きさは変えず、押せる範囲を 44px 以上にする
+              className="hit-target"
               style={{
+                "--hit-x": "-6px",
+                "--hit-y": "-6px",
                 width: "clamp(2rem, 4dvh, 2.25rem)",
                 height: "clamp(2rem, 4dvh, 2.25rem)",
                 display: "flex",
@@ -880,7 +923,7 @@ function AreaPostSliderContent({
                 cursor: "pointer",
                 padding: 0,
                 transition: "background 150ms ease",
-              }}
+              } as CSSProperties}
               onMouseEnter={(event) => {
                 event.currentTarget.style.background = "rgba(10, 46, 78, 0.14)";
               }}
@@ -891,20 +934,16 @@ function AreaPostSliderContent({
               <ChevronLeftIcon />
             </button>
 
-            <div style={{ display: "flex", gap: "0.4rem" }}>
+            {/* 点は位置を示すだけにする(8px の点どうしでは 44px の押せる範囲を重ねずに取れない)。
+                移動は左右のボタンで行い、位置は読み上げで伝える */}
+            <div aria-hidden="true" style={{ display: "flex", gap: "0.4rem" }}>
               {Array.from({ length: postsLength }, (_, index) => (
-                <button
+                <span
                   key={index}
-                  type="button"
-                  onClick={() => goTo(index)}
-                  aria-label={`スライド ${index + 1}`}
                   style={{
                     width: "0.5rem",
                     height: "0.5rem",
                     borderRadius: "9999px",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
                     background:
                       index === currentIndex
                         ? "var(--c-deep-ocean)"
@@ -914,12 +953,19 @@ function AreaPostSliderContent({
                 />
               ))}
             </div>
+            <span className="sr-only" aria-live="polite">
+              {postsLength}件中{currentIndex + 1}件目
+            </span>
 
             <button
               type="button"
               onClick={goNext}
               aria-label="次の投稿"
+              // 見た目の大きさは変えず、押せる範囲を 44px 以上にする
+              className="hit-target"
               style={{
+                "--hit-x": "-6px",
+                "--hit-y": "-6px",
                 width: "clamp(2rem, 4dvh, 2.25rem)",
                 height: "clamp(2rem, 4dvh, 2.25rem)",
                 display: "flex",
@@ -932,7 +978,7 @@ function AreaPostSliderContent({
                 cursor: "pointer",
                 padding: 0,
                 transition: "background 150ms ease",
-              }}
+              } as CSSProperties}
               onMouseEnter={(event) => {
                 event.currentTarget.style.background = "rgba(10, 46, 78, 0.14)";
               }}

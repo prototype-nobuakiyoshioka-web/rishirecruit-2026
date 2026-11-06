@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FooterCopyright,
   FooterLegalLinks,
@@ -44,6 +44,23 @@ const MOBILE_MENU_STYLE: CSSProperties = {
   boxShadow: "var(--shadow-md)",
 };
 
+// メニューを開いている間、後ろのページを動かさない。
+// iOS Safari は body の overflow: hidden だけでは止まらないため、body を固定して位置を戻す。
+function lockPageScroll() {
+  const { body } = document;
+  const scrollY = window.scrollY;
+  const previous = body.getAttribute("style") ?? "";
+  body.style.position = "fixed";
+  body.style.top = `-${scrollY}px`;
+  body.style.left = "0";
+  body.style.right = "0";
+  body.style.width = "100%";
+  return () => {
+    body.setAttribute("style", previous);
+    window.scrollTo(0, scrollY);
+  };
+}
+
 function isActivePath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -51,12 +68,70 @@ function isActivePath(pathname: string, href: string) {
 export function Header() {
   const pathname = useSitePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Esc や背景のタップで閉じたときは、メニューボタンにフォーカスを戻す
+  const closeMenuAndFocusButton = useCallback(() => {
+    setIsMobileMenuOpen(false);
+    menuButtonRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const unlock = lockPageScroll();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenuAndFocusButton();
+        return;
+      }
+      // Tab はヘッダー(ロゴ・メニューボタン・メニュー)の中で回す
+      if (event.key !== "Tab" || !headerRef.current) return;
+      const focusables = Array.from(
+        headerRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+      ).filter((element) => element.offsetParent !== null);
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    // 開いたまま 1024px 以上(メニューボタンが消える幅)になったら閉じる
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const handleDesktop = () => {
+      if (desktop.matches) setIsMobileMenuOpen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    desktop.addEventListener("change", handleDesktop);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      desktop.removeEventListener("change", handleDesktop);
+      unlock();
+    };
+  }, [isMobileMenuOpen, closeMenuAndFocusButton]);
 
   return (
     <header
+      ref={headerRef}
       className="fixed inset-x-0 top-0 z-50"
       style={HEADER_SHELL_STYLE}
     >
+      {isMobileMenuOpen ? (
+        // 背景のタップを受けて閉じる。トップの島のスクロールにも指が届かないようにする
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 -z-10 bg-[rgba(10,46,78,0.16)] lg:hidden"
+          onClick={closeMenuAndFocusButton}
+        />
+      ) : null}
       <div
         className="flex h-14 items-center justify-between border border-[color:var(--c-border-subtle)] backdrop-blur-md lg:h-16"
         style={HEADER_CONTAINER_STYLE}
@@ -100,6 +175,7 @@ export function Header() {
         </nav>
 
         <button
+          ref={menuButtonRef}
           type="button"
           className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-full)] text-[color:var(--c-deep-ocean)] transition-colors hover:bg-[color:var(--c-border-subtle)] lg:hidden"
           aria-label={isMobileMenuOpen ? "メニューを閉じる" : "メニューを開く"}
@@ -134,7 +210,7 @@ export function Header() {
         // 88px = mobile header height(56px) + shell top padding(16px) + menu gap(16px)。
         <nav
           id="mobile-navigation"
-          className="mx-auto mt-[var(--space-2)] grid max-h-[calc(100vh-88px)] max-w-[var(--container-max)] gap-[var(--space-2)] overflow-y-auto rounded-[var(--radius-2xl)] border border-[color:var(--c-border-subtle)] p-[var(--space-2)] backdrop-blur-md lg:hidden"
+          className="mx-auto mt-[var(--space-2)] grid max-h-[calc(100vh-88px)] max-w-[var(--container-max)] gap-[var(--space-2)] overflow-y-auto overscroll-contain rounded-[var(--radius-2xl)] border border-[color:var(--c-border-subtle)] p-[var(--space-2)] backdrop-blur-md lg:hidden"
           style={MOBILE_MENU_STYLE}
         >
           {NAV_ITEMS.map((item) => {

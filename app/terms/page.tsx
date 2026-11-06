@@ -32,7 +32,7 @@ export default function TermsPage() {
     <main className="bg-[color:var(--c-paper)]">
       <section className="pt-[calc(var(--space-6)*6)] pb-[calc(var(--space-6)*2)]">
         <div className="mx-auto max-w-[720px] px-[var(--space-6)]">
-          <h1 className="text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
+          <h1 className="text-phrase text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
             利用規約
           </h1>
         </div>

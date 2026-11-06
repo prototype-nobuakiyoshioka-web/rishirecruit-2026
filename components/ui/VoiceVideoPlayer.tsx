@@ -71,6 +71,8 @@ type Props = {
 
 /**
  * YouTube 動画埋め込みプレイヤー。
+ * - 最初はサムネイルと再生ボタンだけを出し、押したときにプレイヤーを読み込む
+ *   (読み込み前に黒い四角だけが並ぶのを避ける。1ページに複数あっても重くしない)。
  * - youtube-nocookie.com を使い、rel=0 / modestbranding で装飾を最小化。
  * - 再生終了(state=0) を IFrame API で検知し、オーバーレイで
  *   関連動画/おすすめが露出しないようカバーする。
@@ -79,6 +81,7 @@ export function VoiceVideoPlayer({ videoId, title }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const [ended, setEnded] = useState(false);
+  const [activated, setActivated] = useState(false);
   // 同一ページに複数プレイヤーがあっても衝突しないSSR互換の一意ID。
   // useId() が返すコロン等の記号は DOM id で有効だが CSS セレクタとの衝突リスクを避けるため無害化。
   const rawId = useId();
@@ -90,6 +93,7 @@ export function VoiceVideoPlayer({ videoId, title }: Props) {
   }, []);
 
   useEffect(() => {
+    if (!activated) return;
     let cancelled = false;
 
     loadYouTubeIframeApi().then(() => {
@@ -103,6 +107,8 @@ export function VoiceVideoPlayer({ videoId, title }: Props) {
           modestbranding: 1,
           playsinline: 1,
           fs: 1,
+          // 再生ボタンを押して読み込んだので、そのまま再生する
+          autoplay: 1,
         },
         events: {
           onStateChange: (event) => {
@@ -119,7 +125,7 @@ export function VoiceVideoPlayer({ videoId, title }: Props) {
       playerRef.current?.destroy();
       playerRef.current = null;
     };
-  }, [videoId, elementId]);
+  }, [activated, videoId, elementId]);
 
   return (
     <div className="relative w-full overflow-hidden rounded-[var(--radius-2xl)] bg-black">
@@ -130,6 +136,32 @@ export function VoiceVideoPlayer({ videoId, title }: Props) {
           title={title}
           className="absolute inset-0 h-full w-full"
         />
+        {!activated ? (
+          <button
+            type="button"
+            onClick={() => setActivated(true)}
+            aria-label={`${title}を再生`}
+            className="group absolute inset-0 h-full w-full cursor-pointer"
+          >
+            {/* YouTube のサムネイル。外部画像なので next/image の最適化は通さない */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[color:var(--c-deep-ocean)]/85 text-[color:var(--c-text-inverse)] shadow-[0_6px_18px_-6px_rgba(0,0,0,0.5)] transition-transform duration-200 group-hover:scale-105 group-focus-visible:scale-105"
+            >
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" focusable="false">
+                <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" />
+              </svg>
+            </span>
+          </button>
+        ) : null}
         {ended ? (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black/85 px-6 text-center text-[color:var(--c-text-inverse)]">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">

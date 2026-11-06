@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Fragment } from "react";
+import { Fragment, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { PhraseText } from "@/components/ui/PhraseText";
+import { longestPhraseLength } from "@/lib/text/phrases";
 import { buildMetadata, ogImageFromField } from "@/lib/seo";
 import { splitByBr, htmlToText } from "@/lib/wp/format";
 import {
@@ -81,42 +83,42 @@ export default async function VoiceDetailPage({ params }: PageProps) {
             ]}
           />
 
-          {/* lg 以上ではタイトルが画像上に重ねて表示される（不自然な改行防止）。
-              画像は絶対配置で背面に置き、テキストは背景色と同色の text-stroke で視認性を確保する。 */}
-          <div className="relative mt-12">
-            <div className="relative z-10 pb-2 lg:flex lg:min-h-[440px] lg:flex-col lg:justify-end lg:pr-0">
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+          {/* lg 以上は文字と写真を左右に分け、重ねない(見出しが人物の上を横切らないように)。
+              重ねないので、見出しの縁取り(text-stroke)も付けない。 */}
+          <div className={`relative mt-12 ${photoUrl ? "lg:grid lg:grid-cols-[minmax(0,1fr)_52%] lg:items-end lg:gap-12" : ""}`}>
+            <div className="relative pb-2">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-deep-ocean)]">
                 Voice / Interview
               </p>
               <p className="mt-5 text-sm font-bold text-[color:var(--c-deep-ocean)]/70">
                 {fields?.age ?? "移住者インタビュー"}
               </p>
               <h1
-                className="mt-5 text-balance text-4xl font-black leading-tight tracking-[-0.03em] text-[color:var(--c-deep-ocean)] md:text-6xl"
-                style={{ WebkitTextStroke: "6px #2CA0BB", paintOrder: "stroke fill" }}
-              >
+                style={{ "--phrase-max": longestPhraseLength(fields?.catchCopy ? splitByBr(fields.catchCopy) : [voice.title]) } as CSSProperties}
+                className="text-phrase text-phrase-fit mt-5 text-balance font-black leading-tight tracking-[-0.03em] text-[color:var(--c-deep-ocean)] md:text-6xl lg:text-5xl">
                 {fields?.catchCopy
                   ? splitByBr(fields.catchCopy).map((seg, i, arr) => (
                       <Fragment key={i}>
-                        {seg}
+                        <PhraseText text={seg.trim()} />
                         {i < arr.length - 1 ? <br /> : null}
                       </Fragment>
                     ))
-                  : voice.title}
+                  : <PhraseText text={voice.title} />}
               </h1>
               <p className="mt-6 text-lg font-black text-[color:var(--c-deep-ocean)]">
                 {voice.title}
               </p>
             </div>
             {photoUrl ? (
-              <div className="mt-10 lg:absolute lg:right-0 lg:top-1/2 lg:z-0 lg:mt-0 lg:w-[52%] lg:-translate-y-1/2">
+              <div className="mt-10 lg:mt-0">
                 <Image
                   src={photoUrl}
                   alt={photoAlt}
-                  width={1200}
-                  height={900}
+                  width={photoNode?.mediaDetails?.width ?? 1200}
+                  height={photoNode?.mediaDetails?.height ?? 900}
                   priority
-                  className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover"
+                  sizes="(min-width: 1024px) 52vw, 100vw"
+                  className={`w-full rounded-[var(--radius-2xl)] ${photoNode?.mediaDetails ? "h-auto" : "aspect-[4/3] object-cover"}`}
                 />
               </div>
             ) : null}
@@ -134,7 +136,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
         {qaList.length > 0 ? (
           <section className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
                 Interview
               </p>
               <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
@@ -188,7 +190,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
           <div className="relative mx-auto mt-10 max-w-[1080px] border-t border-white/15 pt-8">
             <Link
               href="/voices"
-              className="text-sm font-bold text-[color:var(--c-ice)] hover:underline md:text-base"
+              className="hit-target [--hit-y:-12px] text-sm font-bold text-[color:var(--c-ice)] hover:underline md:text-base"
             >
               ← 移住者の声一覧へ
             </Link>

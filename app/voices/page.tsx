@@ -54,11 +54,11 @@ export default async function VoicesPage() {
           style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }}
         />
         <div className="relative mx-auto max-w-[var(--container-max)] px-[var(--space-6)]">
-          <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)] md:text-base">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-deep-ocean)] md:text-base">
             Voices from the island
           </p>
-          <h1 className="mt-5 max-w-4xl text-balance text-5xl font-black leading-[1.12] tracking-[-0.035em] text-[color:var(--c-deep-ocean)] md:text-7xl">
-            ここに来た人たちの、
+          <h1 className="text-phrase mt-5 max-w-4xl text-balance text-[clamp(2.25rem,11vw,3rem)] font-black leading-[1.12] tracking-[-0.035em] text-[color:var(--c-deep-ocean)] md:text-7xl">
+            ここに来た<wbr />人たちの、
             <br />
             声。
           </h1>
@@ -79,7 +79,7 @@ export default async function VoicesPage() {
 
         <header className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
               Real stories
             </p>
             <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
@@ -101,7 +101,7 @@ export default async function VoicesPage() {
         {videoItems.length > 0 ? (
           <section className="relative mx-auto max-w-[960px] px-[var(--space-6)] pb-24 md:pb-32">
             <div className="mb-10 text-center md:mb-14">
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
                 Video interviews
               </p>
             </div>
@@ -153,7 +153,7 @@ export default async function VoicesPage() {
                       </Link>
                     ) : null}
                     <div className="mt-6">
-                      <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
                         Voice {String(index + 1).padStart(2, "0")}
                       </p>
                       <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">

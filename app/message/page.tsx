@@ -67,13 +67,13 @@ export default function MessagePage() {
         />
 
         <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--space-6)]">
-          <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)] md:text-base">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-deep-ocean)] md:text-base">
             Message from Rishirifuji
           </p>
-          <h1 className="mt-[var(--space-5)] max-w-4xl text-balance text-5xl font-black leading-[1.12] tracking-[-0.035em] text-[color:var(--c-deep-ocean)] md:text-7xl">
-            利尻富士町ではたらく。
+          <h1 className="text-phrase mt-[var(--space-5)] max-w-4xl text-balance text-[clamp(2.25rem,11vw,3rem)] font-black leading-[1.12] tracking-[-0.035em] text-[color:var(--c-deep-ocean)] md:text-7xl">
+            利尻富士町で<wbr />はたらく。
             <br />
-            島とつながる。
+            島と<wbr />つながる。
           </h1>
           <p className="mt-[var(--space-6)] max-w-xl text-base font-bold leading-8 text-[color:var(--c-deep-ocean)]/80 md:text-xl md:leading-9">
             北海道・利尻富士町の求人と、
@@ -106,7 +106,7 @@ export default function MessagePage() {
 
         <header className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
               Message
             </p>
             <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
@@ -137,7 +137,7 @@ export default function MessagePage() {
               className="grid gap-10 border-t border-[color:var(--c-deep-ocean)]/15 py-16 md:grid-cols-[minmax(16rem,0.85fr)_1.15fr] md:gap-24 md:py-24"
             >
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
                   {story.eyebrow}
                 </p>
                 <h2 className="mt-5 whitespace-pre-line text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-4xl">
@@ -154,7 +154,7 @@ export default function MessagePage() {
         </div>
 
         <section className="relative mx-auto max-w-[1080px] border-t border-[color:var(--c-deep-ocean)]/15 px-[var(--space-6)] py-20 md:py-28">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
             Before you decide
           </p>
           <h2 className="mt-5 max-w-3xl text-balance text-3xl font-black leading-tight tracking-[-0.025em] text-[color:var(--c-deep-ocean)] md:text-5xl md:leading-[1.2]">
@@ -169,7 +169,7 @@ export default function MessagePage() {
                 key={point.number}
                 className="grid gap-5 border-t border-[color:var(--c-deep-ocean)]/15 py-10 md:grid-cols-[5rem_15rem_1fr] md:items-start md:gap-10 md:py-12"
               >
-                <p className="text-sm font-black tracking-[0.14em] text-[color:var(--c-warning)]">
+                <p className="text-sm font-black tracking-[0.14em] text-[color:var(--c-accent-text)]">
                   {point.number}
                 </p>
                 <h3 className="text-2xl font-black tracking-[-0.02em] text-[color:var(--c-deep-ocean)]">
@@ -209,11 +209,11 @@ export default function MessagePage() {
               求人一覧を見る
             </Button>
           </div>
-          <div className="relative mx-auto mt-10 flex max-w-[1080px] flex-wrap gap-x-8 gap-y-4 border-t border-white/15 pt-8 text-sm font-bold text-[color:var(--c-ice)] md:text-base">
-            <Link href="/voices" className="hover:underline">
+          <div className="relative mx-auto mt-10 flex max-w-[1080px] flex-wrap gap-x-8 gap-y-6 border-t border-white/15 pt-8 text-sm font-bold text-[color:var(--c-ice)] md:text-base">
+            <Link href="/voices" className="hit-target [--hit-y:-12px] hover:underline">
               移住者の声を読む →
             </Link>
-            <Link href="/contact" className="hover:underline">
+            <Link href="/contact" className="hit-target [--hit-y:-12px] hover:underline">
               応募前に相談する →
             </Link>
           </div>

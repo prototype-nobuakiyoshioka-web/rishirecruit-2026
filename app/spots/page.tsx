@@ -15,7 +15,7 @@ export default async function SpotsPage() {
   return (
     <EditorialIndexShell
       eyebrow="Places on the island"
-      title={<>島を知ることは、<br />暮らしを知ること。</>}
+      title={<>島を<wbr />知ることは、<br />暮らしを<wbr />知ること。</>}
       lead={<>休日に歩く場所、季節を感じる景色。<br />働く先にある島の日常を巡ります。</>}
       introEyebrow="Island guide"
       introLabel="島の風景と場所"
@@ -39,7 +39,7 @@ export default async function SpotsPage() {
                   </Link>
                 ) : null}
                 <div className="mt-6">
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-warning)]">{category ? SPOT_CATEGORY_LABELS[category] ?? category : "Spot"}</p>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-accent-text)]">{category ? SPOT_CATEGORY_LABELS[category] ?? category : "Spot"}</p>
                   <h2 className="mt-2 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">{spot.title}</h2>
                   {fields?.catchCopy ? <p className="mt-2 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
                   <Link href={`/spots/${spot.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">この場所を知る →</Link>
@@ -48,7 +48,7 @@ export default async function SpotsPage() {
             );
           })}
         </div>
-        <div className="mt-20 border-t border-[color:var(--c-deep-ocean)]/15 pt-10"><Link href="/jobs" className="font-black text-[color:var(--c-deep-ocean)] hover:underline">この島で働く →</Link></div>
+        <div className="mt-20 border-t border-[color:var(--c-deep-ocean)]/15 pt-10"><Link href="/jobs" className="hit-target [--hit-y:-12px] font-black text-[color:var(--c-deep-ocean)] hover:underline">この島で働く →</Link></div>
       </section>
     </EditorialIndexShell>
   );

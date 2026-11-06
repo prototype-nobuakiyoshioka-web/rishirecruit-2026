@@ -32,8 +32,8 @@ export default function PrivacyPage() {
     <main className="bg-[color:var(--c-paper)]">
       <section className="pt-[calc(var(--space-6)*6)] pb-[calc(var(--space-6)*2)]">
         <div className="mx-auto max-w-[720px] px-[var(--space-6)]">
-          <h1 className="text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
-            プライバシーポリシー
+          <h1 className="text-phrase text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
+            プライバシー<wbr />ポリシー
           </h1>
         </div>
       </section>

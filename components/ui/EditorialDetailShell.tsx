@@ -1,6 +1,8 @@
 import Image from "next/image";
-import { Fragment, type ReactNode } from "react";
+import { Fragment, type CSSProperties, type ReactNode } from "react";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { PhraseText } from "@/components/ui/PhraseText";
+import { longestPhraseLength } from "@/lib/text/phrases";
 
 // 文字列値に含まれる <br /> や \n を実際の改行 (<br />) として描画する。
 // ACF textarea (new_lines: 'br') は保存時 \n → 出力時 <br /> に変換されるため、
@@ -26,7 +28,7 @@ type EditorialDetailShellProps = {
   title: string;
   lead?: string | null;
   // 画像が無い場合は null を渡すと画像領域を出さない（求人詳細で画像未設定時など）
-  image: { sourceUrl: string; altText: string } | null;
+  image: { sourceUrl: string; altText: string; width?: number | null; height?: number | null } | null;
   children: ReactNode;
 };
 
@@ -37,21 +39,25 @@ export function EditorialDetailShell({ breadcrumbs, eyebrow, meta, title, lead, 
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-repeat opacity-[0.14] mix-blend-multiply" style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }} />
         <div className="relative mx-auto max-w-[var(--container-max)] px-[var(--space-6)]">
           <Breadcrumbs items={breadcrumbs} />
-          {/* lg 以上ではタイトルが画像上に重ねて表示される（不自然な改行防止）。
-              画像は絶対配置で背面に置き、テキストは背景色と同色の text-stroke で視認性を確保する。 */}
-          <div className="relative mt-12">
-            <div className={`relative z-10 lg:flex ${image ? "lg:min-h-[440px]" : ""} lg:flex-col lg:justify-end lg:pr-0`}>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">{eyebrow}</p>
+          {/* lg 以上は文字と写真を左右に分け、重ねない(見出しが人物や画像内の文字を横切らないように)。
+              重ねないので、見出しの縁取り(text-stroke)も付けない。 */}
+          <div className={`relative mt-12 ${image ? "lg:grid lg:grid-cols-[minmax(0,1fr)_52%] lg:items-end lg:gap-12" : ""}`}>
+            <div className="relative">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-deep-ocean)]">{eyebrow}</p>
               {meta ? <p className="mt-5 text-sm font-bold text-[color:var(--c-deep-ocean)]/70">{meta}</p> : null}
-              <h1
-                className="mt-5 text-balance text-4xl font-black leading-tight tracking-[-0.03em] text-[color:var(--c-deep-ocean)] md:text-6xl"
-                style={{ WebkitTextStroke: "6px #2CA0BB", paintOrder: "stroke fill" }}
-              >{title}</h1>
+              <h1 style={{ "--phrase-max": longestPhraseLength([title]) } as CSSProperties} className="text-phrase text-phrase-fit mt-5 text-balance font-black leading-tight tracking-[-0.03em] text-[color:var(--c-deep-ocean)] md:text-6xl lg:text-5xl">
+                <PhraseText text={title} />
+              </h1>
               {lead ? <p className="mt-6 max-w-2xl text-base font-bold leading-8 text-[color:var(--c-deep-ocean)]/75 md:text-lg">{lead}</p> : null}
             </div>
             {image ? (
-              <div className="mt-10 lg:absolute lg:right-0 lg:top-1/2 lg:z-0 lg:mt-0 lg:w-[52%] lg:-translate-y-1/2">
-                <Image src={image.sourceUrl} alt={image.altText || `${title}の写真`} width={1200} height={900} priority className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover" />
+              <div className="mt-10 lg:mt-0">
+                {/* 寸法が分かる画像は切り抜かずに全体を見せる(求人の画像には文字が入っている) */}
+                {image.width && image.height ? (
+                  <Image src={image.sourceUrl} alt={image.altText || `${title}の写真`} width={image.width} height={image.height} priority sizes="(min-width: 1024px) 52vw, 100vw" className="h-auto w-full rounded-[var(--radius-2xl)]" />
+                ) : (
+                  <Image src={image.sourceUrl} alt={image.altText || `${title}の写真`} width={1200} height={900} priority sizes="(min-width: 1024px) 52vw, 100vw" className="aspect-[4/3] w-full rounded-[var(--radius-2xl)] object-cover" />
+                )}
               </div>
             ) : null}
           </div>
@@ -66,7 +72,7 @@ export function EditorialDetailShell({ breadcrumbs, eyebrow, meta, title, lead, 
 }
 
 export function EditorialDetailSection({ eyebrow, label, children }: { eyebrow: string; label: string; children: ReactNode }) {
-  return <section className="relative mx-auto grid max-w-[1080px] gap-10 border-t border-[color:var(--c-deep-ocean)]/15 px-[var(--space-6)] py-16 first:border-t-0 md:grid-cols-[13rem_1fr] md:gap-20 md:py-24"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">{eyebrow}</p><p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">{label}</p></div><div>{children}</div></section>;
+  return <section className="relative mx-auto grid max-w-[1080px] gap-10 border-t border-[color:var(--c-deep-ocean)]/15 px-[var(--space-6)] py-16 first:border-t-0 md:grid-cols-[13rem_1fr] md:gap-20 md:py-24"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">{eyebrow}</p><p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">{label}</p></div><div>{children}</div></section>;
 }
 
 // 値が"実質空"か判定(null/undefined/空文字/空白のみの文字列 → 空扱い)。

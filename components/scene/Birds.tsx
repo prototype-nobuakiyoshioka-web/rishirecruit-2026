@@ -1,6 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
+import { useReducedMotionRef } from "./useReducedMotionRef";
 import { useRef } from "react";
 import type { Group } from "three";
 
@@ -91,10 +92,12 @@ function Bird({ def }: { def: BirdDef }) {
   const groupRef = useRef<Group>(null);
   const leftWingRef = useRef<Group>(null);
   const rightWingRef = useRef<Group>(null);
+  const reducedMotion = useReducedMotionRef();
 
   useFrame((state) => {
     if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
+    // 動きを減らす設定では、最初の位置で止める(羽ばたきも止める)
+    const t = reducedMotion.current ? 0 : state.clock.elapsedTime;
     const angle = def.phase + t * def.speed;
 
     const x = def.centerX + Math.cos(angle) * def.orbitRadius;

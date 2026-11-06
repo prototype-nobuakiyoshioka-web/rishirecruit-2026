@@ -1,6 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
+import { useReducedMotionRef } from "./useReducedMotionRef";
 import { useRef } from "react";
 import * as THREE from "three";
 import type { Group } from "three";
@@ -34,16 +35,19 @@ const dir = new THREE.Vector3();
 
 export function Boat() {
   const groupRef = useRef<Group>(null);
+  const reducedMotion = useReducedMotionRef();
 
   useFrame((state) => {
     if (!groupRef.current) return;
+    // 動きを減らす設定では、港に止まった最初の姿勢のまま動かさない
+    const elapsed = reducedMotion.current ? 0 : state.clock.elapsedTime;
 
     const cycle =
       PORT_PAUSE_SECONDS +
       TRAVEL_SECONDS +
       OFFSHORE_PAUSE_SECONDS +
       TRAVEL_SECONDS;
-    const s = state.clock.elapsedTime % cycle;
+    const s = elapsed % cycle;
 
     let progress: number;
     let heading: 1 | -1 | 0;
@@ -68,7 +72,7 @@ export function Boat() {
 
     groupRef.current.position.lerpVectors(ANCHOR_A, ANCHOR_B, progress);
     groupRef.current.position.y +=
-      Math.sin(state.clock.elapsedTime * ((Math.PI * 2) / BOB_PERIOD)) *
+      Math.sin(elapsed * ((Math.PI * 2) / BOB_PERIOD)) *
       BOB_AMPLITUDE;
 
     if (heading !== 0) {

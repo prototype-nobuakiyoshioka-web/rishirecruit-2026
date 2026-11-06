@@ -165,7 +165,7 @@ export default function ContactPage() {
   return (
     <EditorialIndexShell
       eyebrow="Contact rishirecruit"
-      title={<>気になることを、<br />話すところから。</>}
+      title={<>気になる<wbr />ことを、<br />話す<wbr />ところから。</>}
       lead={<>求人のことも、島での暮らしも。<br />まだ決めていない段階から相談できます。</>}
       introEyebrow="Before you contact"
       introLabel="お問い合わせの前に"
@@ -175,7 +175,7 @@ export default function ContactPage() {
       <section className="relative mx-auto max-w-[1080px] px-[var(--space-6)] pb-20 md:pb-28">
         {isSubmitted ? (
           <div className="border-y border-[color:var(--c-deep-ocean)]/15 py-20 md:py-28" aria-live="polite">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
               Thank you
             </p>
             <h2 className="mt-5 text-balance text-3xl font-black leading-tight text-[color:var(--c-deep-ocean)] md:text-5xl">
@@ -192,7 +192,7 @@ export default function ContactPage() {
         ) : (
           <div className="grid gap-12 border-t border-[color:var(--c-deep-ocean)]/15 pt-14 md:grid-cols-[15rem_1fr] md:gap-20 md:pt-20">
             <aside>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
                 Contact form
               </p>
               <h2 className="mt-4 text-2xl font-black text-[color:var(--c-deep-ocean)]">

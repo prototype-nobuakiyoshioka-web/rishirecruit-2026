@@ -36,10 +36,10 @@ export function EditorialIndexShell({
           style={{ backgroundImage: "url('/images/message/bg-textre.webp')" }}
         />
         <div className="relative mx-auto max-w-[var(--container-max)] px-[var(--space-6)]">
-          <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)] md:text-base">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-deep-ocean)] md:text-base">
             {eyebrow}
           </p>
-          <h1 className="mt-5 max-w-5xl text-balance text-4xl font-black leading-[1.14] tracking-[-0.035em] text-[color:var(--c-deep-ocean)] md:text-7xl md:leading-[1.12]">
+          <h1 className="text-phrase mt-5 max-w-5xl text-balance text-4xl font-black leading-[1.14] tracking-[-0.035em] text-[color:var(--c-deep-ocean)] md:text-7xl md:leading-[1.12]">
             {title}
           </h1>
           <p className="mt-6 max-w-2xl text-base font-bold leading-8 text-[color:var(--c-deep-ocean)]/80 md:text-xl md:leading-9">
@@ -56,7 +56,7 @@ export function EditorialIndexShell({
         />
         <header className="relative mx-auto grid max-w-[1080px] gap-10 px-[var(--space-6)] pb-20 pt-20 md:grid-cols-[13rem_1fr] md:gap-20 md:pb-28 md:pt-28">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-warning)]">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[color:var(--c-accent-text)]">
               {introEyebrow}
             </p>
             <p className="mt-2 text-sm font-bold text-[color:var(--c-text-secondary)]">
