@@ -2,64 +2,100 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useSitePathname } from "@/lib/utils/site-pathname";
+import { DEFAULT_COPY, copyForPath, crossesSection } from "@/lib/utils/page-section";
 
 type TransitionPhase = "idle" | "covering" | "revealing";
 
-const TRANSITION_COPY = [
-  { prefix: "/message", eyebrow: "Message", title: "島で働く、その前に。" },
-  { prefix: "/voices", eyebrow: "Voices", title: "ここに来た人たちの、声。" },
-  { prefix: "/jobs", eyebrow: "Jobs", title: "あなたの行き先を、ここから。" },
-  { prefix: "/spots", eyebrow: "Spots", title: "島を知ることは、暮らしを知ること。" },
-  { prefix: "/events", eyebrow: "Events", title: "今、この島で起きていること。" },
-  { prefix: "/columns", eyebrow: "Column", title: "島から、声をのせて。" },
-  { prefix: "/contact", eyebrow: "Contact", title: "気になることを、話すところから。" },
-  { prefix: "/privacy", eyebrow: "Privacy", title: "大切な情報について。" },
-  { prefix: "/terms", eyebrow: "Terms", title: "このサイトを使う前に。" },
-] as const;
+// 時間は globals.css の .page-transition--* / [data-page-nav] と合わせる
+/** 押してから幕を上げ始めるまでの最短。幕が下りきる(480ms)→ 一文が読める時間を確保する */
+const MIN_COVER_MS = 880;
+/** 幕が上がりきるまで。上がり始めた時点で下のページは操作できる */
+const REVEAL_MS = 600;
+/** 同じセクションの中の移動で、新しいページがふわっと出る時間 */
+const FADE_IN_MS = 220;
+/** 着いたことが分からなくても、この時間で必ず元に戻す(移動の失敗など) */
+const SAFETY_MS = 8000;
+/** URL が変わったかを見る間隔 */
+const POLL_MS = 50;
 
-const DEFAULT_COPY = {
-  eyebrow: "Rishirecruit",
-  title: "利尻富士町の仕事と暮らしへ。",
-};
-
-function copyForPath(pathname: string) {
-  return (
-    TRANSITION_COPY.find(
-      ({ prefix }) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-    ) ?? DEFAULT_COPY
-  );
+/** <html data-page-nav>。CSS がこれを見て body > main を薄くする・隠す・フェードで出す */
+function setNavState(state: "fade-out" | "fade-in" | "cover" | null) {
+  const root = document.documentElement;
+  if (state) {
+    root.dataset.pageNav = state;
+  } else {
+    delete root.dataset.pageNav;
+  }
 }
 
+type PendingNavigation = {
+  kind: "cover" | "fade";
+  fromHref: string;
+  startedAt: number;
+};
+
+/**
+ * ページ移動の演出。押したらすぐ router.push し、演出は読み込みの待ち時間に重ねる。
+ * - セクションが変わる移動:幕を下ろし、「着いた」かつ「一文の最短表示が過ぎた」で上げる
+ * - 同じセクションの中の移動:前のページを少し薄くし、着いたらフェードで出す
+ * 「着いた」は URL の変化で判断する(末尾の /・転送・404・戻るなど、予定とずれても上がる)。
+ */
 export function PageTransition() {
-  const pathname = useSitePathname();
   const router = useRouter();
   const [phase, setPhase] = useState<TransitionPhase>("idle");
   const [copy, setCopy] = useState(DEFAULT_COPY);
-  const targetPath = useRef<string | null>(null);
-  const timers = useRef<number[]>([]);
+  const pending = useRef<PendingNavigation | null>(null);
 
   useEffect(() => {
-    const activeTimers = timers.current;
+    let timers: number[] = [];
+    let poller: number | null = null;
 
-    return () => {
-      activeTimers.forEach(window.clearTimeout);
+    const clearTimers = () => {
+      timers.forEach(window.clearTimeout);
+      timers = [];
+      if (poller !== null) {
+        window.clearInterval(poller);
+        poller = null;
+      }
     };
-  }, []);
 
-  useEffect(() => {
-    if (phase !== "covering" || pathname !== targetPath.current) return;
+    const later = (fn: () => void, ms: number) => {
+      timers.push(window.setTimeout(fn, ms));
+    };
 
-    setPhase("revealing");
-    timers.current.push(
-      window.setTimeout(() => {
-        setPhase("idle");
-        targetPath.current = null;
-      }, 720),
-    );
-  }, [pathname, phase]);
+    const reveal = () => {
+      setNavState(null);
+      setPhase("revealing");
+      later(() => setPhase("idle"), REVEAL_MS);
+    };
 
-  useEffect(() => {
+    const finish = (nav: PendingNavigation, arrived: boolean) => {
+      if (pending.current !== nav) return;
+      pending.current = null;
+      clearTimers();
+
+      if (nav.kind === "fade") {
+        if (!arrived) {
+          setNavState(null);
+          return;
+        }
+        setNavState("fade-in");
+        later(() => setNavState(null), FADE_IN_MS);
+        return;
+      }
+
+      later(reveal, Math.max(0, nav.startedAt + MIN_COVER_MS - performance.now()));
+    };
+
+    const watchArrival = (nav: PendingNavigation) => {
+      clearTimers();
+      pending.current = nav;
+      poller = window.setInterval(() => {
+        if (window.location.href !== nav.fromHref) finish(nav, true);
+      }, POLL_MS);
+      later(() => finish(nav, false), SAFETY_MS);
+    };
+
     const handleInternalNavigation = (event: MouseEvent) => {
       if (
         event.defaultPrevented ||
@@ -68,7 +104,8 @@ export function PageTransition() {
         event.ctrlKey ||
         event.shiftKey ||
         event.altKey ||
-        phase !== "idle"
+        // 幕が出ている間は何もしない(幕が押せる範囲をふさいでいる)
+        pending.current?.kind === "cover"
       ) {
         return;
       }
@@ -96,26 +133,34 @@ export function PageTransition() {
 
       event.preventDefault();
 
-      const nextPath = `${destination.pathname}${destination.search}${destination.hash}`;
+      const fromHref = window.location.href;
+      const isCrossing = crossesSection(window.location.pathname, destination.pathname);
+      router.push(`${destination.pathname}${destination.search}${destination.hash}`);
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        router.push(nextPath);
-        return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      if (isCrossing) {
+        setCopy(copyForPath(destination.pathname));
+        setPhase("covering");
+        setNavState("cover");
+      } else {
+        setNavState("fade-out");
       }
-
-      targetPath.current = destination.pathname;
-      setCopy(copyForPath(destination.pathname));
-      setPhase("covering");
-      timers.current.push(
-        window.setTimeout(() => router.push(nextPath), 620),
-      );
+      watchArrival({
+        kind: isCrossing ? "cover" : "fade",
+        fromHref,
+        startedAt: performance.now(),
+      });
     };
 
     document.addEventListener("click", handleInternalNavigation, true);
     return () => {
       document.removeEventListener("click", handleInternalNavigation, true);
+      clearTimers();
+      pending.current = null;
+      setNavState(null);
     };
-  }, [phase, router]);
+  }, [router]);
 
   return (
     <div

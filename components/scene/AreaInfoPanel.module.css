@@ -1,0 +1,103 @@
+/* SP のエリアのカードの「求人 n件」などの入口。
+   押せるものは、サイトのボタン(ブルーのおもちゃのプレート:AreaJumpLink など)を小さくした形にし、
+   投稿カードの情報のチップ(紺の薄い地・押せない)と見分けられるようにする */
+.entries {
+  display: flex;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry,
+.entryEmpty {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+  padding: 0 6px 0 9px;
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.entry {
+  position: relative;
+  border: 0;
+  background: #b2dbea;
+  color: var(--c-deep-ocean);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 #ffffff85, 0 2px 0 #74a7b7;
+  transition: background-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+
+/* 見た目は 24px、押せる範囲は上下に広げて 44px(左右は隣と重ならない幅だけ) */
+.entry::after {
+  content: "";
+  position: absolute;
+  inset: -10px -3px;
+}
+
+@media (hover: hover) {
+  .entry:hover {
+    background: #c0e2ee;
+  }
+}
+
+.entry:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 #ffffff50, 0 0 0 #74a7b7;
+}
+
+.entry:focus-visible {
+  outline: 3px solid var(--c-deep-ocean);
+  outline-offset: 2px;
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+/* 0件:押せない見た目(地と影を付けず、文字を薄くする) */
+.entryEmpty {
+  padding-inline: 4px;
+  color: var(--c-text-secondary);
+  font-weight: 700;
+}
+
+/* 320px など:3つが1行に収まるよう、文字を少し小さくし、矢印を省く(プレートの形で押せることは伝わる) */
+@media (max-width: 359px) {
+  .entries {
+    gap: 5px;
+    margin-top: 0;
+  }
+
+  .entry,
+  .entryEmpty {
+    height: 22px;
+    padding: 0 7px;
+    font-size: 0.6875rem;
+  }
+
+  .entry::after {
+    inset: -11px -2px;
+  }
+
+  .chevron {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry {
+    transition: none;
+  }
+}

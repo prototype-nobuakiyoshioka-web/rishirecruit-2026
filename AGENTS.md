@@ -208,6 +208,20 @@ useFrame((_, dt) => {
 - 3D が使えないとき(WebGL 非対応、モデル取得失敗)は `IslandFallback` を出す(`IslandCanvas` のエラーバウンダリ)
 - Lenis は `<ScrollControls>` と競合して一度リバートした(下の「よくあるエラー」参照)
 
+- SP のエリアのカード(`AreaInfoPanel` の SP 分岐)には、見出しの下に「求人 n件 / イベント n件 / 観光地 n件」の入口を出す。件数は `AreaPostSlider` が持つ投稿データ(各種類 `first: 20`)の件数。押すとそのタブを選び、カルーセルを投稿のカードへ送ってタブにフォーカスを移す。0件の種類は押せない見た目(地なし・薄い文字)。投稿のタブの表記は SP・タブレット・PC とも「求人 / イベント / 観光地」
+- SP の投稿カードのタイトルは2行まで(カードの高さ 180px は変えない)。エリアのカードは 80vw・間 12px で、右に投稿のカード(タブの「求人」)がのぞく
+
+### ページ移動の幕(`components/layout/PageTransition.tsx`)
+
+- サイト内のリンクを押したら、すぐ `router.push` する。演出は読み込みの待ち時間に重ねる(押してから移動が始まるまで待たせない)
+- **幕はセクションが変わるときだけ出す。** セクションの区分は `lib/utils/page-section.ts` の `TRANSITION_COPY`(message / voices / jobs / spots / events / columns / contact / privacy / terms)とトップ。区分にない URL はそのパス自体を1セクションとみなす
+  - 幕は 480ms で下りきり、「着いた」かつ「押してから 880ms」の両方を満たしたら上げ始める(600ms)。上げ始めた時点で幕は押せる範囲をふさがない(操作できるまで約 0.9 秒)
+  - 幕が出ている間、新しいページの `<main>` は隠す(`<html data-page-nav="cover">`)。前のページは幕が下りきるまで見せる
+- **同じセクションの中の移動(一覧 ⇔ 詳細、詳細 → 詳細)は幕を出さない。** 押した直後に前のページを少し薄くし(`data-page-nav="fade-out"`)、着いたら 220ms で戻す(`fade-in`)。操作はずっとできる
+- 「着いた」は URL の変化で判断する(50ms ごとに見る)。末尾の /・転送・404・戻る/進むで予定と違う URL になっても上がる。8 秒たっても変わらなければ、必ず元に戻す
+- 動きを減らす設定(prefers-reduced-motion)では、演出なしで移動する
+- 時間を変えるときは、`PageTransition.tsx` の定数と `globals.css` の `.page-transition--*` / `[data-page-nav]` をそろえる
+
 ### モバイル時の GLB 切替
 
 デバイス判定で `island.glb` ↔ `island-mobile.glb` を切り替える。`dpr` も `[1, 1.5]` に制限し、影とポストエフェクトはオフ。

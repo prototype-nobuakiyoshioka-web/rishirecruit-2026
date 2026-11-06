@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  useRef,
   useState,
   type AnimationEvent,
   type CSSProperties,
@@ -56,9 +57,9 @@ interface PostInfo {
 }
 
 const TABS: { key: TabType; label: string }[] = [
-  { key: "job", label: "Job" },
-  { key: "event", label: "Event" },
-  { key: "spot", label: "Spot" },
+  { key: "job", label: "求人" },
+  { key: "event", label: "イベント" },
+  { key: "spot", label: "観光地" },
 ];
 
 function ChevronLeftIcon() {
@@ -254,6 +255,35 @@ function AreaPostSliderContent({
     setDirection("next");
   };
 
+  // SP:エリアのカードの入口(「求人 n件」など)から、その種類のタブを選んで投稿のカードへ移る
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Partial<Record<TabType, HTMLButtonElement | null>>>({});
+  const postEntries = TABS.map((tab) => ({
+    key: tab.key,
+    label: tab.label,
+    count:
+      tab.key === "job"
+        ? jobPostings.length
+        : tab.key === "event"
+          ? events.length
+          : touristspots.length,
+  }));
+  const openPosts = (key: string) => {
+    const tab = TABS.find((item) => item.key === key)?.key;
+    if (!tab) return;
+    handleTabChange(tab);
+    const carousel = carouselRef.current;
+    if (carousel) {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      carousel.scrollTo({
+        left: carousel.scrollWidth - carousel.clientWidth,
+        behavior: reduceMotion ? "auto" : "smooth",
+      });
+    }
+    // キーボード・読み上げでも、移った先(選んだタブ)から続けられるようにする
+    tabRefs.current[tab]?.focus({ preventScroll: true });
+  };
+
   // ページャーの前後に応じて previousIndex と direction をセットしてから index を更新
   const goPrev = () => {
     if (postsLength < 2) return;
@@ -298,11 +328,14 @@ function AreaPostSliderContent({
               fontSize: "clamp(0.875rem, 2dvh, 1rem)",
               fontWeight: 700,
               color: "var(--c-deep-ocean)",
-              lineHeight: 1.35,
+              // 2行になっても高さ 180px のカードに収まるよう、行間を少し詰める
+              lineHeight: 1.3,
               marginBottom: "var(--space-1)",
-              whiteSpace: "nowrap",
+              // 長い職種名も読めるよう2行まで出す(カードの高さ 180px は変えない)
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 2,
               overflow: "hidden",
-              textOverflow: "ellipsis",
             }}
           >
             {slideInfo.title}
@@ -387,7 +420,7 @@ function AreaPostSliderContent({
                       color: "var(--c-deep-ocean)",
                       fontSize: "0.72rem",
                       fontWeight: 700,
-                      lineHeight: 1.4,
+                      lineHeight: 1.3,
                       whiteSpace: allowWrap ? "normal" : "nowrap",
                       overflow: allowWrap ? "visible" : "hidden",
                       textOverflow: allowWrap ? "clip" : "ellipsis",
@@ -405,6 +438,10 @@ function AreaPostSliderContent({
             href={slideInfo.href}
             className="stretched-link"
             style={{
+              // 行の高さを文字に合わせ、タイトルが2行のときも 180px のカードに収める
+              display: "block",
+              width: "fit-content",
+              lineHeight: 1.3,
               fontSize: "0.875rem",
               fontWeight: 700,
               color: "var(--c-deep-ocean)",
@@ -420,7 +457,8 @@ function AreaPostSliderContent({
             style={{
               // 写真の上もカードのリンク(.stretched-link)として押せるようにする
               pointerEvents: "none",
-              width: "28vw",
+              // 359px 以下は globals.css で細くし、文字の行数を減らして 180px に収める
+              width: "var(--mobile-thumbnail-width, 28vw)",
               maxWidth: "7rem",
               aspectRatio: "4 / 3",
               position: "relative",
@@ -434,7 +472,7 @@ function AreaPostSliderContent({
               src={slideInfo.imageUrl}
               alt={slideInfo.title}
               fill
-              sizes="28vw"
+              sizes="(max-width: 359px) 22vw, 28vw"
               style={{ objectFit: "cover" }}
             />
           </div>
@@ -664,11 +702,13 @@ function AreaPostSliderContent({
         }}
       >
         <div
+          ref={carouselRef}
           aria-label="エリアと投稿のカルーセル"
           style={{
             width: "100vw",
             display: "flex",
-            gap: "var(--space-4)",
+            // 投稿のカードが右にのぞく幅を確保する(エリアのカード 80vw・間 12px)
+            gap: "var(--space-3)",
             overflowX: "auto",
             overflowY: "hidden",
             // タブの押せる範囲(上に 6px)がスクロール領域で切られないよう、上に 6px の余白を足す。
@@ -688,13 +728,13 @@ function AreaPostSliderContent({
           <div
             data-carousel-card="area"
             style={{
-              width: "82vw",
+              width: "80vw",
               height: "100%",
-              flex: "0 0 82vw",
+              flex: "0 0 80vw",
               scrollSnapAlign: "start",
             }}
           >
-            <AreaInfoPanel isMobile />
+            <AreaInfoPanel isMobile postEntries={postEntries} onOpenPosts={openPosts} />
           </div>
 
           <div
@@ -721,7 +761,11 @@ function AreaPostSliderContent({
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
+                  ref={(element) => {
+                    tabRefs.current[tab.key] = element;
+                  }}
                   type="button"
+                  aria-pressed={activeTab === tab.key}
                   onClick={() => handleTabChange(tab.key)}
                   // 見た目は高さ 32px のまま、押せる範囲を上下 6px ずつ広げて 44px にする。
                   // 下に広げた分がカードの上の余白に重なるので、カードより手前に置く
@@ -730,14 +774,19 @@ function AreaPostSliderContent({
                     "--hit-y": "-6px",
                     zIndex: 1,
                     minHeight: "32px",
-                    padding: "0.1rem clamp(0.625rem, 3.5vw, 1.25rem)",
+                    // 日本語の表記(イベントは4文字)でも、320px でページ送りと1行に収まる幅にする。
+                    // 押せる範囲の幅も 44px 以上
+                    minWidth: "44px",
+                    flexShrink: 0,
+                    whiteSpace: "nowrap",
+                    padding: "0.1rem clamp(0.5rem, 2.5vw, 1.25rem)",
                     borderRadius: "var(--radius-md) var(--radius-md) 0 0",
                     background:
                       activeTab === tab.key
                         ? "rgba(255, 255, 255, 0.95)"
                         : "rgba(255, 255, 255, 0.7)",
                     fontWeight: activeTab === tab.key ? 700 : 500,
-                    fontSize: "0.875rem",
+                    fontSize: "clamp(0.8rem, 4vw, 0.875rem)",
                     color: "var(--c-deep-ocean)",
                     border: "none",
                     cursor: "pointer",
@@ -776,7 +825,7 @@ function AreaPostSliderContent({
                   <span
                     aria-hidden="true"
                     style={{
-                      minWidth: "2.25rem",
+                      minWidth: "2rem",
                       textAlign: "center",
                       fontSize: "0.8125rem",
                       fontWeight: 700,

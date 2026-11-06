@@ -2,10 +2,22 @@
 
 import { AREA_INFO } from "@/lib/constants/areas";
 import { AreaJumpLink } from "./AreaJumpLink";
+import styles from "./AreaInfoPanel.module.css";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
+
+/** SP のエリアのカードに出す、投稿の種類ごとの入口 */
+export interface AreaPostEntry {
+  key: string;
+  label: string;
+  count: number;
+}
 
 interface AreaInfoPanelProps {
   isMobile?: boolean;
+  /** SP のみ。見出しの下の余白に「求人 n件」などの入口を出す */
+  postEntries?: AreaPostEntry[];
+  /** 入口を押したとき。その種類のタブを選んで投稿のカードへ移る */
+  onOpenPosts?: (key: string) => void;
   /** タブレットの下部パネル。幅が狭いので、説明の1行が折り返さない大きさにそろえる */
   isTablet?: boolean;
 }
@@ -13,6 +25,8 @@ interface AreaInfoPanelProps {
 export function AreaInfoPanel({
   isMobile = false,
   isTablet = false,
+  postEntries,
+  onOpenPosts,
 }: AreaInfoPanelProps) {
   const areaSlug = useScrollProgressStore((state) => state.activeAreaSlug);
   const info = AREA_INFO[areaSlug];
@@ -25,7 +39,7 @@ export function AreaInfoPanel({
       data-pin-connector-target="area-info"
       style={{
         position: "relative",
-        width: isMobile ? "82vw" : "100%",
+        width: isMobile ? "80vw" : "100%",
         // SP はタブカードと高さを揃えるため 100%。内容がはみ出す場合はカード内スクロール。
         height: isMobile ? "100%" : undefined,
         overflowY: isMobile ? "auto" : undefined,
@@ -85,6 +99,34 @@ export function AreaInfoPanel({
           - {info.nameEn}
         </span>
       </h2>
+
+      {isMobile && postEntries && postEntries.length > 0 && (
+        <ul className={styles.entries} aria-label={`${info.name}エリアの投稿`}>
+          {postEntries.map((entry) => (
+            <li key={entry.key}>
+              {entry.count > 0 ? (
+                <button
+                  type="button"
+                  className={styles.entry}
+                  onClick={() => onOpenPosts?.(entry.key)}
+                >
+                  {entry.label}
+                  <span className={styles.count}>{entry.count}件</span>
+                  <svg className={styles.chevron} viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+                    <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              ) : (
+                // 0件の種類は押せない見た目にする(件数があることだけ伝える)
+                <span className={styles.entryEmpty}>
+                  {entry.label}
+                  <span className={styles.count}>0件</span>
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
 
       {isMobile ? (
         <div style={{ marginTop: "auto", marginBottom: "6px" }}>
