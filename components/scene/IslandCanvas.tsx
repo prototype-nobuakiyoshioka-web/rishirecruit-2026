@@ -2,13 +2,7 @@
 
 import { ScrollControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import {
-  Component,
-  Suspense,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { Component, Suspense, useState, type ReactNode } from "react";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 import { Airplane } from "./Airplane";
 import { Background } from "./Background";
@@ -19,6 +13,7 @@ import { FishingBoats } from "./FishingBoats";
 import { IslandFallback } from "./IslandFallback";
 import { IslandModel } from "./IslandModel";
 import { PinLayer } from "./PinLayer";
+import { useSceneLayout } from "./useSceneLayout";
 
 const SHOW_PINS = true;
 
@@ -51,8 +46,8 @@ class IslandErrorBoundary extends Component<
 }
 
 export function IslandCanvas() {
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
-  // 最初の描画は isMobile === null で何も出さないので、ハイドレーションには影響しない
+  const layout = useSceneLayout();
+  // 最初の描画は layout === null で何も出さないので、ハイドレーションには影響しない
   const [isWebGLAvailable] = useState(
     () => typeof document === "undefined" || canUseWebGL()
   );
@@ -60,17 +55,8 @@ export function IslandCanvas() {
     (state) => state.activeAreaSlug
   );
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)");
-    const updateMatches = () => setIsMobile(mediaQuery.matches);
-
-    updateMatches();
-    mediaQuery.addEventListener("change", updateMatches);
-
-    return () => mediaQuery.removeEventListener("change", updateMatches);
-  }, []);
-
-  if (isMobile === null) return null;
+  if (layout === null) return null;
+  const isMobile = layout === "sp";
   if (!isWebGLAvailable) return <IslandFallback />;
 
   return (
@@ -90,7 +76,7 @@ export function IslandCanvas() {
         {/* SP はスクロール量を減らして早く鬼脇まで届くように */}
         <ScrollControls pages={isMobile ? 1.5 : 6} damping={0}>
           <Suspense fallback={null}>
-            <IslandModel isMobile={isMobile}>
+            <IslandModel isMobile={isMobile} isTablet={layout === "tablet"}>
               {SHOW_PINS && (
                 <PinLayer activeAreaSlug={activeAreaSlug} isMobile={isMobile} />
               )}

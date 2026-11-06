@@ -68,12 +68,26 @@ const SP_SCREEN_SHIFT_Y_PX = 24;
 const SP_COMPACT_SCREEN_SHIFT_Y_PX = 52;
 const MOBILE_CAMERA_FOV = 60;
 const MOBILE_HORIZONTAL_MARGIN = 16;
-const ADAPTIVE_FIT_MAX_WIDTH = 768;
 const DESKTOP_CAMERA_POSITION = new THREE.Vector3(-6, 5, 12);
+// タブレット(768〜1279px):パネルを画面下に並べるので、ヘッダーとパネルの間の帯に島を収める。
+// 島の置き方と見る角度は PC と同じで、カメラの距離と描画の位置(setViewOffset)だけを合わせる。
+const DESKTOP_ISLAND_POSITION = new THREE.Vector3(-4, 1, 0);
+const DESKTOP_CAMERA_DIRECTION = DESKTOP_CAMERA_POSITION.clone().normalize();
+// 帯の上端 = ヘッダーの下(上余白 16px + 高さ 56px)+ 少しの余白
+const TABLET_TOP_RESERVE_PX = 84;
+// 帯の下端 = 下部パネルのおおよその上端(画面の下からの距離)。
+// 島の手前の海岸がパネルに少し掛かるのは許容し、島の本体と選択中のピンが上に出るようにする
+const TABLET_BOTTOM_RESERVE_PX = 330;
+const TABLET_SIDE_MARGIN_PX = 16;
+// 回転の両端と正面で島が帯に収まるように測る。頂点は間引いて使う(1/TABLET_VERTEX_STRIDE)
+const TABLET_FIT_ANGLES = [-MAX_ROTATION, 0, MAX_ROTATION];
+const TABLET_VERTEX_STRIDE = 24;
+const TABLET_FIT_ITERATIONS = 4;
 
 interface IslandModelProps {
   children?: ReactNode;
   isMobile?: boolean;
+  isTablet?: boolean;
 }
 
 // 表示から除外する GLB ノード名。完全一致 or "*" 接尾でプレフィックス一致。
@@ -89,7 +103,101 @@ function revealIntroUi() {
   window.setTimeout(() => setIntroPhase(null), INTRO_UI_DURATION_MS);
 }
 
-export function IslandModel({ children, isMobile = false }: IslandModelProps) {
+/** 島の頂点を間引いて、島のグループ基準(回転・拡大の前)の座標で返す */
+function sampleIslandPoints(island: THREE.Object3D, group: THREE.Object3D) {
+  group.updateWorldMatrix(true, true);
+  const toGroup = new THREE.Matrix4().copy(group.matrixWorld).invert();
+  const matrix = new THREE.Matrix4();
+  const points: THREE.Vector3[] = [];
+  island.traverseVisible((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const position = child.geometry.getAttribute("position");
+    if (!position) return;
+    matrix.multiplyMatrices(toGroup, child.matrixWorld);
+    for (let i = 0; i < position.count; i += TABLET_VERTEX_STRIDE) {
+      points.push(
+        new THREE.Vector3().fromBufferAttribute(position, i).applyMatrix4(matrix)
+      );
+    }
+  });
+  return points;
+}
+
+/**
+ * タブレット用:島が回転のどの位置でも帯(band)に収まるよう、カメラの距離と描画の位置を決める。
+ * 見る角度は PC と同じ。距離を変えて大きさを合わせ、setViewOffset で帯の中央へ動かす
+ */
+function fitCameraToBand(
+  camera: THREE.PerspectiveCamera,
+  points: THREE.Vector3[],
+  groupMatrices: THREE.Matrix4[],
+  target: THREE.Vector3,
+  width: number,
+  height: number
+) {
+  const band = {
+    left: TABLET_SIDE_MARGIN_PX,
+    right: width - TABLET_SIDE_MARGIN_PX,
+    top: TABLET_TOP_RESERVE_PX,
+    bottom: Math.max(height - TABLET_BOTTOM_RESERVE_PX, TABLET_TOP_RESERVE_PX + 1),
+  };
+  const projected = new THREE.Vector3();
+  const measure = () => {
+    camera.updateMatrixWorld();
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const groupMatrix of groupMatrices) {
+      for (const point of points) {
+        projected.copy(point).applyMatrix4(groupMatrix).project(camera);
+        const x = (projected.x * 0.5 + 0.5) * width;
+        const y = (-projected.y * 0.5 + 0.5) * height;
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+      }
+    }
+    return { minX, maxX, minY, maxY };
+  };
+
+  camera.aspect = width / height;
+  camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+  let distance = DESKTOP_CAMERA_POSITION.length();
+  let rect = { minX: 0, maxX: width, minY: 0, maxY: height };
+  // 遠近があるので、距離と見えの大きさの比で数回合わせ込む
+  for (let i = 0; i < TABLET_FIT_ITERATIONS; i += 1) {
+    camera.position.copy(target).addScaledVector(DESKTOP_CAMERA_DIRECTION, distance);
+    camera.lookAt(target);
+    rect = measure();
+    const ratio = Math.max(
+      (rect.maxX - rect.minX) / (band.right - band.left),
+      (rect.maxY - rect.minY) / (band.bottom - band.top)
+    );
+    if (!Number.isFinite(ratio) || ratio <= 0) break;
+    distance *= ratio;
+  }
+  camera.position.copy(target).addScaledVector(DESKTOP_CAMERA_DIRECTION, distance);
+  camera.lookAt(target);
+  rect = measure();
+  // 正の値で描画範囲を右・下にずらす = 島が左・上に動く
+  camera.setViewOffset(
+    width,
+    height,
+    (rect.minX + rect.maxX) / 2 - (band.left + band.right) / 2,
+    (rect.minY + rect.maxY) / 2 - (band.top + band.bottom) / 2,
+    width,
+    height
+  );
+}
+
+export function IslandModel({
+  children,
+  isMobile = false,
+  isTablet = false,
+}: IslandModelProps) {
   const { scene } = useGLTF(isMobile ? MOBILE_MODEL_PATH : MODEL_PATH, "/draco/") as unknown as {
     scene: THREE.Group;
   };
@@ -111,8 +219,8 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
 
   const { camera, size: viewportSize } = useThree();
   const viewportHeight = viewportSize.height;
-  const shouldAutoFit = isMobile || viewportSize.width <= ADAPTIVE_FIT_MAX_WIDTH;
-  const isIntermediateViewport = !isMobile && shouldAutoFit;
+  // タブレットは PC の島の置き方のまま、カメラだけを合わせる(fitCameraToBand)
+  const shouldAutoFit = isMobile;
   const fitCameraFov = isMobile ? MOBILE_CAMERA_FOV : 55;
   const isCompactMobile = viewportHeight <= 720;
   const spRoom =
@@ -132,11 +240,7 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
       : SP_LOOKAT_Y_OFFSET
     : MOBILE_LOOKAT_Y_OFFSET;
   const mobileScale = isCompactMobile ? 3.12 : 2.63;
-  const mobilePositionX = isIntermediateViewport
-    ? -0.58
-    : isCompactMobile
-      ? -0.45
-      : -0.34;
+  const mobilePositionX = isCompactMobile ? -0.45 : -0.34;
   const islandSize = useMemo(() => {
     if (!islandObject) return null;
 
@@ -158,17 +262,10 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
       viewportSize.width /
       Math.max(viewportSize.width - MOBILE_HORIZONTAL_MARGIN, 1);
 
-    const projectionFactor = isIntermediateViewport ? 1.06 : 1;
-
-    return (
-      Math.max(horizontalDistance, verticalDistance) *
-      marginFactor *
-      projectionFactor
-    );
+    return Math.max(horizontalDistance, verticalDistance) * marginFactor;
   }, [
     fitCameraFov,
     islandSize,
-    isIntermediateViewport,
     mobileScale,
     shouldAutoFit,
     viewportSize.height,
@@ -187,6 +284,13 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   const introStartedRef = useRef(false);
   const introRef = useRef<{ elapsed: number; speed: number } | null>(null);
   const cameraBaseRef = useRef(new THREE.Vector3());
+  // カメラの注視点。オープニングの寄りはこの点を中心に行う(PC は原点)
+  const cameraTargetRef = useRef(new THREE.Vector3());
+  // 島の頂点の間引き結果(モデルが替わったら取り直す)
+  const tabletPointsRef = useRef<{
+    island: THREE.Object3D;
+    points: THREE.Vector3[];
+  } | null>(null);
   const scroll = useScroll();
   const setRotationComplete = useScrollProgressStore(
     (state) => state.setRotationComplete
@@ -220,6 +324,36 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
   useEffect(() => {
     if (!(camera instanceof THREE.PerspectiveCamera)) return;
 
+    cameraTargetRef.current.set(0, 0, 0);
+    const group = groupRef.current;
+    if (isTablet && group) {
+      if (tabletPointsRef.current?.island !== islandObject) {
+        tabletPointsRef.current = {
+          island: islandObject,
+          points: sampleIslandPoints(islandObject, group),
+        };
+      }
+      const finalScale = 3 * MODEL_BASE_SCALE_DESKTOP;
+      const groupMatrices = TABLET_FIT_ANGLES.map((angle) =>
+        new THREE.Matrix4().compose(
+          DESKTOP_ISLAND_POSITION,
+          new THREE.Quaternion().setFromAxisAngle(THREE.Object3D.DEFAULT_UP, angle),
+          new THREE.Vector3(finalScale, finalScale, finalScale)
+        )
+      );
+      cameraTargetRef.current.copy(DESKTOP_ISLAND_POSITION);
+      fitCameraToBand(
+        camera,
+        tabletPointsRef.current.points,
+        groupMatrices,
+        cameraTargetRef.current,
+        viewportSize.width,
+        viewportSize.height
+      );
+      camera.updateProjectionMatrix();
+      cameraBaseRef.current.copy(camera.position);
+      return;
+    }
     if (shouldAutoFit && mobileCameraDistance !== null) {
       camera.position
         .copy(isMobile ? SP_CAMERA_DIRECTION : MOBILE_CAMERA_DIRECTION)
@@ -251,6 +385,8 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
     cameraZoom,
     isCompactMobile,
     isMobile,
+    isTablet,
+    islandObject,
     lookAtYOffset,
     mobileCameraDistance,
     shouldAutoFit,
@@ -325,10 +461,13 @@ export function IslandModel({ children, isMobile = false }: IslandModelProps) {
       intro.elapsed += Math.min(dt, INTRO_MAX_FRAME_S) * intro.speed;
       const remaining = 1 - getIntroEase(intro.elapsed);
       groupRef.current.rotation.y = target + INTRO_ROTATION * remaining;
+      // 注視点から離れた位置から寄る(PC・SP の注視点は原点なので従来と同じ)
       camera.position
         .copy(cameraBaseRef.current)
-        .multiplyScalar(1 + (INTRO_DISTANCE_SCALE - 1) * remaining);
-      if (!shouldAutoFit) camera.lookAt(0, 0, 0);
+        .sub(cameraTargetRef.current)
+        .multiplyScalar(1 + (INTRO_DISTANCE_SCALE - 1) * remaining)
+        .add(cameraTargetRef.current);
+      if (!shouldAutoFit) camera.lookAt(cameraTargetRef.current);
       if (intro.elapsed >= INTRO_REVEAL_AT_S) revealIntroUi();
       if (intro.elapsed >= INTRO_DURATION_S) introRef.current = null;
     } else {

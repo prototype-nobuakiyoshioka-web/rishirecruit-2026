@@ -1,31 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, type CSSProperties } from "react";
 import type { AreaWithPosts } from "@/lib/wp/queries/areas";
 import { AREA_INFO } from "@/lib/constants/areas";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 import { AreaInfoPanel } from "./AreaInfoPanel";
 import { AreaPostSlider } from "./AreaPostSlider";
 import { useForwardScrollToIsland } from "./useForwardScrollToIsland";
+import { useSceneLayout } from "./useSceneLayout";
 
 interface AreaSidePanelsProps {
   areaData: Record<string, AreaWithPosts | null>;
-}
-
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
-    const updateMatches = () => setMatches(mediaQuery.matches);
-
-    updateMatches();
-    mediaQuery.addEventListener("change", updateMatches);
-
-    return () => mediaQuery.removeEventListener("change", updateMatches);
-  }, [query]);
-
-  return matches;
 }
 
 // 見えているエリアが変わったことをスクリーンリーダーに伝える
@@ -39,9 +24,11 @@ function AreaLiveStatus() {
 }
 
 export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  // マウント前は PC の配置で描く(従来どおり)
+  const layout = useSceneLayout() ?? "pc";
+  const isMobile = layout === "sp";
   const panelRef = useRef<HTMLDivElement>(null);
-  useForwardScrollToIsland(panelRef, isMobile);
+  useForwardScrollToIsland(panelRef, layout);
 
   if (isMobile) {
     return (
@@ -74,6 +61,53 @@ export function AreaSidePanels({ areaData }: AreaSidePanelsProps) {
           }}
         >
           <AreaPostSlider areaData={areaData} isMobile />
+        </div>
+      </div>
+      </>
+    );
+  }
+
+  if (layout === "tablet") {
+    return (
+      <>
+      <AreaLiveStatus />
+      {/* タブレット:エリアと投稿のパネルを画面の下に左右で並べ、上に島とピンを見せる。
+          部品と動き(線・タブ・ページ送り)は PC と同じ */}
+      <div
+        ref={panelRef}
+        data-intro-ui="panel"
+        className="fixed z-40 grid"
+        style={{
+          // エリアのパネルは説明の最長行(23字)が1行に収まる幅、投稿のパネルは PC と同じ幅。
+          // 768px では残りの幅を投稿のパネルに使う
+          "--tablet-area-panel-w": "22rem",
+          "--tablet-post-panel-w": "34rem",
+          // コラム看板(ColumnBoard: 下から 24+44px、高さ 64px)の上にエリアのパネルを置くための余白
+          // (並びの下端 24px からの距離)
+          "--tablet-board-clearance": "calc(44px + 64px + var(--space-4))",
+          left: "var(--space-6)",
+          right: "var(--space-6)",
+          bottom: "var(--space-6)",
+          gridTemplateColumns:
+            "minmax(0, var(--tablet-area-panel-w)) minmax(0, var(--tablet-post-panel-w))",
+          justifyContent: "space-between",
+          alignItems: "end",
+          columnGap: "var(--space-4)",
+          pointerEvents: "none",
+        } as CSSProperties}
+      >
+        {/* 左下のコラム看板(ColumnBoard)に重ならないよう、エリアのパネルはその上に置く */}
+        <div
+          style={{
+            minWidth: 0,
+            marginBottom: "var(--tablet-board-clearance)",
+            pointerEvents: "auto",
+          }}
+        >
+          <AreaInfoPanel isTablet />
+        </div>
+        <div style={{ minWidth: 0, pointerEvents: "auto" }}>
+          <AreaPostSlider areaData={areaData} isTablet />
         </div>
       </div>
       </>

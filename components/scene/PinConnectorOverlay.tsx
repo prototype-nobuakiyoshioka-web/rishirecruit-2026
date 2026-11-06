@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useActivePinPositionStore } from "@/store/active-pin-position-store";
+import { getSceneLayout } from "./useSceneLayout";
 
 // ピン外周からさらに離す余白（円と点線の間に空ける隙間、px）
 // 値を小さくすると dot がピンに近づき、大きくすると離れる
@@ -15,6 +16,7 @@ const PIN_EDGE_GAP = 12;
  * - rAF ループで store 直接読み + パネル DOM の getBoundingClientRect
  * - 描画は React 再レンダを避けて imperative に SVG 属性を書き換える
  * - SP は出さない(カードが横に動くため。選択中のピンは Pin 側で脈打たせる)
+ * - PC はパネルの左辺の中央、タブレット(パネルが画面下)は上辺の中央につなぐ
  * - パネルが不在 or ピンが視錐台外なら非表示
  */
 export function PinConnectorOverlay() {
@@ -25,6 +27,8 @@ export function PinConnectorOverlay() {
     let raf = 0;
     let lastX = -1;
     let lastY = -1;
+    let lastTargetX = -1;
+    let lastTargetY = -1;
     let lastVisible = false;
 
     const tick = () => {
@@ -45,28 +49,40 @@ export function PinConnectorOverlay() {
         '[data-pin-connector-target="area-info"]',
       );
 
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      const shouldShow = !isMobile && visible && target !== null;
+      const layout = getSceneLayout();
+      const shouldShow = layout !== "sp" && visible && target !== null;
 
       if (!shouldShow) {
         if (svg.style.opacity !== "0") svg.style.opacity = "0";
+        lastVisible = false;
         raf = requestAnimationFrame(tick);
         return;
       }
 
-      // 何も変化していなければ描画スキップ
-      if (Math.abs(pinX - lastX) < 0.5 && Math.abs(pinY - lastY) < 0.5 && lastVisible) {
+      const rect = target.getBoundingClientRect();
+      // PC はパネルが右にあるため左辺中央、タブレットは画面下にあるため上辺中央に終点を置く
+      const targetX =
+        layout === "tablet" ? rect.left + rect.width / 2 : rect.left;
+      const targetY =
+        layout === "tablet" ? rect.top : rect.top + rect.height / 2;
+
+      // ピンもパネルも動いていなければ描画スキップ
+      // (パネルは切り替え時のアニメーションや画面の回転で動く)
+      if (
+        lastVisible &&
+        Math.abs(pinX - lastX) < 0.5 &&
+        Math.abs(pinY - lastY) < 0.5 &&
+        Math.abs(targetX - lastTargetX) < 0.5 &&
+        Math.abs(targetY - lastTargetY) < 0.5
+      ) {
         raf = requestAnimationFrame(tick);
         return;
       }
       lastX = pinX;
       lastY = pinY;
+      lastTargetX = targetX;
+      lastTargetY = targetY;
       lastVisible = true;
-
-      const rect = target.getBoundingClientRect();
-      // パネルは右にあるため左辺中央に終点を置く
-      const targetX = rect.left;
-      const targetY = rect.top + rect.height / 2;
 
       // ピン中心 → パネルへの単位ベクトル
       const dx = targetX - pinX;

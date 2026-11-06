@@ -106,6 +106,8 @@ function ChevronRightIcon() {
 interface AreaPostSliderProps {
   areaData: Record<string, AreaWithPosts | null>;
   isMobile?: boolean;
+  /** タブレットの下部パネル。PC の部品のまま、写真を見出しの横に寄せて本文の幅を確保する */
+  isTablet?: boolean;
 }
 
 // 見た目は 32px のまま、押せる範囲を上下左右 6px ずつ広げて 44px にする(.hit-target)
@@ -184,6 +186,7 @@ function getSpotInfo(post: Touristspot): PostInfo {
 export function AreaPostSlider({
   areaData,
   isMobile = false,
+  isTablet = false,
 }: AreaPostSliderProps) {
   const areaSlug = useScrollProgressStore((state) => state.activeAreaSlug);
 
@@ -193,6 +196,7 @@ export function AreaPostSlider({
       areaSlug={areaSlug}
       areaData={areaData}
       isMobile={isMobile}
+      isTablet={isTablet}
     />
   );
 }
@@ -201,6 +205,7 @@ function AreaPostSliderContent({
   areaSlug,
   areaData,
   isMobile = false,
+  isTablet = false,
 }: AreaPostSliderContentProps) {
   const [activeTab, setActiveTab] = useState<TabType>("job");
   const [slideIndex, setSlideIndex] = useState(0);
@@ -446,9 +451,68 @@ function AreaPostSliderContent({
       </p>
     );
 
+  // PC 1スライド分の写真。タブレットは見出しの横に小さく置く(本文を全幅で読ませる)
+  const renderDesktopThumbnail = (slideInfo: PostInfo) =>
+    slideInfo.imageUrl ? (
+      <div
+        style={{
+          // 写真の上もカードのリンク(.stretched-link)として押せるようにする
+          pointerEvents: "none",
+          width: isTablet ? "6.5rem" : "clamp(9rem, 13.5vw, 12rem)",
+          height: isTablet ? "4.875rem" : "clamp(6rem, 15dvh, 8rem)",
+          position: "relative",
+          borderRadius: "var(--radius-md)",
+          overflow: "hidden",
+          background: "#E5E5E5",
+          flexShrink: 0,
+        }}
+      >
+        <Image
+          src={slideInfo.imageUrl}
+          alt={slideInfo.title}
+          fill
+          sizes={isTablet ? "104px" : undefined}
+          style={{ objectFit: "cover" }}
+        />
+      </div>
+    ) : null;
+
   // PC 1スライド分のコンテンツ
-  const renderDesktopSlide = (slideInfo: PostInfo | null) =>
-    slideInfo ? (
+  const renderDesktopSlide = (slideInfo: PostInfo | null) => {
+    if (!slideInfo) {
+      return (
+        <p style={{ color: "var(--c-text-secondary)" }}>
+          このエリアには該当する情報がありません。
+        </p>
+      );
+    }
+    const heading = (
+      <>
+        <h3
+          style={{
+            fontSize: "clamp(1rem, 2.2dvh, 1.15rem)",
+            fontWeight: 700,
+            color: "var(--c-deep-ocean)",
+            marginBottom: "clamp(var(--space-1), 1dvh, var(--space-2))",
+          }}
+        >
+          {slideInfo.title}
+        </h3>
+        {slideInfo.catchCopy && (
+          <p
+            style={{
+              fontSize: "clamp(0.82rem, 1.8dvh, 0.9rem)",
+              color: "var(--c-text-secondary)",
+              lineHeight: 1.55,
+              marginBottom: "clamp(var(--space-2), 2dvh, var(--space-4))",
+            }}
+          >
+            {slideInfo.catchCopy}
+          </p>
+        )}
+      </>
+    );
+    return (
       <div
         style={{
           display: "flex",
@@ -462,30 +526,22 @@ function AreaPostSliderContent({
             display: "flex",
             flexDirection: "column",
             alignSelf: "stretch",
-            minHeight: "clamp(9rem, 20dvh, 12rem)",
+            minHeight: isTablet ? "9rem" : "clamp(9rem, 20dvh, 12rem)",
           }}
         >
-          <h3
-            style={{
-              fontSize: "clamp(1rem, 2.2dvh, 1.15rem)",
-              fontWeight: 700,
-              color: "var(--c-deep-ocean)",
-              marginBottom: "clamp(var(--space-1), 1dvh, var(--space-2))",
-            }}
-          >
-            {slideInfo.title}
-          </h3>
-          {slideInfo.catchCopy && (
-            <p
+          {isTablet ? (
+            <div
               style={{
-                fontSize: "clamp(0.82rem, 1.8dvh, 0.9rem)",
-                color: "var(--c-text-secondary)",
-                lineHeight: 1.55,
-                marginBottom: "clamp(var(--space-2), 2dvh, var(--space-4))",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "var(--space-4)",
               }}
             >
-              {slideInfo.catchCopy}
-            </p>
+              <div style={{ flex: 1, minWidth: 0 }}>{heading}</div>
+              {renderDesktopThumbnail(slideInfo)}
+            </div>
+          ) : (
+            heading
           )}
           {(slideInfo.jobMeta || slideInfo.eventMeta) && (() => {
             // event の場合 scheduleEntries があれば「会場と日程」を縦積み、無ければ period + venueName の従来2行
@@ -565,34 +621,10 @@ function AreaPostSliderContent({
           </Link>
         </div>
 
-        {slideInfo.imageUrl && (
-          <div
-            style={{
-              // 写真の上もカードのリンク(.stretched-link)として押せるようにする
-              pointerEvents: "none",
-              width: "clamp(9rem, 13.5vw, 12rem)",
-              height: "clamp(6rem, 15dvh, 8rem)",
-              position: "relative",
-              borderRadius: "var(--radius-md)",
-              overflow: "hidden",
-              background: "#E5E5E5",
-              flexShrink: 0,
-            }}
-          >
-            <Image
-              src={slideInfo.imageUrl}
-              alt={slideInfo.title}
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-        )}
+        {!isTablet && renderDesktopThumbnail(slideInfo)}
       </div>
-    ) : (
-      <p style={{ color: "var(--c-text-secondary)" }}>
-        このエリアには該当する情報がありません。
-      </p>
     );
+  };
 
   // 遷移中は 2スライドが横並びのトラックとして描画、通常時は1スライドを直接。
   const renderSlideArea = (renderSlide: (i: PostInfo | null) => ReactNode) => {

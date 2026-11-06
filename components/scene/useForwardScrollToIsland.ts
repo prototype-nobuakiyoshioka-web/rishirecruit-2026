@@ -17,7 +17,8 @@ const MOMENTUM_MAX_IDLE_MS = 80;
  */
 export function useForwardScrollToIsland(
   ref: RefObject<HTMLElement | null>,
-  isMobile: boolean,
+  // 配置(SP / タブレット / PC)が変わるとパネルの要素が替わるので、付け直すために受け取る
+  layout: string,
 ) {
   useEffect(() => {
     const target = ref.current;
@@ -102,5 +103,5 @@ export function useForwardScrollToIsland(
       target.removeEventListener("touchmove", handleTouchMove);
       target.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [ref, isMobile]);
+  }, [ref, layout]);
 }

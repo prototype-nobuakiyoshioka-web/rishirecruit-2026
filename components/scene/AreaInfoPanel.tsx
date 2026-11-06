@@ -6,9 +6,14 @@ import { useScrollProgressStore } from "@/store/scroll-progress-store";
 
 interface AreaInfoPanelProps {
   isMobile?: boolean;
+  /** タブレットの下部パネル。幅が狭いので、説明の1行が折り返さない大きさにそろえる */
+  isTablet?: boolean;
 }
 
-export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
+export function AreaInfoPanel({
+  isMobile = false,
+  isTablet = false,
+}: AreaInfoPanelProps) {
   const areaSlug = useScrollProgressStore((state) => state.activeAreaSlug);
   const info = AREA_INFO[areaSlug];
   if (!info) return null;
@@ -33,7 +38,9 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
         borderRadius: "var(--radius-lg)",
         padding: isMobile
           ? "var(--space-2)"
-          : "clamp(var(--space-4), 2.5dvh, var(--space-6))",
+          : isTablet
+            ? "clamp(var(--space-4), 2.5dvh, var(--space-6)) var(--space-5)"
+            : "clamp(var(--space-4), 2.5dvh, var(--space-6))",
         boxShadow: "var(--shadow-md)",
         willChange: "transform, opacity",
       }}
@@ -138,7 +145,7 @@ export function AreaInfoPanel({ isMobile = false }: AreaInfoPanelProps) {
           <p
             key={line}
             style={{
-              fontSize: "clamp(0.82rem, 1.8dvh, 0.9rem)",
+              fontSize: isTablet ? "0.82rem" : "clamp(0.82rem, 1.8dvh, 0.9rem)",
               color: "var(--c-text-secondary)",
               lineHeight: 1.55,
             }}

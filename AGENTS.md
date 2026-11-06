@@ -192,13 +192,16 @@ useFrame((_, dt) => {
 - `pages`: **SP=1.5 / PC=6**(SP は早く鬼脇に届くよう短くしている)、`damping={0}`(慣性は `IslandModel` の `damp` 側で付ける)
 - `scroll.offset`(0〜1)を `components/scene/IslandModel.tsx` の `useFrame` で読み、次を決めている
   - 島の回転(上記 clamp → damp、±45°)
-  - SP / 中間幅のみ:島の x 位置を offset に合わせて少しずらす、`lookAt` を毎フレーム固定
+  - SP のみ:島の x 位置を offset に合わせて少しずらす、`lookAt` を毎フレーム固定
   - `offset < 0.5` → 鴛泊、それ以上 → 鬼脇(`activeAreaSlug` を store に保存し、パネル・スライダー・ピンが追従)
   - `offset >= 0.95`(`FOOTER_REVEAL_SCROLL_OFFSET`)→ フッター表示(`isRotationComplete`)
 - ヘッダーのナビは 1024px 以上で横並び、それ未満はメニューボタン(タブレット幅では6項目が1行に収まらないため)。トップの SP 判定とは別
 - pathname で出し分けるときは `usePathname` ではなく `useSitePathname`(`lib/utils/site-pathname.ts`)を使う。Vercel でトップを ISR で作り直すとサーバー側が `/index` になり、ハイドレーションに失敗するため
 - オープニングの状態は window に持ち、`<html data-intro>` へ写す。ハイドレーションに失敗して属性が消えても `IntroPhaseSync` が戻す
-- SP 判定は `(max-width: 767px)`。`IslandCanvas` と `AreaSidePanels` にそれぞれ書かれているので、変えるときは両方そろえる
+- トップの配置は3段階。判定は `components/scene/useSceneLayout.ts` の1か所にまとめてあり、`IslandCanvas`・`AreaSidePanels`・`PinConnectorOverlay` が使う(変えるときはここだけ直す)
+  - SP:`(max-width: 767px)`。下部カルーセル
+  - タブレット:`(min-width: 768px) and (max-width: 1279px)`(iPad の縦・横)。PC の部品(線・タブ・ページ送り)のまま、エリアのパネルを左下(コラム看板の上)、投稿のパネルを右下に並べる。投稿カードは写真を見出しの横に小さく置き、本文を全幅にする。島は PC と同じ置き方・角度で、`IslandModel` の `fitCameraToBand` がヘッダーとパネルの間の帯(`TABLET_TOP_RESERVE_PX` / `TABLET_BOTTOM_RESERVE_PX`)に、回転の両端と正面で収まるようカメラの距離と `setViewOffset` を決める。線はパネルの上辺の中央につなぐ
+  - PC:1280px 以上。右にパネル、線はパネルの左辺の中央につなぐ
 - SP の下部パネル(`AreaPostSlider` の SP 分岐)は横スクロール+`scroll-snap`。縦スクロール(島の回転)と指の操作がぶつかりやすいので、スクロール仕様を変えるときは実機またはモバイル表示で両方を確認する
 - カード上の縦スクロール(タッチ・ホイール)は `useForwardScrollToIsland` で島のスクロールに渡す。SP のパネルは `touch-action: pan-x` で、横はカルーセルに任せる
 - 詳細から戻ったときは `lastScrollOffset`(store)から位置を復元する(`IslandModel`)。ScrollControls の内部要素は store の `scrollElement` で参照できる
