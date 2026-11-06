@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 type YTPlayer = {
   playVideo(): void;
@@ -175,7 +176,7 @@ export function VoiceVideoPlayer({ videoId, title }: Props) {
               onClick={handleReplay}
               className="mt-2 inline-flex min-h-11 items-center rounded-full border border-[color:var(--c-ice)] px-6 py-2 text-sm font-black text-[color:var(--c-text-inverse)] transition hover:bg-white/10"
             >
-              もう一度見る →
+              もう一度見る<TextArrow />
             </button>
           </div>
         ) : null}

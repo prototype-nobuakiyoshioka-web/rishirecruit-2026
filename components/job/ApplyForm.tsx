@@ -8,6 +8,7 @@ import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
 import { Turnstile } from "@/components/ui/Turnstile";
 import { focusFirstError } from "@/lib/forms/focus-first-error";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 // CF7 求人応募フォームの数値ID（管理画面の post=ID）
 const CF7_APPLY_ID = process.env.NEXT_PUBLIC_CF7_APPLY_ID ?? "177";
@@ -313,7 +314,7 @@ export function ApplyForm({ jobTitle, jobSlug }: ApplyFormProps) {
           href="/jobs"
           className="mt-[var(--space-6)] inline-flex min-h-11 items-center font-bold text-[color:var(--c-deep-ocean)] hover:underline"
         >
-          他の求人を見る →
+          他の求人を見る<TextArrow />
         </Link>
       </section>
     );

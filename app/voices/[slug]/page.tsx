@@ -13,6 +13,7 @@ import {
   getTestimonialBySlug,
   getTestimonials,
 } from "@/lib/wp/queries/voices";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -192,7 +193,7 @@ export default async function VoiceDetailPage({ params }: PageProps) {
               href="/voices"
               className="hit-target [--hit-y:-12px] text-sm font-bold text-[color:var(--c-ice)] hover:underline md:text-base"
             >
-              ← 移住者の声一覧へ
+              <TextArrow direction="left" />移住者の声一覧へ
             </Link>
           </div>
         </aside>

@@ -7,6 +7,7 @@ import { selectFirst } from "@/lib/wp/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { getJobPostings } from "@/lib/wp/queries/jobs";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 export const metadata: Metadata = buildMetadata({
   title: "利尻富士町の求人",
@@ -55,7 +56,7 @@ export default async function JobsPage() {
                       <div key={item.label} className="grid grid-cols-[6rem_1fr] gap-4 border-b border-[color:var(--c-deep-ocean)]/15 py-3"><dt className="text-[color:var(--c-text-secondary)]">{item.label}</dt><dd className="font-bold text-[color:var(--c-text-primary)]">{item.value || "—"}</dd></div>
                     ))}
                   </dl>
-                  <Link href={`/jobs/${job.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">募集要項を見る →</Link>
+                  <Link href={`/jobs/${job.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">募集要項を見る<TextArrow /></Link>
                 </div>
               </article>
             );

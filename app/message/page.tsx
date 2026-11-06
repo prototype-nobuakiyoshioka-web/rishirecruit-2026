@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { buildMetadata } from "@/lib/seo";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 export const metadata: Metadata = buildMetadata({
   title: "利尻富士町で働くということ",
@@ -211,10 +212,10 @@ export default function MessagePage() {
           </div>
           <div className="relative mx-auto mt-10 flex max-w-[1080px] flex-wrap gap-x-8 gap-y-6 border-t border-white/15 pt-8 text-sm font-bold text-[color:var(--c-ice)] md:text-base">
             <Link href="/voices" className="hit-target [--hit-y:-12px] hover:underline">
-              移住者の声を読む →
+              移住者の声を読む<TextArrow />
             </Link>
             <Link href="/contact" className="hit-target [--hit-y:-12px] hover:underline">
-              応募前に相談する →
+              応募前に相談する<TextArrow />
             </Link>
           </div>
         </aside>

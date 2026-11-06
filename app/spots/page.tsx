@@ -7,6 +7,7 @@ import { selectFirst } from "@/lib/wp/format";
 import { SPOT_CATEGORY_LABELS } from "@/lib/wp/labels";
 import { getTouristspots } from "@/lib/wp/queries/spots";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 export const metadata: Metadata = buildMetadata({ title: "利尻島の観光地", description: "利尻島の観光地と、島で暮らす人の身近な風景を紹介します。", path: "/spots" });
 
@@ -42,13 +43,13 @@ export default async function SpotsPage() {
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-[color:var(--c-accent-text)]">{category ? SPOT_CATEGORY_LABELS[category] ?? category : "Spot"}</p>
                   <h2 className="mt-2 text-2xl font-black text-[color:var(--c-deep-ocean)] md:text-3xl">{spot.title}</h2>
                   {fields?.catchCopy ? <p className="mt-2 leading-7 text-[color:var(--c-text-secondary)]">{fields.catchCopy}</p> : null}
-                  <Link href={`/spots/${spot.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">この場所を知る →</Link>
+                  <Link href={`/spots/${spot.slug}`} className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 font-black text-[color:var(--c-deep-ocean)]">この場所を知る<TextArrow /></Link>
                 </div>
               </article>
             );
           })}
         </div>
-        <div className="mt-20 border-t border-[color:var(--c-deep-ocean)]/15 pt-10"><Link href="/jobs" className="hit-target [--hit-y:-12px] font-black text-[color:var(--c-deep-ocean)] hover:underline">この島で働く →</Link></div>
+        <div className="mt-20 border-t border-[color:var(--c-deep-ocean)]/15 pt-10"><Link href="/jobs" className="hit-target [--hit-y:-12px] font-black text-[color:var(--c-deep-ocean)] hover:underline">この島で働く<TextArrow /></Link></div>
       </section>
     </EditorialIndexShell>
   );

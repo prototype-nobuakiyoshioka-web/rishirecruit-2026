@@ -16,6 +16,7 @@ import { EMPLOYMENT_TYPE_LABELS } from "@/lib/wp/labels";
 import { formatEventPeriod, formatScheduleEntries } from "@/lib/utils/format-date";
 import { useScrollProgressStore } from "@/store/scroll-progress-store";
 import { AreaInfoPanel } from "./AreaInfoPanel";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 type TabType = "job" | "event" | "spot";
 
@@ -447,7 +448,7 @@ function AreaPostSliderContent({
               color: "var(--c-deep-ocean)",
             }}
           >
-            詳細を見る →
+            詳細を見る<TextArrow />
           </Link>
         </div>
 
@@ -655,7 +656,7 @@ function AreaPostSliderContent({
               alignSelf: "flex-start",
             }}
           >
-            詳細を見る →
+            詳細を見る<TextArrow />
           </Link>
         </div>
 

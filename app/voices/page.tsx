@@ -10,6 +10,7 @@ import { getTestimonials } from "@/lib/wp/queries/voices";
 import { getVoiceVideos } from "@/lib/wp/queries/voice-videos";
 import { extractYouTubeVideoId, fetchYouTubeOEmbed } from "@/lib/utils/youtube";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 export const metadata: Metadata = buildMetadata({
   title: "移住者の声",
@@ -176,7 +177,7 @@ export default async function VoicesPage() {
                         href={`/voices/${voice.slug}`}
                         className="mt-4 inline-flex min-h-11 items-center border-b border-[color:var(--c-deep-ocean)] pb-1 text-base font-black text-[color:var(--c-deep-ocean)] transition-opacity hover:opacity-65"
                       >
-                        この人の話を読む →
+                        この人の話を読む<TextArrow />
                       </Link>
                     </div>
                   </article>

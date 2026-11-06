@@ -9,6 +9,7 @@ import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
 import { Turnstile } from "@/components/ui/Turnstile";
 import { focusFirstError } from "@/lib/forms/focus-first-error";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 // CF7 お問い合わせフォームの数値ID（管理画面の post=ID）
 const CF7_CONTACT_ID = process.env.NEXT_PUBLIC_CF7_CONTACT_ID ?? "176";
@@ -185,8 +186,8 @@ export default function ContactPage() {
               内容を確認のうえ、ご入力いただいたメールアドレスへご連絡します。
             </p>
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-4 font-black text-[color:var(--c-deep-ocean)]">
-              <Link href="/jobs" className="hover:underline">募集中の仕事を見る →</Link>
-              <Link href="/" className="hover:underline">トップへ戻る →</Link>
+              <Link href="/jobs" className="hover:underline">募集中の仕事を見る<TextArrow /></Link>
+              <Link href="/" className="hover:underline">トップへ戻る<TextArrow /></Link>
             </div>
           </div>
         ) : (

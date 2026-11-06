@@ -4,6 +4,7 @@ import { EditorialIndexShell } from "@/components/ui/EditorialIndexShell";
 import { buildMetadata } from "@/lib/seo";
 import { fetchNoteArticles } from "@/lib/note/fetch-articles";
 import { gridSpanClass } from "@/lib/utils/grid-spans";
+import { TextArrow } from "@/components/ui/TextArrow";
 
 export const metadata: Metadata = buildMetadata({
   title: "島ぐらしコラム",
@@ -110,7 +111,7 @@ export default async function ColumnsPage() {
             href="/jobs"
             className="hit-target [--hit-y:-12px] font-black text-[color:var(--c-deep-ocean)] hover:underline"
           >
-            この島で働く →
+            この島で働く<TextArrow />
           </Link>
         </div>
       </section>
