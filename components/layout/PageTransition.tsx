@@ -1,7 +1,8 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useSitePathname } from "@/lib/utils/site-pathname";
 
 type TransitionPhase = "idle" | "covering" | "revealing";
 
@@ -31,7 +32,7 @@ function copyForPath(pathname: string) {
 }
 
 export function PageTransition() {
-  const pathname = usePathname();
+  const pathname = useSitePathname();
   const router = useRouter();
   const [phase, setPhase] = useState<TransitionPhase>("idle");
   const [copy, setCopy] = useState(DEFAULT_COPY);

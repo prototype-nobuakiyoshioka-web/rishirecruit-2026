@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { useSitePathname } from "@/lib/utils/site-pathname";
 import type { CSSProperties } from "react";
 import {
   FooterCopyright,
@@ -71,7 +71,7 @@ function FooterContent({ compact = false }: { compact?: boolean }) {
 }
 
 export function Footer() {
-  const pathname = usePathname();
+  const pathname = useSitePathname();
   const isRotationComplete = useScrollProgressStore(
     (state) => state.isRotationComplete
   );

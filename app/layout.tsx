@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { IntroPhaseSync } from "@/components/layout/IntroPhaseSync";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { GA_ID } from "@/lib/analytics";
 import { INTRO_BOOT_SCRIPT } from "@/lib/three/island-intro";
@@ -70,6 +71,7 @@ export default function RootLayout({
     <html lang="ja" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
+        <IntroPhaseSync />
         <Header />
         <PageTransition />
         {children}

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
 import { useState } from "react";
 import {
@@ -11,6 +10,7 @@ import {
   FooterOfficeInfo,
 } from "@/components/layout/FooterInfo";
 import { SITE_NAME } from "@/lib/seo";
+import { useSitePathname } from "@/lib/utils/site-pathname";
 
 const NAV_ITEMS = [
   { label: "メッセージ", href: "/message" },
@@ -49,7 +49,7 @@ function isActivePath(pathname: string, href: string) {
 }
 
 export function Header() {
-  const pathname = usePathname();
+  const pathname = useSitePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -58,7 +58,7 @@ export function Header() {
       style={HEADER_SHELL_STYLE}
     >
       <div
-        className="flex h-14 items-center justify-between border border-[color:var(--c-border-subtle)] backdrop-blur-md md:h-16"
+        className="flex h-14 items-center justify-between border border-[color:var(--c-border-subtle)] backdrop-blur-md lg:h-16"
         style={HEADER_CONTAINER_STYLE}
       >
         <Link
@@ -78,7 +78,7 @@ export function Header() {
           <span>リシリクルート</span>
         </Link>
 
-        <nav className="hidden items-center md:flex" style={DESKTOP_NAV_STYLE}>
+        <nav className="hidden items-center lg:flex" style={DESKTOP_NAV_STYLE}>
           {NAV_ITEMS.map((item) => {
             const isActive = isActivePath(pathname, item.href);
 
@@ -101,7 +101,7 @@ export function Header() {
 
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-full)] text-[color:var(--c-deep-ocean)] transition-colors hover:bg-[color:var(--c-border-subtle)] md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-full)] text-[color:var(--c-deep-ocean)] transition-colors hover:bg-[color:var(--c-border-subtle)] lg:hidden"
           aria-label={isMobileMenuOpen ? "メニューを閉じる" : "メニューを開く"}
           aria-expanded={isMobileMenuOpen}
           aria-controls="mobile-navigation"
@@ -134,7 +134,7 @@ export function Header() {
         // 88px = mobile header height(56px) + shell top padding(16px) + menu gap(16px)。
         <nav
           id="mobile-navigation"
-          className="mx-auto mt-[var(--space-2)] grid max-h-[calc(100vh-88px)] max-w-[var(--container-max)] gap-[var(--space-2)] overflow-y-auto rounded-[var(--radius-2xl)] border border-[color:var(--c-border-subtle)] p-[var(--space-2)] backdrop-blur-md md:hidden"
+          className="mx-auto mt-[var(--space-2)] grid max-h-[calc(100vh-88px)] max-w-[var(--container-max)] gap-[var(--space-2)] overflow-y-auto rounded-[var(--radius-2xl)] border border-[color:var(--c-border-subtle)] p-[var(--space-2)] backdrop-blur-md lg:hidden"
           style={MOBILE_MENU_STYLE}
         >
           {NAV_ITEMS.map((item) => {

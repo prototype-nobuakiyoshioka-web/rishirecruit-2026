@@ -195,6 +195,9 @@ useFrame((_, dt) => {
   - SP / 中間幅のみ:島の x 位置を offset に合わせて少しずらす、`lookAt` を毎フレーム固定
   - `offset < 0.5` → 鴛泊、それ以上 → 鬼脇(`activeAreaSlug` を store に保存し、パネル・スライダー・ピンが追従)
   - `offset >= 0.95`(`FOOTER_REVEAL_SCROLL_OFFSET`)→ フッター表示(`isRotationComplete`)
+- ヘッダーのナビは 1024px 以上で横並び、それ未満はメニューボタン(タブレット幅では6項目が1行に収まらないため)。トップの SP 判定とは別
+- pathname で出し分けるときは `usePathname` ではなく `useSitePathname`(`lib/utils/site-pathname.ts`)を使う。Vercel でトップを ISR で作り直すとサーバー側が `/index` になり、ハイドレーションに失敗するため
+- オープニングの状態は window に持ち、`<html data-intro>` へ写す。ハイドレーションに失敗して属性が消えても `IntroPhaseSync` が戻す
 - SP 判定は `(max-width: 767px)`。`IslandCanvas` と `AreaSidePanels` にそれぞれ書かれているので、変えるときは両方そろえる
 - SP の下部パネル(`AreaPostSlider` の SP 分岐)は横スクロール+`scroll-snap`。縦スクロール(島の回転)と指の操作がぶつかりやすいので、スクロール仕様を変えるときは実機またはモバイル表示で両方を確認する
 - カード上の縦スクロール(タッチ・ホイール)は `useForwardScrollToIsland` で島のスクロールに渡す。SP のパネルは `touch-action: pan-x` で、横はカルーセルに任せる
