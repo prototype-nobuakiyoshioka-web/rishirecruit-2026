@@ -21,6 +21,7 @@ const JOB_POSTING_CARD_FIELDS = gql`
       catchCopy
       salary
       workHours
+      housingSupportAvailable
       pinLocation
       thumbnailImage {
         node {
