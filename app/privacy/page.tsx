@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FooterOfficeInfo } from "@/components/layout/FooterInfo";
+import { LegalDocument, type LegalSection } from "@/components/ui/LegalDocument";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -10,12 +10,7 @@ export const metadata: Metadata = buildMetadata({
 
 // 本文の原稿：project/利尻富士-リシリクルート2026/プライバシーポリシー_本文_2026-11-16.md
 // 本文の中の章番号の参照（「7. 〜を参照」など）は、章の並びを変えたら一緒に直す。
-type PrivacyBlock =
-  | { kind: "p"; text: string }
-  | { kind: "h3"; text: string }
-  | { kind: "ul"; items: (string | { label: string; text: string })[] };
-
-const PRIVACY_SECTIONS: { title: string; blocks: PrivacyBlock[] }[] = [
+const PRIVACY_SECTIONS: LegalSection[] = [
   {
     title: "1. 基本方針",
     blocks: [
@@ -177,75 +172,15 @@ const PRIVACY_SECTIONS: { title: string; blocks: PrivacyBlock[] }[] = [
   },
 ];
 
-const BODY_TEXT = "text-base leading-8 text-[color:var(--c-text-secondary)]";
-const H2_CLASS = "text-xl font-bold tracking-normal text-[color:var(--c-text-primary)]";
-
-function PrivacyBlockView({ block }: { block: PrivacyBlock }) {
-  if (block.kind === "h3") {
-    return (
-      <h3 className="mt-[var(--space-5)] text-base font-bold tracking-normal text-[color:var(--c-text-primary)]">
-        {block.text}
-      </h3>
-    );
-  }
-  if (block.kind === "ul") {
-    return (
-      <ul className={`mt-[var(--space-2)] list-disc space-y-[var(--space-2)] pl-[1.25em] marker:text-[color:var(--c-deep-ocean)] ${BODY_TEXT}`}>
-        {block.items.map((item) =>
-          typeof item === "string" ? (
-            <li key={item}>{item}</li>
-          ) : (
-            <li key={item.label}>
-              <span className="font-bold text-[color:var(--c-text-primary)]">{item.label}</span>
-              <span className="block">{item.text}</span>
-            </li>
-          ),
-        )}
-      </ul>
-    );
-  }
-  return <p className={`mt-[var(--space-3)] ${BODY_TEXT}`}>{block.text}</p>;
-}
-
 export default function PrivacyPage() {
   return (
-    <main className="bg-[color:var(--c-paper)]">
-      <section className="pt-[calc(var(--space-6)*6)] pb-[calc(var(--space-6)*2)]">
-        <div className="mx-auto max-w-[720px] px-[var(--space-6)]">
-          <h1 className="text-phrase text-4xl font-bold leading-tight tracking-normal text-[color:var(--c-text-primary)] md:text-6xl">
-            プライバシー<wbr />ポリシー
-          </h1>
-        </div>
-      </section>
-
-      <article className="mx-auto max-w-[720px] px-[var(--space-6)] pb-[calc(var(--space-6)*4)]">
-        <p className={BODY_TEXT}>
-          利尻富士町役場（以下「当町」といいます。）は、リシリクルート2026（https://www.rishirecruit.com 、以下「当サイト」といいます。）をご利用いただく方の個人情報を、次の方針に基づいて取り扱います。
-        </p>
-
-        <div className="mt-[var(--space-6)] grid gap-[calc(var(--space-6)*1.5)]">
-          {PRIVACY_SECTIONS.map((section) => (
-            <section key={section.title}>
-              <h2 className={H2_CLASS}>{section.title}</h2>
-              {section.blocks.map((block, index) => (
-                <PrivacyBlockView key={index} block={block} />
-              ))}
-            </section>
-          ))}
-
-          <section>
-            <h2 className={H2_CLASS}>12. お問い合わせ先</h2>
-            <p className={`mt-[var(--space-3)] ${BODY_TEXT}`}>
-              個人情報の取り扱いに関するお問い合わせは、次の窓口までお願いします。
-            </p>
-            <FooterOfficeInfo className={`mt-[var(--space-3)] ${BODY_TEXT}`} />
-          </section>
-        </div>
-
-        <p className="mt-[calc(var(--space-6)*2)] border-t border-[color:var(--c-border-subtle)] pt-[var(--space-4)] text-sm leading-6 text-[color:var(--c-text-secondary)]">
-          制定日：2026年11月16日
-        </p>
-      </article>
-    </main>
+    <LegalDocument
+      title={<>プライバシー<wbr />ポリシー</>}
+      intro="利尻富士町役場（以下「当町」といいます。）は、リシリクルート2026（https://www.rishirecruit.com 、以下「当サイト」といいます。）をご利用いただく方の個人情報を、次の方針に基づいて取り扱います。"
+      sections={PRIVACY_SECTIONS}
+      contactTitle="12. お問い合わせ先"
+      contactLead="個人情報の取り扱いに関するお問い合わせは、次の窓口までお願いします。"
+      enactedOn="2026年11月16日"
+    />
   );
 }
