@@ -30,7 +30,7 @@ export function FooterCopyright({ className = "" }: { className?: string }) {
     <p className={["tracking-normal", className].join(" ")}>
       © 2026 rishirecruit ・ 利尻富士町
       <span className="mt-2 block text-[10px] leading-relaxed">
-        3D地形：<a href="https://maps.gsi.go.jp/development/ichiran.html" className="underline">国土地理院</a>の標高タイルを加工 ／ 地図データ：© <a href="https://www.openstreetmap.org/copyright" className="underline">OpenStreetMap contributors</a>
+        3D地形：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener noreferrer" className="underline">国土地理院<span className="sr-only">(新しいタブで開きます)</span></a>の標高タイルを加工 ／ 地図データ：© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="underline">OpenStreetMap contributors<span className="sr-only">(新しいタブで開きます)</span></a>
       </span>
     </p>
   );
