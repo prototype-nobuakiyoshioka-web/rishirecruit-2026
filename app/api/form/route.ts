@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sanitizeInflowFields } from "@/lib/forms/inflow";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { submitCf7, type Cf7Response } from "@/lib/wp/submit-cf7";
 
@@ -16,6 +17,7 @@ type FormRequest = {
   fields?: Record<string, string>;
   turnstileToken?: string;
   honeypot?: string;
+  inflow?: Record<string, string>;
 };
 
 // フォーム送信をサーバー側で受け、Turnstile検証+最小バリデーションを通してからCF7へ中継する。
@@ -31,7 +33,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { formId, fields, turnstileToken, honeypot } = payload;
+  const { formId, fields, turnstileToken, honeypot, inflow } = payload;
 
   // ハニーポット: 人間は空のまま。値が入っていればボットとみなし、成功を装って静かに破棄する。
   if (honeypot) {
@@ -72,8 +74,13 @@ export async function POST(request: Request) {
   const safeFields: Record<string, string> = {};
   for (const [key, value] of Object.entries(fields)) {
     if (key.startsWith("_wpcf7")) continue;
+    // 流入元は下でサーバー側の値だけを入れる(画面の項目からは受け取らない)
+    if (key.startsWith("inflow_")) continue;
     safeFields[key] = typeof value === "string" ? value : String(value);
   }
+
+  // 流入元を添える。CF7 はフォームに定義のない項目を無視するため、WP 側の設定前でも送信は失敗しない。
+  Object.assign(safeFields, sanitizeInflowFields(inflow));
 
   try {
     const result = await submitCf7(formId, safeFields);

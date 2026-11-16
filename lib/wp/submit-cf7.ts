@@ -5,6 +5,8 @@
  * を返すため、ここで一括付与する。フロントからは name→値 のマップだけ渡せばよい。
  */
 
+import { readInflowFields } from "@/lib/forms/inflow-storage";
+
 // WordPress のベース URL（GraphQL とは別。CF7 REST は /wp-json 配下）
 const WP_BASE_URL =
   process.env.NEXT_PUBLIC_WP_BASE_URL ?? "http://rishirecruit-2026.local";
@@ -52,6 +54,7 @@ export function isCf7Success(result: Cf7Response): boolean {
  * フォームを Next.js の API ルート（/api/form）経由で送信する。
  * サーバー側で Turnstile 検証とバリデーションを通してから CF7 へ中継されるため、
  * クライアントからは CF7 を直接叩かない（ボット対策・secret秘匿）。
+ * 流入元（inflow）は画面の項目とは別に添え、サーバー側で受け取り直して CF7 へ渡す。
  */
 export async function submitForm(
   formId: string,
@@ -62,7 +65,13 @@ export async function submitForm(
   const res = await fetch("/api/form", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ formId, fields, turnstileToken, honeypot }),
+    body: JSON.stringify({
+      formId,
+      fields,
+      turnstileToken,
+      honeypot,
+      inflow: readInflowFields(),
+    }),
   });
   return (await res.json()) as Cf7Response;
 }

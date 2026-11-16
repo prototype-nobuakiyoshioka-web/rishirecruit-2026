@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { InflowCapture } from "@/components/layout/InflowCapture";
 import { IntroPhaseSync } from "@/components/layout/IntroPhaseSync";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { GA_ID } from "@/lib/analytics";
@@ -72,6 +73,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
         <IntroPhaseSync />
+        <InflowCapture />
         <Header />
         <PageTransition />
         {children}
